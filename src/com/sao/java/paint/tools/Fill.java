@@ -1,6 +1,9 @@
 package com.sao.java.paint.tools;
 
 import java.util.Stack;
+
+import com.sao.java.paint.divcompat.ColorPalette;
+
 import java.awt.image.BufferedImage;
 import java.awt.Point;
 
@@ -60,4 +63,10 @@ public class Fill extends ColorDrawingTool
     {
             return "Fill";
     }
+
+@Override
+public void setPalette(ColorPalette cp) {
+        // TODO Auto-generated method stub
+        
+}
 }

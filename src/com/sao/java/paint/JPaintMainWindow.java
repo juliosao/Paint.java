@@ -7,10 +7,14 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+
+import javax.imageio.ImageIO;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 
 import com.sao.java.paint.ui.ColorListener;
 import com.sao.java.paint.divcompat.ColorPalette;
@@ -21,8 +25,11 @@ import com.sao.java.paint.ui.ColorGammaBar;
 import com.sao.java.paint.ui.ColorProvider;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -31,6 +38,11 @@ import javax.swing.JSlider;
 public class JPaintMainWindow extends JFrame
     implements WindowListener, ToolBoxListener, ColorListener
 {
+    static FileNameExtensionFilter filters[] = new FileNameExtensionFilter[]{ 
+        new FileNameExtensionFilter("All Images", "JPEG","JPG","PNG"),
+        new FileNameExtensionFilter("JPEG Image", "JPEG","JPG"),
+        new FileNameExtensionFilter("PNG Image", "PNG"),
+    };
     DrawingPanel drawingPanel;
     ToolBox toolbox;
     ColorPickerDialog colorPicker = null;
@@ -117,10 +129,23 @@ public class JPaintMainWindow extends JFrame
         JMenuItem mnu = new JMenuItem("New...");
         menuFile.add(mnu);
         mnu = new JMenuItem("Open...");
+        mnu.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                openPicture();
+            }
+        });
         menuFile.add(mnu);
+        
         mnu = new JMenuItem("Save...");
         menuFile.add(mnu);
+        
         mnu = new JMenuItem("Save As...");
+        mnu.addActionListener(new java.awt.event.ActionListener(){
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                savePictureAs();
+            }
+        });
         menuFile.add(mnu);
         mnu = new JMenuItem("Exit");
         menuFile.add(mnu);
@@ -185,5 +210,67 @@ public class JPaintMainWindow extends JFrame
     @Override
     public void setColorProvider(ColorProvider cp) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public void openPicture()
+    {
+        try
+        {
+            JFileChooser fileChooser = new JFileChooser();            
+            fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+            for(FileNameExtensionFilter filter: filters)
+            {
+                fileChooser.setFileFilter(filter);
+            }
+            
+            
+            int result = fileChooser.showOpenDialog(JPaintMainWindow.this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                BufferedImage bi = ImageIO.read(selectedFile);
+                drawingPanel.setImage(bi);
+            }
+        }
+        catch(Exception ex)
+        {
+            JOptionPane.showMessageDialog(JPaintMainWindow.this, "Cannot open file");
+        }
+    }
+
+    public void savePictureAs()
+    {
+        try
+        {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+            fileChooser.setDialogTitle("Save image as...");
+            fileChooser.setApproveButtonText("Save");
+            for(FileNameExtensionFilter filter: filters)
+            {
+                fileChooser.setFileFilter(filter);
+            }
+            fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+            int result = fileChooser.showOpenDialog(JPaintMainWindow.this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File f = fileChooser.getSelectedFile();
+                int index = f.getName().lastIndexOf('.');
+                String mode = "png";
+                if (index > 0) {
+                    mode = f.getName().substring(index + 1).toLowerCase();
+                }
+                ImageIO.write(drawingPanel.getImage(), mode ,f );
+            }
+        }
+        catch(Exception ex)
+        {
+            JOptionPane.showMessageDialog(JPaintMainWindow.this, "Cannot open file");
+        }
+    }
+
+
+    @Override
+    public void setPalette(ColorPalette cp) {
+        // TODO Auto-generated method stub
+        
     }
 }

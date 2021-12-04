@@ -2,6 +2,7 @@ package com.sao.java.paint.tools;
 
 import java.awt.image.BufferedImage;
 
+import com.sao.java.paint.divcompat.ColorPalette;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -58,6 +59,12 @@ public class Ellipse
 	public String getDescription()
 	{
 		return "Ellipse";
+	}
+
+	@Override
+	public void setPalette(ColorPalette cp) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -1,6 +1,9 @@
 package com.sao.java.paint.tools;
 
 import java.awt.image.BufferedImage;
+
+import com.sao.java.paint.divcompat.ColorPalette;
+
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.BasicStroke;
@@ -39,5 +42,11 @@ public class Pencil extends ColorDrawingTool
     public String getDescription()
     {
 	    return "Pencil";
+    }
+
+    @Override
+    public void setPalette(ColorPalette cp) {
+      // TODO Auto-generated method stub
+      
     }
 }

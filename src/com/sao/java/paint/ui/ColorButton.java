@@ -11,6 +11,8 @@ import java.awt.event.ActionEvent;
 import java.util.HashSet;
 import javax.swing.JButton;
 
+import com.sao.java.paint.divcompat.ColorPalette;
+
 
 /**
  *
@@ -96,6 +98,13 @@ public class ColorButton
         {
             cp.setStrokeColor(color);
         }
+    }
+
+
+    @Override
+    public void setPalette(ColorPalette cp) {
+        // TODO Auto-generated method stub
+        
     }
     
 }

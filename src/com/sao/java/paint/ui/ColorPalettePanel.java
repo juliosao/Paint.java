@@ -103,5 +103,12 @@ public class ColorPalettePanel
     public void removeColorListener(ColorListener cl) {
         colorListeners.remove(cl);
     }
+
+
+    @Override
+    public void setPalette(ColorPalette cp) {
+        // TODO Auto-generated method stub
+        
+    }
     
 }

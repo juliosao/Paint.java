@@ -114,4 +114,10 @@ public class ColorGammaBar
         }
     }
 
+    @Override
+    public void setPalette(ColorPalette cp) {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

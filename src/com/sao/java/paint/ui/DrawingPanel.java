@@ -89,9 +89,10 @@ public class DrawingPanel
     }
 
     public void setImage(BufferedImage img)
-    {        
-        updateScrolls();
+    {                
         image = img;
+        updateScrolls();
+        updateUI();
     }
 
     public BufferedImage getImage()

@@ -339,4 +339,10 @@ public class ColorPickerDialog
             cp.setStrokeColor(color);
         }
     }
+
+    @Override
+    public void setPalette(ColorPalette cp) {
+        // TODO Auto-generated method stub
+        
+    }
 }

@@ -29,6 +29,7 @@ import java.io.File;
 
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
@@ -39,9 +40,10 @@ public class JPaintMainWindow extends JFrame
     implements WindowListener, ToolBoxListener, ColorListener
 {
     static FileNameExtensionFilter filters[] = new FileNameExtensionFilter[]{ 
-        new FileNameExtensionFilter("All Images", "JPEG","JPG","PNG"),
+        new FileNameExtensionFilter("All Images", "JPEG","JPG","PNG","BMP"),
         new FileNameExtensionFilter("JPEG Image", "JPEG","JPG"),
         new FileNameExtensionFilter("PNG Image", "PNG"),
+        new FileNameExtensionFilter("BMP Image", "BMP"),
     };
     DrawingPanel drawingPanel;
     ToolBox toolbox;
@@ -52,13 +54,15 @@ public class JPaintMainWindow extends JFrame
     JSlider zoomer;
     DrawingTool drawingTool;
     ColorPalette palette = new ColorPalette();
+    File currentFile = null;
+    static final String TITLE = "Paint.java v0.1";
 
 
     public JPaintMainWindow()
     {
         super();
 
-        setTitle("JPaint v0.1");
+        setTitle(TITLE);
 
         Container c = getContentPane();
         BorderLayout bl = new BorderLayout();
@@ -75,12 +79,12 @@ public class JPaintMainWindow extends JFrame
         c.add(createBotomToolBar(),BorderLayout.SOUTH);
         
         toolbox = new ToolBox(this);
-	c.add(toolbox,BorderLayout.WEST);               
+	    c.add(toolbox,BorderLayout.WEST);               
 
         createMenus();
         
-        
-	setSize(800,600);
+	    setSize(800,600);
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(this);
     }
     
@@ -116,7 +120,7 @@ public class JPaintMainWindow extends JFrame
         Graphics2D g = (Graphics2D)image.createGraphics();
         g.setPaint(Color.WHITE);
         g.fillRect ( 0, 0, image.getWidth(), image.getHeight() );
-	g.dispose();
+	    g.dispose();
         return image;
     }
         
@@ -138,6 +142,11 @@ public class JPaintMainWindow extends JFrame
         menuFile.add(mnu);
         
         mnu = new JMenuItem("Save...");
+        mnu.addActionListener(new java.awt.event.ActionListener(){
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                savePicture();
+            }
+        });
         menuFile.add(mnu);
         
         mnu = new JMenuItem("Save As...");
@@ -148,6 +157,12 @@ public class JPaintMainWindow extends JFrame
         });
         menuFile.add(mnu);
         mnu = new JMenuItem("Exit");
+        mnu.addActionListener(new java.awt.event.ActionListener(){
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                
+            }
+        });
+        
         menuFile.add(mnu);
 
         setJMenuBar(menuBar);
@@ -160,8 +175,16 @@ public class JPaintMainWindow extends JFrame
 
     @Override
     public void windowClosing(WindowEvent we) {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        System.exit(0);
+        switch (JOptionPane.showConfirmDialog(JPaintMainWindow.this, "Do you want to save picture?", 
+        "Exit paint.java", JOptionPane.YES_NO_CANCEL_OPTION)) {
+            case JOptionPane.CANCEL_OPTION:
+                return;
+            case JOptionPane.YES_OPTION:
+                savePicture();
+            default:
+                System.exit(0);
+                break;
+        }
     }
 
     @Override
@@ -212,6 +235,9 @@ public class JPaintMainWindow extends JFrame
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    /**
+     * Shows open dile dialog and loads image from selected file
+     */
     public void openPicture()
     {
         try
@@ -229,6 +255,8 @@ public class JPaintMainWindow extends JFrame
                 File selectedFile = fileChooser.getSelectedFile();
                 BufferedImage bi = ImageIO.read(selectedFile);
                 drawingPanel.setImage(bi);
+                currentFile = selectedFile;
+                this.setTitle(TITLE + " - " + currentFile.getName());
             }
         }
         catch(Exception ex)
@@ -237,6 +265,47 @@ public class JPaintMainWindow extends JFrame
         }
     }
 
+    /**
+     * Saves current picture to the desired file
+     * @param f File where to save the current picture
+     */
+    public void savePicture(File f)
+    {
+        try
+        {
+            int index = f.getName().lastIndexOf('.');
+            String mode = "png";
+            if (index > 0) {
+                mode = f.getName().substring(index + 1).toLowerCase();
+            }
+            ImageIO.write(drawingPanel.getImage(), mode ,f );
+            currentFile = f;
+            this.setTitle(TITLE + " - " + currentFile.getName());
+        }
+        catch(Exception ex)
+        {
+            JOptionPane.showMessageDialog(JPaintMainWindow.this, "Cannot save file");
+        }
+    }
+
+    /**
+     * Saves current picture to file. Asking for file if needed
+     */
+    public void savePicture()
+    {
+        if(currentFile != null)
+        {
+            savePicture(currentFile);
+        }
+        else
+        {
+            savePictureAs();
+        }
+    }
+
+    /**
+     * Shows save as Dialog and saves image in the selected file
+     */
     public void savePictureAs()
     {
         try
@@ -252,13 +321,7 @@ public class JPaintMainWindow extends JFrame
             fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
             int result = fileChooser.showOpenDialog(JPaintMainWindow.this);
             if (result == JFileChooser.APPROVE_OPTION) {
-                File f = fileChooser.getSelectedFile();
-                int index = f.getName().lastIndexOf('.');
-                String mode = "png";
-                if (index > 0) {
-                    mode = f.getName().substring(index + 1).toLowerCase();
-                }
-                ImageIO.write(drawingPanel.getImage(), mode ,f );
+                savePicture(fileChooser.getSelectedFile());                
             }
         }
         catch(Exception ex)

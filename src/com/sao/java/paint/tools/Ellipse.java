@@ -1,9 +1,6 @@
 package com.sao.java.paint.tools;
 
 import java.awt.image.BufferedImage;
-
-import com.sao.java.paint.divcompat.ColorPalette;
-
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.BasicStroke;
@@ -24,7 +21,7 @@ public class Ellipse
 		tmpG.dispose();
 
 		g = (Graphics2D)image.getGraphics();
-		g.setColor(strokeColor);
+		g.setColor(colorProvider.getStrokeColor());
 		g.setStroke(new BasicStroke(3));
 		old=me.getPoint();
 		g.drawOval(old.x, old.y, 0, 0 );
@@ -61,10 +58,5 @@ public class Ellipse
 		return "Ellipse";
 	}
 
-	@Override
-	public void setPalette(ColorPalette cp) {
-		// TODO Auto-generated method stub
-		
-	}
 
 }

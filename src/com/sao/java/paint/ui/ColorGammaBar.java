@@ -12,7 +12,6 @@ import java.awt.GridLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashSet;
 import javax.swing.Box.Filler;
 import javax.swing.JPanel;
 
@@ -22,35 +21,47 @@ import javax.swing.JPanel;
  */
 public class ColorGammaBar
     extends JPanel
-    implements ColorListener, ColorProvider, ActionListener
+    implements ColorProvider, Coloreable
 {
     ColorButton strokeButton;
     ColorButton[] colorButtons;
     ColorPalette palette;
     ColorProvider colorProvider = null;
-    HashSet<ColorListener> colorListeners = new HashSet<>();
-    
-    public ColorGammaBar(ColorPalette p)
+        
+    public ColorGammaBar(ColorProvider p)
     {
+        colorProvider = p;
         setLayout(new GridLayout(1,ColorGamma.NUMCOLORS+2));
         
+        /**
+         * Stroke Button
+         */
         strokeButton = new ColorButton(Color.black);
-        strokeButton.addActionListener(this);
+        strokeButton.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                askForStrokeColor(); 
+            }
+        });
         add(strokeButton);
         
+        /**
+         * Color gamma buttons
+         */
         Dimension d = new Dimension(10,10);
-		add(new Filler(d,d,d));
-
-
-        palette = p;
-        ColorGamma gamma = palette.getGamma(Color.black);
-
+		add(new Filler(d,d,d));        
+        ColorGamma gamma = colorProvider.getColorPalette().getGamma(Color.black);
         colorButtons = new ColorButton[ColorGamma.NUMCOLORS];
 
         for(int i=0; i<ColorGamma.NUMCOLORS; i++)
         {
             ColorButton c = new ColorButton(gamma.getColor(i));
-            c.addColorListener(this);
+            c.addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    setStrokeColor(c.getStrokeColor());
+                }
+            });
             add(c);
             colorButtons[i] = c;
         }
@@ -59,39 +70,14 @@ public class ColorGammaBar
     @Override
     public void setStrokeColor(Color c) {
         strokeButton.setBackground(c);
-        dispatchStrokeColor();
-    }
-
-
-    @Override
-    public void actionPerformed(ActionEvent e) 
-    {
-       askForStrokeColor();
-    }
-    
-    /**
-     * Adds a listener for color events
-     * @param c Listener for the color events
-     */
-    public void addColorListener(ColorListener c)
-    {
-        colorListeners.add(c);
-    }
-    
-    /**
-     * Removes a listener for color events
-     * @param c Listener to remove
-     */
-    public void removeColorListener(ColorListener c)    
-    {
-        colorListeners.remove(c);
-    }
-  
-
-    @Override
-    public void setColorProvider(ColorProvider cp) {
-        colorProvider = cp;
-        cp.addColorListener(this);
+        if(colorProvider != null)
+        {
+            ColorGamma gamma = colorProvider.getColorPalette().getGamma(c);
+            for(int i=0; i<ColorGamma.NUMCOLORS; i++)
+            {
+                colorButtons[i].setStrokeColor(gamma.getColor(i));
+            }
+        }
     }
     
     @Override
@@ -102,22 +88,21 @@ public class ColorGammaBar
     @Override
     public void askForStrokeColor() {
         if(colorProvider != null )
-            colorProvider.askForStrokeColor();               
-    }
-
-    @Override
-    public void dispatchStrokeColor() {
-        Color c = strokeButton.getBackground();
-        for(ColorListener cl: colorListeners)
         {
-            cl.setStrokeColor(c);
+			colorProvider.setStrokeColor(getStrokeColor());
+            colorProvider.askForStrokeColor(); 
+            setStrokeColor(colorProvider.getStrokeColor());
         }
+
     }
 
     @Override
-    public void setPalette(ColorPalette cp) {
-        // TODO Auto-generated method stub
-        
+    public void setColorProvider(ColorProvider cp) {
+        colorProvider = cp;
     }
-
+    
+    @Override
+    public ColorPalette getColorPalette() {
+        return colorProvider.getColorPalette();
+    }
 }

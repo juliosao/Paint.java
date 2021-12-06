@@ -2,28 +2,33 @@ package com.sao.java.paint;
 
 import com.sao.java.paint.ui.DrawingPanel;
 import com.sao.java.paint.dialogs.ColorPickerDialog;
+import com.sao.java.paint.dialogs.NewImageDialog;
+
 import java.awt.BorderLayout;
-import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.Container;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
-import com.sao.java.paint.ui.ColorListener;
 import com.sao.java.paint.divcompat.ColorPalette;
 import com.sao.java.paint.ui.ToolBox;
 import com.sao.java.paint.ui.ToolBoxListener;
 import com.sao.java.paint.tools.DrawingTool;
 import com.sao.java.paint.ui.ColorGammaBar;
 import com.sao.java.paint.ui.ColorProvider;
-import java.awt.Graphics2D;
+import com.sao.java.paint.ui.Coloreable;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 
@@ -37,7 +42,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  * @author julio
  */
 public class JPaintMainWindow extends JFrame
-    implements WindowListener, ToolBoxListener, ColorListener
+    implements WindowListener, Coloreable, ToolBoxListener
 {
     static FileNameExtensionFilter filters[] = new FileNameExtensionFilter[]{ 
         new FileNameExtensionFilter("All Images", "JPEG","JPG","PNG","BMP"),
@@ -45,6 +50,8 @@ public class JPaintMainWindow extends JFrame
         new FileNameExtensionFilter("PNG Image", "PNG"),
         new FileNameExtensionFilter("BMP Image", "BMP"),
     };
+	static int windowCount = 0;
+
     DrawingPanel drawingPanel;
     ToolBox toolbox;
     ColorPickerDialog colorPicker = null;
@@ -53,6 +60,8 @@ public class JPaintMainWindow extends JFrame
     JMenu menuFile;
     JSlider zoomer;
     DrawingTool drawingTool;
+    Container container;
+    ColorProvider colorProvider;
     ColorPalette palette = new ColorPalette();
     File currentFile = null;
     static final String TITLE = "Paint.java v0.1";
@@ -61,26 +70,19 @@ public class JPaintMainWindow extends JFrame
     public JPaintMainWindow()
     {
         super();
-
+		windowCount += 1;
         setTitle(TITLE);
 
-        Container c = getContentPane();
+        container = getContentPane();
         BorderLayout bl = new BorderLayout();
         setLayout(bl);
         
         palette = new ColorPalette();
         colorPicker = new ColorPickerDialog(this, palette);                
         
-        drawingPanel=new DrawingPanel();
-        drawingPanel.setSize(800,600);    
-        drawingPanel.setImage(createImg(640,480));
-        c.add(drawingPanel,BorderLayout.CENTER);
-        
-        c.add(createBotomToolBar(),BorderLayout.SOUTH);
-        
-        toolbox = new ToolBox(this);
-	    c.add(toolbox,BorderLayout.WEST);               
-
+        createDrawingPanel();
+        createBotomToolBar();
+        createToolBox();
         createMenus();
         
 	    setSize(800,600);
@@ -88,41 +90,56 @@ public class JPaintMainWindow extends JFrame
         addWindowListener(this);
     }
     
-    
-    private JPanel createBotomToolBar()
+    private void createDrawingPanel()
     {
-        JPanel container = new JPanel();
-        container.setLayout(new BorderLayout());
+        drawingPanel=new DrawingPanel();
+        drawingPanel.setSize(800,600);    
+        //drawingPanel.setImage(createImg(640,480));
+        container.add(drawingPanel,BorderLayout.CENTER);
+    }
+
+    private void createToolBox()
+    {
+        toolbox = new ToolBox(this);
+        toolbox.setColorProvider(colorToolbar);
+	    container.add(toolbox,BorderLayout.WEST);
+    }
+    
+    private void createBotomToolBar()
+    {
+        JPanel pnl = new JPanel();
+        pnl.setLayout(new FlowLayout());
         
-        colorToolbar = new ColorGammaBar(palette);
+        colorToolbar = new ColorGammaBar(colorPicker);
         colorToolbar.setColorProvider(colorPicker);        
-        container.add(colorToolbar,BorderLayout.CENTER);
-        colorToolbar.addColorListener(this);
-        colorToolbar.dispatchStrokeColor();
+        pnl.add(colorToolbar);//,BorderLayout.CENTER);
         
+
+		JLabel jlbl = new JLabel("Zoom:");
+		pnl.add(jlbl);
+
+		JLabel lblZoom = new JLabel("100 %");
+
         zoomer = new JSlider(10,1000);
         zoomer.setValue(100);
         zoomer.addChangeListener(new javax.swing.event.ChangeListener() {
             @Override
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 drawingPanel.setZoom(zoomer.getValue());
+				lblZoom.setText(""+zoomer.getValue()+" %");
             }
         });
-        container.add(zoomer,BorderLayout.EAST);
+        pnl.add(zoomer);//,BorderLayout.EAST);
+		
+		pnl.add(lblZoom);
         
-        return container;
+        container.add(pnl,BorderLayout.SOUTH);
     }
-    
-    
-    protected BufferedImage createImg(int height, int width)
-    {
-        BufferedImage image = new BufferedImage(height, width, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = (Graphics2D)image.createGraphics();
-        g.setPaint(Color.WHITE);
-        g.fillRect ( 0, 0, image.getWidth(), image.getHeight() );
-	    g.dispose();
-        return image;
-    }
+
+	public void setImage(BufferedImage bi)
+	{
+		drawingPanel.setImage(bi);		
+	}
         
     private void createMenus()
     {
@@ -131,35 +148,49 @@ public class JPaintMainWindow extends JFrame
         menuBar.add(menuFile);
 
         JMenuItem mnu = new JMenuItem("New...");
+		mnu.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				NewImageDialog nid = new NewImageDialog(JPaintMainWindow.this);
+				nid.setVisible(true);
+				if(nid.getResult() == NewImageDialog.OK)
+				{
+					JPaintMainWindow jpmw = new JPaintMainWindow();
+					jpmw.setImage(nid.getImage());					
+        			jpmw.setVisible(true);
+				}
+			}
+		});
+
         menuFile.add(mnu);
         mnu = new JMenuItem("Open...");
-        mnu.addActionListener(new java.awt.event.ActionListener()
+        mnu.addActionListener(new ActionListener()
         {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(ActionEvent evt) {
                 openPicture();
             }
         });
         menuFile.add(mnu);
         
         mnu = new JMenuItem("Save...");
-        mnu.addActionListener(new java.awt.event.ActionListener(){
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        mnu.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
                 savePicture();
             }
         });
         menuFile.add(mnu);
         
         mnu = new JMenuItem("Save As...");
-        mnu.addActionListener(new java.awt.event.ActionListener(){
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        mnu.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
                 savePictureAs();
             }
         });
         menuFile.add(mnu);
         mnu = new JMenuItem("Exit");
-        mnu.addActionListener(new java.awt.event.ActionListener(){
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                
+        mnu.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                dispatchEvent(new WindowEvent(JPaintMainWindow.this, WindowEvent.WINDOW_CLOSING));
             }
         });
         
@@ -182,14 +213,17 @@ public class JPaintMainWindow extends JFrame
             case JOptionPane.YES_OPTION:
                 savePicture();
             default:
-                System.exit(0);
+				setVisible(false);
+				windowCount--;
+				if(windowCount == 0)
+                	System.exit(0);
                 break;
         }
     }
 
     @Override
     public void windowClosed(WindowEvent we) {
-
+		dispose();
     }
 
     @Override
@@ -216,23 +250,11 @@ public class JPaintMainWindow extends JFrame
     public void onToolSelected(DrawingTool t) {
         drawingTool = t;
         drawingPanel.setDrawingTool(t);
-        if(drawingTool instanceof ColorListener)
-        {
-            ((ColorListener)drawingTool).setStrokeColor(colorToolbar.getStrokeColor());
-        }
-    }
-
-    @Override
-    public void setStrokeColor(Color c) {
-        if(drawingTool instanceof ColorListener)
-        {
-            ((ColorListener)drawingTool).setStrokeColor(c);
-        }
     }
 
     @Override
     public void setColorProvider(ColorProvider cp) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        colorProvider = cp;
     }
 
     /**
@@ -248,8 +270,7 @@ public class JPaintMainWindow extends JFrame
             {
                 fileChooser.setFileFilter(filter);
             }
-            
-            
+
             int result = fileChooser.showOpenDialog(JPaintMainWindow.this);
             if (result == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fileChooser.getSelectedFile();
@@ -277,6 +298,10 @@ public class JPaintMainWindow extends JFrame
             String mode = "png";
             if (index > 0) {
                 mode = f.getName().substring(index + 1).toLowerCase();
+            }
+            else
+            {
+                f = new File(f.getAbsolutePath()+"."+mode);
             }
             ImageIO.write(drawingPanel.getImage(), mode ,f );
             currentFile = f;
@@ -319,7 +344,7 @@ public class JPaintMainWindow extends JFrame
                 fileChooser.setFileFilter(filter);
             }
             fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
-            int result = fileChooser.showOpenDialog(JPaintMainWindow.this);
+            int result = fileChooser.showSaveDialog(JPaintMainWindow.this);
             if (result == JFileChooser.APPROVE_OPTION) {
                 savePicture(fileChooser.getSelectedFile());                
             }
@@ -330,10 +355,4 @@ public class JPaintMainWindow extends JFrame
         }
     }
 
-
-    @Override
-    public void setPalette(ColorPalette cp) {
-        // TODO Auto-generated method stub
-        
-    }
 }

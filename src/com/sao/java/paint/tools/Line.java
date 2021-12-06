@@ -23,7 +23,7 @@ public class Line extends ColorDrawingTool
         tmpG.dispose();
 
         g = (Graphics2D)image.getGraphics();
-        g.setColor(strokeColor);
+        g.setColor(colorProvider.getStrokeColor());
         g.setStroke(new BasicStroke(3));
         old=me.getPoint();
         g.drawLine(old.x, old.y, old.x, old.y );
@@ -51,9 +51,4 @@ public class Line extends ColorDrawingTool
             return "Line";
     }
 
-    @Override
-    public void setPalette(ColorPalette cp) {
-        // TODO Auto-generated method stub
-        
-    }
 }

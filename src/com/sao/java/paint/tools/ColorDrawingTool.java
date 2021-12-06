@@ -5,9 +5,8 @@
  */
 package com.sao.java.paint.tools;
 
-import com.sao.java.paint.ui.ColorListener;
 import com.sao.java.paint.ui.ColorProvider;
-import java.awt.Color;
+import com.sao.java.paint.ui.Coloreable;
 
 /**
  *
@@ -15,19 +14,12 @@ import java.awt.Color;
  */
 public abstract class ColorDrawingTool 
         extends DrawingTool
-        implements ColorListener
+        implements Coloreable
 {
-    protected Color strokeColor = Color.BLACK;
-    private ColorProvider colorProvider = null;
-    
-    @Override
-    public void setStrokeColor(Color c) {
-        strokeColor = c;
-    }
+    protected ColorProvider colorProvider = null;
     
     @Override
     public void setColorProvider(ColorProvider cp) {
         colorProvider = cp;
-        colorProvider.addColorListener(this);
     }
 }

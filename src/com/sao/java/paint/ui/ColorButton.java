@@ -7,8 +7,6 @@ package com.sao.java.paint.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.util.HashSet;
 import javax.swing.JButton;
 
 import com.sao.java.paint.divcompat.ColorPalette;
@@ -20,10 +18,9 @@ import com.sao.java.paint.divcompat.ColorPalette;
  */
 public class ColorButton 
         extends JButton
-        implements ColorProvider, ColorListener
+        implements ColorProvider, Coloreable
 {
     ColorProvider colorProvider = null;
-    HashSet<ColorListener> colorListeners = new HashSet<>();
 
     /**
      * Class constructor
@@ -44,32 +41,9 @@ public class ColorButton
         setMinimumSize(s);
         setPreferredSize(s);
         setFocusPainted(false);
-        addActionListener((ActionEvent e) -> {
-            ColorButton.this.dispatchStrokeColor();
-        });
-    }
-  
-    
-    /**
-     * Adds a listener for color events
-     * @param c Listener for the color events
-     */
-    @Override
-    public void addColorListener(ColorListener c)
-    {        
-        colorListeners.add(c);
-    }
-    
-    /**
-     * Removes a listener for color events
-     * @param c Listener to remove
-     */
-    @Override
-    public void removeColorListener(ColorListener c)    
-    {
-        colorListeners.remove(c);
     }
 
+    
     @Override
     public void setStrokeColor(Color c) {
         setBackground(c);
@@ -91,20 +65,11 @@ public class ColorButton
             colorProvider.askForStrokeColor();
     }
 
-    @Override
-    public void dispatchStrokeColor() {
-        Color color = getBackground();
-        for(ColorListener cp: colorListeners)
-        {
-            cp.setStrokeColor(color);
-        }
-    }
-
 
     @Override
-    public void setPalette(ColorPalette cp) {
-        // TODO Auto-generated method stub
-        
+    public ColorPalette getColorPalette() {
+        return colorProvider.getColorPalette();
     }
+
     
 }

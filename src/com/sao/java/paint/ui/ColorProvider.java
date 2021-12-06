@@ -7,6 +7,8 @@ package com.sao.java.paint.ui;
 
 import java.awt.Color;
 
+import com.sao.java.paint.divcompat.ColorPalette;
+
 /**
  *
  * @author Julio
@@ -17,6 +19,12 @@ public interface ColorProvider {
      * @return The actual stroke color
      */
     Color getStrokeColor();
+
+    /**
+     * Sets actual stroke color
+     * @return The actual stroke color
+     */
+    void setStrokeColor(Color c);
     
     /**
      * Causes color provider ask to parent color providers for color
@@ -24,20 +32,9 @@ public interface ColorProvider {
     void askForStrokeColor();
     
     /**
-     * Causes color provider to setup stroke color for all color listeners
+     * Returns current color palette
+     * @return Current color palette
      */
-    void dispatchStrokeColor();
-    
-    /**
-     * Adds new ColorListener to the set of listeners to manage
-     * @param cl The ColorListener to add
-     */
-    void addColorListener(ColorListener cl);
-    
-    /**
-     * Remove a ColorListener from the set of listeners to manage
-     * @param cl The ColorListener to remove
-     */
-    void removeColorListener(ColorListener cl);
-    
+    ColorPalette getColorPalette();
+
 }

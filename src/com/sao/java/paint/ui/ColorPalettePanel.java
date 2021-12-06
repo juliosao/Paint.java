@@ -10,7 +10,6 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashSet;
 import javax.swing.JPanel;
 
 /**
@@ -18,11 +17,10 @@ import javax.swing.JPanel;
  */
 public class ColorPalettePanel 
         extends JPanel
-        implements ColorProvider, ColorListener, ActionListener {
+        implements ColorProvider, Coloreable, ActionListener {
     
     int idx = 0;
     ColorButton buttons[] = new ColorButton[ColorPalette.NUMCOLORS];
-    HashSet<ColorListener> colorListeners = new HashSet<>();
     ColorProvider colorProvider = null;
     
     
@@ -36,7 +34,6 @@ public class ColorPalettePanel
             add(b);
         }
     }
-    
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -46,19 +43,15 @@ public class ColorPalettePanel
             if(src == buttons[i])
             {
                 idx = i;
-                dispatchStrokeColor();
-                break;
+                colorProvider.setStrokeColor(buttons[i].getStrokeColor());
+                return;
             }
         }
     }
 
     @Override
     public void askForStrokeColor() 
-    {        
-        if(colorProvider != null)
-        {
-            colorProvider.askForStrokeColor();
-        }        
+    {
     }
 
     @Override
@@ -69,15 +62,10 @@ public class ColorPalettePanel
             if(buttons[i].getBackground().equals(c))
             {
                 idx = i;
+                colorProvider.setStrokeColor(c);
                 return;
             }
         }
-        dispatchStrokeColor();
-    }
-
-    @Override
-    public void setColorProvider(ColorProvider cp) {
-        colorProvider = cp;
     }
 
     @Override
@@ -86,29 +74,12 @@ public class ColorPalettePanel
     }
 
     @Override
-    public void dispatchStrokeColor() {
-        Color c = buttons[idx].getBackground();
-        for(ColorListener colorListener: colorListeners)
-        {
-            colorListener.setStrokeColor(c);
-        }
-    }
-
-    @Override
-    public void addColorListener(ColorListener cl) {
-        colorListeners.add(cl);
-    }
-
-    @Override
-    public void removeColorListener(ColorListener cl) {
-        colorListeners.remove(cl);
-    }
-
-
-    @Override
-    public void setPalette(ColorPalette cp) {
-        // TODO Auto-generated method stub
-        
+    public void setColorProvider(ColorProvider cp) {
+        colorProvider = cp;
     }
     
+    @Override
+    public ColorPalette getColorPalette() {
+        return colorProvider.getColorPalette();
+    }
 }

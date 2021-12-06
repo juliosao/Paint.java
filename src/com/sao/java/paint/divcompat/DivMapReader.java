@@ -9,10 +9,9 @@ import javax.imageio.ImageReader;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.metadata.IIOMetadata;
 
+/*
 public class DivMapReader extends ImageReader {
 {
-    
-}
 
 @Override
 public int getNumImages(boolean allowSearch) throws IOException {
@@ -55,3 +54,6 @@ public BufferedImage read(int imageIndex, ImageReadParam param) throws IOExcepti
     // TODO Auto-generated method stub
     return null;
 }
+
+}
+*/

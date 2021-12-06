@@ -17,7 +17,7 @@ public class Pencil extends ColorDrawingTool
     public void onMousePressed(BufferedImage image, DrawingMouseEvent me)
     {
 		g = (Graphics2D)image.getGraphics();
-		g.setColor(strokeColor);
+		g.setColor(colorProvider.getStrokeColor());
 		g.setStroke(new BasicStroke(3));
 		old=me.getPoint();
 		g.drawLine(old.x, old.y, old.x, old.y);
@@ -44,9 +44,4 @@ public class Pencil extends ColorDrawingTool
 	    return "Pencil";
     }
 
-    @Override
-    public void setPalette(ColorPalette cp) {
-      // TODO Auto-generated method stub
-      
-    }
 }

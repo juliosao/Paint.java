@@ -65,7 +65,6 @@ public class JPaintMainWindow extends JFrame
     Container container;
     ColorProvider colorProvider;
 	StrokeProvider strokeProvider = new BasicStrokeProvider();
-    ColorPalette palette = new ColorPalette();
     File currentFile = null;
     static final String TITLE = "Paint.java v0.1";
 
@@ -80,8 +79,7 @@ public class JPaintMainWindow extends JFrame
         BorderLayout bl = new BorderLayout();
         setLayout(bl);
         
-        palette = new ColorPalette();
-        colorPicker = new ColorPickerDialog(this, palette);                
+        colorPicker = new ColorPickerDialog(this, new ColorPalette());                
         
         createDrawingPanel();
         createBotomToolBar();

@@ -18,6 +18,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -87,8 +88,9 @@ public class ColorPickerDialog
 				ColorPickerDialog.this.setVisible(false);				
 			}
 		});
+		jp.add(btnOk);
 
-		JButton btnCancel = new JButton("Ok");
+		JButton btnCancel = new JButton("Cancel");
 		btnCancel.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {				
@@ -96,7 +98,7 @@ public class ColorPickerDialog
 			}
 		});
 
-		jp.add(btnOk);
+		jp.add(btnCancel);
 		add(jp,BorderLayout.SOUTH);
 	}
 
@@ -113,10 +115,22 @@ public class ColorPickerDialog
 		
 		JPanel pnlPalette = new JPanel();
 		pnlPalette.setBorder(BorderFactory.createTitledBorder("Palette"));
+		pnlPalette.setLayout(new BoxLayout(pnlPalette,BoxLayout.Y_AXIS));
+
 		colorPalettePanel = new ColorPalettePanel(palette);
 		colorPalettePanel.setColorProvider(this);
 		pnlPalette.add(colorPalettePanel);
 		jp.add(pnlPalette);
+
+		JButton btnLoad = new JButton("Load palette...");
+		btnLoad.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+
+		});
+		pnlPalette.add(btnLoad);
 		
 		add(jp,BorderLayout.CENTER);
 	}

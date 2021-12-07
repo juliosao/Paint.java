@@ -12,11 +12,13 @@ import com.sao.java.paint.tools.Ellipse;
 import com.sao.java.paint.tools.Line;
 import com.sao.java.paint.tools.Pencil;
 import com.sao.java.paint.tools.Rectangle;
+import com.sao.java.paint.tools.Strokable;
+import com.sao.java.paint.tools.StrokeProvider;
 import com.sao.java.paint.tools.Fill;
 
 public class ToolBox
 	extends JPanel
-    implements Coloreable
+    implements Coloreable, Strokable
 {
 	ToolBoxListener lst;
 	DrawingTool[] tools;
@@ -62,4 +64,15 @@ public class ToolBox
             }
         }        
     }
+
+	@Override
+	public void setStrokeProvider(StrokeProvider sp) {
+		for (final DrawingTool t: tools)   
+        {
+            if(t instanceof Strokable)   
+            {
+                ((Strokable)t).setStrokeProvider(sp);
+            }
+        }  		
+	}
 }

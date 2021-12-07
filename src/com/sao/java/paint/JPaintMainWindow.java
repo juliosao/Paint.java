@@ -25,6 +25,8 @@ import com.sao.java.paint.divcompat.ColorPalette;
 import com.sao.java.paint.ui.ToolBox;
 import com.sao.java.paint.ui.ToolBoxListener;
 import com.sao.java.paint.tools.DrawingTool;
+import com.sao.java.paint.tools.StrokeProvider;
+import com.sao.java.paint.tools.BasicStrokeProvider;
 import com.sao.java.paint.ui.ColorGammaBar;
 import com.sao.java.paint.ui.ColorProvider;
 import com.sao.java.paint.ui.Coloreable;
@@ -62,6 +64,7 @@ public class JPaintMainWindow extends JFrame
     DrawingTool drawingTool;
     Container container;
     ColorProvider colorProvider;
+	StrokeProvider strokeProvider = new BasicStrokeProvider();
     ColorPalette palette = new ColorPalette();
     File currentFile = null;
     static final String TITLE = "Paint.java v0.1";
@@ -102,6 +105,7 @@ public class JPaintMainWindow extends JFrame
     {
         toolbox = new ToolBox(this);
         toolbox.setColorProvider(colorToolbar);
+		toolbox.setStrokeProvider(strokeProvider);
 	    container.add(toolbox,BorderLayout.WEST);
     }
     
@@ -134,6 +138,26 @@ public class JPaintMainWindow extends JFrame
 		pnl.add(lblZoom);
         
         container.add(pnl,BorderLayout.SOUTH);
+
+		jlbl = new JLabel(" - Width:");
+		pnl.add(jlbl);
+		JLabel lblWidth = new JLabel("1 px");
+
+        JSlider jslWidth = new JSlider(1,100);
+        jslWidth.setValue(1);
+        jslWidth.addChangeListener(new javax.swing.event.ChangeListener() {
+            @Override
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+				if(strokeProvider instanceof BasicStrokeProvider)
+				{
+                	((BasicStrokeProvider)strokeProvider).setWidth(jslWidth.getValue());
+					lblWidth.setText(""+jslWidth.getValue()+" px");
+				}
+            }
+        });
+
+		pnl.add(jslWidth);
+        pnl.add(lblWidth);//,BorderLayout.EAST);
     }
 
 	public void setImage(BufferedImage bi)

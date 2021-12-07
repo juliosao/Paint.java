@@ -3,13 +3,16 @@ package com.sao.java.paint.tools;
 import java.awt.image.BufferedImage;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.BasicStroke;
 
-public class Rectangle extends ColorDrawingTool
+
+public class Rectangle 
+	extends ColorDrawingTool
+	implements Strokable
 {
     Point old = null;
     BufferedImage backupImage;
     Graphics2D g;
+	StrokeProvider strokeProvider = null;
 
     @Override
     public void onMousePressed(BufferedImage image, DrawingMouseEvent me)
@@ -21,7 +24,10 @@ public class Rectangle extends ColorDrawingTool
 
             g = (Graphics2D)image.getGraphics();
             g.setColor(colorProvider.getStrokeColor());
-    g.setStroke(new BasicStroke(3));
+
+			if(strokeProvider != null)
+				g.setStroke(strokeProvider.getStroke());
+
             old=me.getPoint();
             g.drawRect(old.x, old.y, 0, 0 );
     }
@@ -56,4 +62,9 @@ public class Rectangle extends ColorDrawingTool
             return "Rectangle";
     }
 
+	@Override
+	public void setStrokeProvider(StrokeProvider sp) {
+		strokeProvider = sp;
+		
+	}
 }

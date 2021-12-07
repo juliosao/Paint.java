@@ -6,11 +6,14 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.BasicStroke;
 
-public class Line extends ColorDrawingTool
+public class Line 
+	extends ColorDrawingTool
+	implements Strokable
 {
     Point old = null;
     BufferedImage backupImage;
     Graphics2D g;
+	StrokeProvider strokeProvider;
 
     @Override
     public void onMousePressed(BufferedImage image, DrawingMouseEvent me)
@@ -22,7 +25,8 @@ public class Line extends ColorDrawingTool
 
         g = (Graphics2D)image.getGraphics();
         g.setColor(colorProvider.getStrokeColor());
-        g.setStroke(new BasicStroke(3));
+        if(strokeProvider != null)
+			g.setStroke(strokeProvider.getStroke());
         old=me.getPoint();
         g.drawLine(old.x, old.y, old.x, old.y );
     }
@@ -48,5 +52,10 @@ public class Line extends ColorDrawingTool
     {
         return "Line";
     }
+
+	@Override
+	public void setStrokeProvider(StrokeProvider sp) {
+		strokeProvider = sp;		
+	}
 
 }

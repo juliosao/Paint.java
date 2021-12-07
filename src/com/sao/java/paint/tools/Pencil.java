@@ -1,24 +1,24 @@
 package com.sao.java.paint.tools;
 
 import java.awt.image.BufferedImage;
-
-import com.sao.java.paint.divcompat.ColorPalette;
-
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.BasicStroke;
 
-public class Pencil extends ColorDrawingTool    
+public class Pencil 
+	extends ColorDrawingTool    
+	implements Strokable
 {
     Point old = null;
     Graphics2D g;
+	StrokeProvider strokeProvider;
 
     @Override
     public void onMousePressed(BufferedImage image, DrawingMouseEvent me)
     {
 		g = (Graphics2D)image.getGraphics();
 		g.setColor(colorProvider.getStrokeColor());
-		g.setStroke(new BasicStroke(3));
+		if(strokeProvider != null)
+			g.setStroke(strokeProvider.getStroke());
 		old=me.getPoint();
 		g.drawLine(old.x, old.y, old.x, old.y);
     }
@@ -44,4 +44,9 @@ public class Pencil extends ColorDrawingTool
 	    return "Pencil";
     }
 
+	@Override
+	public void setStrokeProvider(StrokeProvider sp) {
+		strokeProvider = sp;
+		
+	}
 }

@@ -6,6 +6,7 @@ import com.sao.java.paint.dialogs.NewImageDialog;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.WindowEvent;
@@ -14,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.imageio.ImageIO;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -23,14 +25,19 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import com.sao.java.paint.divcompat.ColorPalette;
-import com.sao.java.paint.ui.ToolBox;
-import com.sao.java.paint.ui.ToolBoxListener;
-import com.sao.java.paint.tools.DrawingTool;
-import com.sao.java.paint.tools.StrokeProvider;
-import com.sao.java.paint.tools.BasicStrokeProvider;
 import com.sao.java.paint.ui.ColorGammaBar;
 import com.sao.java.paint.ui.ColorProvider;
 import com.sao.java.paint.ui.Coloreable;
+import com.sao.java.paint.tools.ColorPicker;
+import com.sao.java.paint.tools.DrawingTool;
+import com.sao.java.paint.tools.StrokeProvider;
+import com.sao.java.paint.tools.BasicStrokeProvider;
+import com.sao.java.paint.tools.Ellipse;
+import com.sao.java.paint.tools.Line;
+import com.sao.java.paint.tools.Pencil;
+import com.sao.java.paint.tools.Rectangle;
+import com.sao.java.paint.tools.Strokable;
+import com.sao.java.paint.tools.Fill;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -45,7 +52,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  * @author julio
  */
 public class JPaintMainWindow extends JFrame
-    implements WindowListener, Coloreable, ToolBoxListener
+    implements WindowListener, Coloreable
 {
     static FileNameExtensionFilter filters[] = new FileNameExtensionFilter[]{ 
         new FileNameExtensionFilter("All Images", "JPEG","JPG","PNG","BMP"),
@@ -57,19 +64,19 @@ public class JPaintMainWindow extends JFrame
     final static Dimension preferredDimension = new Dimension(1024,768);
 
     DrawingPanel drawingPanel;
-    ToolBox toolbox;
+    JPanel toolbox;
     ColorPickerDialog colorPicker = null;
     ColorGammaBar colorToolbar;
     JMenuBar menuBar;
     JMenu menuFile;
     JSlider zoomer;
-    DrawingTool drawingTool;
     Container container;
     ColorProvider colorProvider;
 	StrokeProvider strokeProvider = new BasicStrokeProvider();
     File currentFile = null;
     static final String TITLE = "Paint.java v0.1";
     
+    DrawingTool[] tools;
 
 
     public JPaintMainWindow()
@@ -104,10 +111,46 @@ public class JPaintMainWindow extends JFrame
 
     private void createToolBox()
     {
-        toolbox = new ToolBox(this);
-        toolbox.setColorProvider(colorToolbar);
-		toolbox.setStrokeProvider(strokeProvider);
+        toolbox = new JPanel();
+        toolbox.setLayout(new GridLayout(0,1));
 	    container.add(toolbox,BorderLayout.WEST);
+
+        tools = new DrawingTool[]{
+            new Pencil(),
+            new Line(),
+            new Rectangle(),
+            new Ellipse(),
+            new Fill(),
+            new ColorPicker()
+        };
+
+        for(DrawingTool t: tools)
+        {
+            if(drawingPanel.getDrawingTool() == null)
+            {
+                drawingPanel.setDrawingTool(t);
+            }
+
+            if(t instanceof Coloreable)   
+            {
+                ((Coloreable)t).setColorProvider(colorToolbar);
+            }
+
+            if(t instanceof Strokable)   
+            {
+                ((Strokable)t).setStrokeProvider(strokeProvider);
+            }
+
+            JButton btn = new JButton(t.getDescription());
+            btn.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e)
+                {
+                    drawingPanel.setDrawingTool(t);
+                }
+            });
+            toolbox.add(btn);
+        }
+        
     }
     
     private void createBotomToolBar()
@@ -269,12 +312,6 @@ public class JPaintMainWindow extends JFrame
     @Override
     public void windowDeactivated(WindowEvent we) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void onToolSelected(DrawingTool t) {
-        drawingTool = t;
-        drawingPanel.setDrawingTool(t);
     }
 
     @Override

@@ -88,6 +88,11 @@ public class DrawingPanel
         setCursor(dtool.getCursor());
     }
 
+    public DrawingTool getDrawingTool()
+    {
+        return dtool;
+    }
+
     public void setImage(BufferedImage img)
     {                
         image = img;
@@ -106,7 +111,7 @@ public class DrawingPanel
         {
             Point current =  evt.getPoint();
             DrawingMouseEvent dme = new DrawingMouseEvent((int)((current.getX()+x)*100/zoom),(int)((current.getY()+y)*100/zoom));
-            dtool.onMouseDragged(image,dme);
+            dtool.onMouseDragged(this,dme);
         }
         updateUI();
     }
@@ -117,7 +122,7 @@ public class DrawingPanel
         {
             Point current =  me.getPoint();
             DrawingMouseEvent dme = new DrawingMouseEvent((int)((current.getX()+x)*100/zoom),(int)((current.getY()+y)*100/zoom) );
-            dtool.onMousePressed(image, dme);
+            dtool.onMousePressed(this, dme);
         }
         isMousePressed = true;
         updateUI();
@@ -129,7 +134,7 @@ public class DrawingPanel
         {
             Point current =  me.getPoint();
             DrawingMouseEvent dme = new DrawingMouseEvent((int)((current.getX()+x)*100/zoom),(int)((current.getY()+y)*100/zoom) );
-            dtool.onMouseReleased(image, dme);
+            dtool.onMouseReleased(this, dme);
         }
         isMousePressed = false;
         updateUI();

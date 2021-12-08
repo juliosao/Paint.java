@@ -1,6 +1,9 @@
 package com.sao.java.paint.tools;
 
 import java.awt.image.BufferedImage;
+
+import com.sao.java.paint.ui.DrawingPanel;
+
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Stroke;
@@ -16,8 +19,9 @@ public class Ellipse
 	StrokeProvider strokeProvider;
 
 	@Override
-	public void onMousePressed(BufferedImage image, DrawingMouseEvent me)
+	public void onMousePressed(DrawingPanel dp,  DrawingMouseEvent me)
 	{
+		BufferedImage image = dp.getImage();
 		backupImage = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 		Graphics2D tmpG = (Graphics2D)backupImage.getGraphics();
 		tmpG.drawImage(image, 0, 0, null);
@@ -32,7 +36,7 @@ public class Ellipse
 	}
 
 	@Override
-	public void onMouseReleased(BufferedImage image, DrawingMouseEvent me)
+	public void onMouseReleased(DrawingPanel dp,  DrawingMouseEvent me)
 	{
 		Point current =  me.getPoint();
 		g.drawImage(backupImage, 0, 0, null);
@@ -45,7 +49,7 @@ public class Ellipse
 	}
 
 	@Override
-	public void onMouseDragged(BufferedImage image, DrawingMouseEvent me)
+	public void onMouseDragged(DrawingPanel dp,  DrawingMouseEvent me)
 	{
 		Point current =  me.getPoint();
 		g.drawImage(backupImage, 0, 0, null);

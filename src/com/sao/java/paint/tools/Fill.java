@@ -2,7 +2,7 @@ package com.sao.java.paint.tools;
 
 import java.util.Stack;
 
-import com.sao.java.paint.divcompat.ColorPalette;
+import com.sao.java.paint.ui.DrawingPanel;
 
 import java.awt.image.BufferedImage;
 import java.awt.Color;
@@ -13,19 +13,19 @@ public class Fill extends ColorDrawingTool
         protected Color strokeColor = null;
 
     @Override
-    public void onMousePressed(BufferedImage image, DrawingMouseEvent me)
+    public void onMousePressed(DrawingPanel dp,  DrawingMouseEvent me)
     {
             strokeColor=colorProvider.getStrokeColor();
     }
 
     @Override
-    public void onMouseReleased(BufferedImage image, DrawingMouseEvent me)
+    public void onMouseReleased(DrawingPanel dp,  DrawingMouseEvent me)
     {
-            standardFloodFill(image,me.x,me.y);
+            standardFloodFill(dp.getImage(),me.x,me.y);
     }
 
     @Override
-    public void onMouseDragged(BufferedImage image, DrawingMouseEvent me)
+    public void onMouseDragged(DrawingPanel dp,  DrawingMouseEvent me)
     {
 
     }

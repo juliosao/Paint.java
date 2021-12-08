@@ -22,7 +22,6 @@ public class ColorBuilder extends JPanel
 	public ColorBuilder()
 	{
 		super();
-		Dimension lblDimesion = new Dimension(64,16);
 
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		JPanel pnlComponents = new JPanel();

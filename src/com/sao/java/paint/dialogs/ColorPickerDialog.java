@@ -15,13 +15,17 @@ import java.awt.Container;
 import java.awt.Color;
 import java.awt.Window;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
 import java.awt.event.ActionEvent;
 
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
 
 /**
  *
@@ -37,6 +41,9 @@ public class ColorPickerDialog
 	ColorBuilder colorBuilder;
 	Color currentColor;
 	
+	static FileNameExtensionFilter filters[] = new FileNameExtensionFilter[]{ 
+        new FileNameExtensionFilter("DIV palette files", "PAL")
+    };
         
     /**
      * Creates new form ColorPicker
@@ -102,7 +109,7 @@ public class ColorPickerDialog
 		add(jp,BorderLayout.SOUTH);
 	}
 
-	public void addMainPanel()
+	public <JPaintMainWindow> void addMainPanel()
 	{
 		JPanel jp = new JPanel();		
 		jp.setLayout(new FlowLayout());
@@ -126,7 +133,28 @@ public class ColorPickerDialog
 		btnLoad.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				try
+				{
+					JFileChooser fileChooser = new JFileChooser();            
+					fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+					for(FileNameExtensionFilter filter: filters)
+					{
+						fileChooser.setFileFilter(filter);
+					}
+
+					int result = fileChooser.showOpenDialog(ColorPickerDialog.this);
+					if (result == JFileChooser.APPROVE_OPTION) {
+						File selectedFile = fileChooser.getSelectedFile();
+						ColorPalette p = new ColorPalette(new FileInputStream(selectedFile) );
+						palette = p;
+						colorPalettePanel.setColorPalette(p);
+
+					}
+				}
+				catch(Exception ex)
+				{
+					JOptionPane.showMessageDialog(ColorPickerDialog.this, "Cannot open file");
+				}
 			}
 
 		});

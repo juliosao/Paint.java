@@ -21,4 +21,4 @@ At the moment, these image formats are supported:
 
 Div Games Studio formats supported:
 
-- PAL (Work in progress)
+- PAL (Read)

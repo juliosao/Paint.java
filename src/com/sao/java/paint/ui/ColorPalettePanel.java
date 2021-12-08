@@ -35,6 +35,8 @@ public class ColorPalettePanel
         }
     }
 
+
+
     @Override
     public void actionPerformed(ActionEvent e) {
         ColorButton src = (ColorButton)e.getSource();
@@ -81,5 +83,13 @@ public class ColorPalettePanel
     @Override
     public ColorPalette getColorPalette() {
         return colorProvider.getColorPalette();
+    }
+
+    public void setColorPalette(ColorPalette p)
+    {
+        for(int i=0; i<ColorPalette.NUMCOLORS; i++)
+        {
+            buttons[i].setStrokeColor(p.getColor(i));            
+        }
     }
 }

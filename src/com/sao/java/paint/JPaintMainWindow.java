@@ -7,6 +7,7 @@ import com.sao.java.paint.dialogs.NewImageDialog;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.event.ActionEvent;
@@ -53,6 +54,7 @@ public class JPaintMainWindow extends JFrame
         new FileNameExtensionFilter("BMP Image", "BMP"),
     };
 	static int windowCount = 0;
+    final static Dimension preferredDimension = new Dimension(1024,768);
 
     DrawingPanel drawingPanel;
     ToolBox toolbox;
@@ -67,6 +69,7 @@ public class JPaintMainWindow extends JFrame
 	StrokeProvider strokeProvider = new BasicStrokeProvider();
     File currentFile = null;
     static final String TITLE = "Paint.java v0.1";
+    
 
 
     public JPaintMainWindow()
@@ -86,15 +89,15 @@ public class JPaintMainWindow extends JFrame
         createToolBox();
         createMenus();
         
-	    setSize(800,600);
+	    setPreferredSize(preferredDimension);
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(this);
+        pack();
     }
     
     private void createDrawingPanel()
     {
         drawingPanel=new DrawingPanel();
-        drawingPanel.setSize(800,600);    
         //drawingPanel.setImage(createImg(640,480));
         container.add(drawingPanel,BorderLayout.CENTER);
     }

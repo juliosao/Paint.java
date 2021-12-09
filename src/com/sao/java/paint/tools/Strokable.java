@@ -1,5 +1,8 @@
 package com.sao.java.paint.tools;
 
+import java.awt.Stroke;
+
 public interface Strokable {
-	public void setStrokeProvider(StrokeProvider sp);
+	public void setStroke(Stroke s);
+	public Stroke getStroke();
 }

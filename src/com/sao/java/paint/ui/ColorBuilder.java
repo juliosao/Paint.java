@@ -10,10 +10,8 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.sao.java.paint.divcompat.ColorPalette;
-
 public class ColorBuilder extends JPanel 
-	implements ColorProvider, ChangeListener  {
+	implements Coloreable, ChangeListener  {
 
 	ColorButton btnResult;
 	JLabel lblR, lblG, lblB;
@@ -94,18 +92,8 @@ public class ColorBuilder extends JPanel
 	}
 
 	@Override
-	public void askForStrokeColor() {
-		// Does nothing		
-	}
-
-	@Override
-	public ColorPalette getColorPalette() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public void stateChanged(ChangeEvent e) {
 		btnResult.setStrokeColor(new Color(sldR.getValue(), sldG.getValue(), sldB.getValue()));		
-	}	
+	}
 	
 }

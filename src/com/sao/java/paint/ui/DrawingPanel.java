@@ -10,7 +10,10 @@ import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import com.sao.java.paint.tools.DrawingTool;
+import com.sao.java.paint.tools.Strokable;
+
 import java.awt.Point;
+import java.awt.Stroke;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.AdjustmentEvent;
@@ -25,15 +28,17 @@ import com.sao.java.paint.tools.DrawingMouseEvent;
  */
 public class DrawingPanel 
     extends JPanel
-    implements MouseMotionListener, MouseListener, AdjustmentListener
+    implements MouseMotionListener, MouseListener, AdjustmentListener, Coloreable, Strokable
         
 {
-    BufferedImage image;
-    DrawingTool dtool;
-    int zoom,x,y;
-    boolean isMousePressed;
-    JScrollBar vScrollBar;
-    JScrollBar hScrollBar;
+    private BufferedImage image;
+    private DrawingTool dtool;
+    private int zoom,x,y;
+    private boolean isMousePressed;
+    private JScrollBar vScrollBar;
+    private JScrollBar hScrollBar;
+    private Color strokeColor;
+    private Stroke stroke;
 
     public DrawingPanel()
     {
@@ -62,6 +67,9 @@ public class DrawingPanel
         hScrollBar.setValue(0);
         add(hScrollBar,BorderLayout.SOUTH);
         hScrollBar.addAdjustmentListener(this);
+
+        strokeColor = Color.BLACK;
+        stroke = new BasicStroke();
     }
 
     @Override
@@ -210,6 +218,27 @@ public class DrawingPanel
         this.y = vScrollBar.getValue();
         updateUI();        
     }
-            
+
+    @Override
+    public Color getStrokeColor() {
+        return strokeColor;
+    }
+
+    @Override
+    public void setStrokeColor(Color c) {
+        strokeColor = c;
+        
+    }
+
+    @Override
+    public Stroke getStroke() {
+        return stroke;
+    }
+
+    @Override
+    public void setStroke(Stroke s)
+    {
+        stroke = s;
+    }            
 }
 

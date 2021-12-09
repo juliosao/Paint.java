@@ -8,7 +8,7 @@ package com.sao.java.paint.dialogs;
 import com.sao.java.paint.divcompat.ColorPalette;
 import com.sao.java.paint.ui.ColorBuilder;
 import com.sao.java.paint.ui.ColorPalettePanel;
-import com.sao.java.paint.ui.ColorProvider;
+import com.sao.java.paint.ui.Coloreable;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Container;
@@ -33,7 +33,7 @@ import javax.swing.JPanel;
  */
 public class ColorPickerDialog 
         extends javax.swing.JDialog
-        implements ColorProvider
+        implements Coloreable
 {
     ColorPalette palette;
     ColorPalettePanel colorPalettePanel;
@@ -73,12 +73,13 @@ public class ColorPickerDialog
 		colorBuilder.setStrokeColor(c);		
 	}
 
-	@Override
-	public void askForStrokeColor() {
-		setVisible(true);		
+	public Color askForStrokeColor(Color defColor) 
+	{	
+		setStrokeColor(defColor);
+		setVisible(true);	
+		return currentColor;
 	}
 
-	@Override
 	public ColorPalette getColorPalette() {
 		return palette;
 	}
@@ -125,7 +126,12 @@ public class ColorPickerDialog
 		pnlPalette.setLayout(new BoxLayout(pnlPalette,BoxLayout.Y_AXIS));
 
 		colorPalettePanel = new ColorPalettePanel(palette);
-		colorPalettePanel.setColorProvider(this);
+		colorPalettePanel.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				setStrokeColor(colorPalettePanel.getStrokeColor());				
+			}
+		});
 		pnlPalette.add(colorPalettePanel);
 		jp.add(pnlPalette);
 
@@ -162,6 +168,5 @@ public class ColorPickerDialog
 		
 		add(jp,BorderLayout.CENTER);
 	}
-
-    
+   
 }

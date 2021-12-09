@@ -17,15 +17,17 @@ import javax.swing.JPanel;
  */
 public class ColorPalettePanel 
         extends JPanel
-        implements ColorProvider, Coloreable, ActionListener {
+        implements Coloreable, ActionListener {
     
     int idx = 0;
+    ColorPalette palette;
     ColorButton buttons[] = new ColorButton[ColorPalette.NUMCOLORS];
-    ColorProvider colorProvider = null;
-    
+    ActionListener listener = null;
     
     public ColorPalettePanel(ColorPalette cp){
+
         setLayout(new GridLayout(16,16,2,2));
+        palette = cp;
         for(int i=0; i<ColorPalette.NUMCOLORS; i++)
         {
             ColorButton b = new ColorButton(cp.getColor(i));
@@ -35,7 +37,10 @@ public class ColorPalettePanel
         }
     }
 
-
+    public void addActionListener(ActionListener l)
+    {
+        listener = l;
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -45,51 +50,35 @@ public class ColorPalettePanel
             if(src == buttons[i])
             {
                 idx = i;
-                colorProvider.setStrokeColor(buttons[i].getStrokeColor());
+                listener.actionPerformed(new ActionEvent(this,ActionEvent.ACTION_PERFORMED,"ColorChanged"));
                 return;
             }
         }
     }
 
-    @Override
-    public void askForStrokeColor() 
-    {
-    }
 
     @Override
     public void setStrokeColor(Color c) 
     {
-        for(int i=0; i<ColorPalette.NUMCOLORS; i++)
-        {
-            if(buttons[i].getBackground().equals(c))
-            {
-                idx = i;
-                colorProvider.setStrokeColor(c);
-                return;
-            }
-        }
+        // Does nothing?
     }
 
     @Override
     public Color getStrokeColor() {
         return buttons[idx].getBackground();
     }
-
-    @Override
-    public void setColorProvider(ColorProvider cp) {
-        colorProvider = cp;
-    }
     
-    @Override
     public ColorPalette getColorPalette() {
-        return colorProvider.getColorPalette();
+        return palette;
     }
 
     public void setColorPalette(ColorPalette p)
     {
+        palette = p;
         for(int i=0; i<ColorPalette.NUMCOLORS; i++)
         {
             buttons[i].setStrokeColor(p.getColor(i));            
         }
     }
+
 }

@@ -1,7 +1,6 @@
 package com.sao.java.paint;
 
 import com.sao.java.paint.ui.DrawingPanel;
-import com.sao.java.paint.dialogs.ColorPickerDialog;
 import com.sao.java.paint.dialogs.NewImageDialog;
 
 import java.awt.BorderLayout;
@@ -9,6 +8,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.BasicStroke;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.event.ActionEvent;
@@ -26,17 +26,12 @@ import javax.swing.JOptionPane;
 
 import com.sao.java.paint.divcompat.ColorPalette;
 import com.sao.java.paint.ui.ColorGammaBar;
-import com.sao.java.paint.ui.ColorProvider;
-import com.sao.java.paint.ui.Coloreable;
 import com.sao.java.paint.tools.ColorPicker;
 import com.sao.java.paint.tools.DrawingTool;
-import com.sao.java.paint.tools.StrokeProvider;
-import com.sao.java.paint.tools.BasicStrokeProvider;
 import com.sao.java.paint.tools.Ellipse;
 import com.sao.java.paint.tools.Line;
 import com.sao.java.paint.tools.Pencil;
 import com.sao.java.paint.tools.Rectangle;
-import com.sao.java.paint.tools.Strokable;
 import com.sao.java.paint.tools.Fill;
 
 import java.awt.image.BufferedImage;
@@ -52,170 +47,156 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  * @author julio
  */
 public class JPaintMainWindow extends JFrame
-    implements WindowListener, Coloreable
+	implements WindowListener
 {
-    static FileNameExtensionFilter filters[] = new FileNameExtensionFilter[]{ 
-        new FileNameExtensionFilter("All Images", "JPEG","JPG","PNG","BMP"),
-        new FileNameExtensionFilter("JPEG Image", "JPEG","JPG"),
-        new FileNameExtensionFilter("PNG Image", "PNG"),
-        new FileNameExtensionFilter("BMP Image", "BMP"),
-    };
+	static FileNameExtensionFilter filters[] = new FileNameExtensionFilter[]{
+		new FileNameExtensionFilter("All Images", "JPEG","JPG","PNG","BMP"),
+		new FileNameExtensionFilter("JPEG Image", "JPEG","JPG"),
+		new FileNameExtensionFilter("PNG Image", "PNG"),
+		new FileNameExtensionFilter("BMP Image", "BMP"),
+	};
 	static int windowCount = 0;
-    final static Dimension preferredDimension = new Dimension(1024,768);
+	final static Dimension preferredDimension = new Dimension(1024,768);
 
-    DrawingPanel drawingPanel;
-    JPanel toolbox;
-    ColorPickerDialog colorPicker = null;
-    ColorGammaBar colorToolbar;
-    JMenuBar menuBar;
-    JMenu menuFile;
-    JSlider zoomer;
-    Container container;
-    ColorProvider colorProvider;
-	StrokeProvider strokeProvider = new BasicStrokeProvider();
-    File currentFile = null;
-    static final String TITLE = "Paint.java v0.1";
-    
-    DrawingTool[] tools;
+	DrawingPanel drawingPanel;
+	JPanel toolbox;
+	ColorGammaBar colorToolbar;
+	JMenuBar menuBar;
+	JMenu menuFile;
+	JSlider zoomer;
+	Container container;
+	File currentFile = null;
+	static final String TITLE = "Paint.java v0.1";
+
+	DrawingTool[] tools;
 
 
-    public JPaintMainWindow()
-    {
-        super();
+	public JPaintMainWindow()
+	{
+		super();
 		windowCount += 1;
-        setTitle(TITLE);
+		setTitle(TITLE);
 
-        container = getContentPane();
-        BorderLayout bl = new BorderLayout();
-        setLayout(bl);
-        
-        colorPicker = new ColorPickerDialog(this, new ColorPalette());                
-        
-        createDrawingPanel();
-        createBotomToolBar();
-        createToolBox();
-        createMenus();
-        
-	    setPreferredSize(preferredDimension);
-        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-        addWindowListener(this);
-        pack();
-    }
-    
-    private void createDrawingPanel()
-    {
-        drawingPanel=new DrawingPanel();
-        //drawingPanel.setImage(createImg(640,480));
-        container.add(drawingPanel,BorderLayout.CENTER);
-    }
+		container = getContentPane();
+		BorderLayout bl = new BorderLayout();
+		setLayout(bl);
 
-    private void createToolBox()
-    {
-        toolbox = new JPanel();
-        toolbox.setLayout(new GridLayout(0,1));
-	    container.add(toolbox,BorderLayout.WEST);
+		createDrawingPanel();
+		createBotomToolBar();
+		createToolBox();
+		createMenus();
 
-        tools = new DrawingTool[]{
-            new Pencil(),
-            new Line(),
-            new Rectangle(),
-            new Ellipse(),
-            new Fill(),
-            new ColorPicker()
-        };
+		setPreferredSize(preferredDimension);
+		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		addWindowListener(this);
+		pack();
+	}
 
-        for(DrawingTool t: tools)
-        {
-            if(drawingPanel.getDrawingTool() == null)
-            {
-                drawingPanel.setDrawingTool(t);
-            }
+	private void createDrawingPanel()
+	{
+		drawingPanel=new DrawingPanel();
+		//drawingPanel.setImage(createImg(640,480));
+		container.add(drawingPanel,BorderLayout.CENTER);
+	}
 
-            if(t instanceof Coloreable)   
-            {
-                ((Coloreable)t).setColorProvider(colorToolbar);
-            }
+	private void createToolBox()
+	{
+		toolbox = new JPanel();
+		toolbox.setLayout(new GridLayout(0,1));
+		container.add(toolbox,BorderLayout.WEST);
 
-            if(t instanceof Strokable)   
-            {
-                ((Strokable)t).setStrokeProvider(strokeProvider);
-            }
+		tools = new DrawingTool[]{
+			new Pencil(),
+			new Line(),
+			new Rectangle(),
+			new Ellipse(),
+			new Fill(),
+			new ColorPicker(colorToolbar)
+		};
 
-            JButton btn = new JButton(t.getDescription());
-            btn.addActionListener(new ActionListener(){
-                public void actionPerformed(ActionEvent e)
-                {
-                    drawingPanel.setDrawingTool(t);
-                }
-            });
-            toolbox.add(btn);
-        }
-        
-    }
-    
-    private void createBotomToolBar()
-    {
-        JPanel pnl = new JPanel();
-        pnl.setLayout(new FlowLayout());
-        
-        colorToolbar = new ColorGammaBar(colorPicker);
-        colorToolbar.setColorProvider(colorPicker);        
-        pnl.add(colorToolbar);//,BorderLayout.CENTER);
-        
+		for(DrawingTool t: tools)
+		{
+			if(drawingPanel.getDrawingTool() == null)
+			{
+				drawingPanel.setDrawingTool(t);
+			}
+
+			JButton btn = new JButton(t.getDescription());
+			btn.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e)
+				{
+					drawingPanel.setDrawingTool(t);
+				}
+			});
+			toolbox.add(btn);
+		}
+
+	}
+
+	private void createBotomToolBar()
+	{
+		JPanel pnl = new JPanel();
+		pnl.setLayout(new FlowLayout());
+
+		colorToolbar = new ColorGammaBar(new ColorPalette());
+		pnl.add(colorToolbar);//,BorderLayout.CENTER);
+		colorToolbar.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				drawingPanel.setStrokeColor(colorToolbar.getStrokeColor());
+			}
+		});
 
 		JLabel jlbl = new JLabel("Zoom:");
 		pnl.add(jlbl);
 
 		JLabel lblZoom = new JLabel("100 %");
 
-        zoomer = new JSlider(10,1000);
-        zoomer.setValue(100);
-        zoomer.addChangeListener(new javax.swing.event.ChangeListener() {
-            @Override
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                drawingPanel.setZoom(zoomer.getValue());
+		zoomer = new JSlider(10,1000);
+		zoomer.setValue(100);
+		zoomer.addChangeListener(new javax.swing.event.ChangeListener() {
+			@Override
+			public void stateChanged(javax.swing.event.ChangeEvent evt) {
+				drawingPanel.setZoom(zoomer.getValue());
 				lblZoom.setText(""+zoomer.getValue()+" %");
-            }
-        });
-        pnl.add(zoomer);//,BorderLayout.EAST);
-		
+			}
+		});
+		pnl.add(zoomer);//,BorderLayout.EAST);
+
 		pnl.add(lblZoom);
-        
-        container.add(pnl,BorderLayout.SOUTH);
+
+		container.add(pnl,BorderLayout.SOUTH);
 
 		jlbl = new JLabel(" - Width:");
 		pnl.add(jlbl);
 		JLabel lblWidth = new JLabel("1 px");
 
-        JSlider jslWidth = new JSlider(1,100);
-        jslWidth.setValue(1);
-        jslWidth.addChangeListener(new javax.swing.event.ChangeListener() {
-            @Override
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-				if(strokeProvider instanceof BasicStrokeProvider)
-				{
-                	((BasicStrokeProvider)strokeProvider).setWidth(jslWidth.getValue());
-					lblWidth.setText(""+jslWidth.getValue()+" px");
-				}
-            }
-        });
+		JSlider jslWidth = new JSlider(1,100);
+		jslWidth.setValue(1);
+		jslWidth.addChangeListener(new javax.swing.event.ChangeListener() {
+			@Override
+			public void stateChanged(javax.swing.event.ChangeEvent evt) {
+				lblWidth.setText(""+jslWidth.getValue()+" px");
+				drawingPanel.setStroke(new BasicStroke(jslWidth.getValue(),BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));
+			}
+		});
 
 		pnl.add(jslWidth);
-        pnl.add(lblWidth);//,BorderLayout.EAST);
-    }
+		pnl.add(lblWidth);//,BorderLayout.EAST);
+	}
 
 	public void setImage(BufferedImage bi)
 	{
-		drawingPanel.setImage(bi);		
+		drawingPanel.setImage(bi);
 	}
-        
-    private void createMenus()
-    {
-        menuBar = new JMenuBar();
-        menuFile = new JMenu("File");
-        menuBar.add(menuFile);
 
-        JMenuItem mnu = new JMenuItem("New...");
+	private void createMenus()
+	{
+		menuBar = new JMenuBar();
+		menuFile = new JMenu("File");
+		menuBar.add(menuFile);
+
+		JMenuItem mnu = new JMenuItem("New...");
 		mnu.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -224,197 +205,192 @@ public class JPaintMainWindow extends JFrame
 				if(nid.getResult() == NewImageDialog.OK)
 				{
 					JPaintMainWindow jpmw = new JPaintMainWindow();
-					jpmw.setImage(nid.getImage());					
-        			jpmw.setVisible(true);
+					jpmw.setImage(nid.getImage());
+					jpmw.setVisible(true);
 				}
 			}
 		});
 
-        menuFile.add(mnu);
-        mnu = new JMenuItem("Open...");
-        mnu.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent evt) {
-                openPicture();
-            }
-        });
-        menuFile.add(mnu);
-        
-        mnu = new JMenuItem("Save...");
-        mnu.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent evt) {
-                savePicture();
-            }
-        });
-        menuFile.add(mnu);
-        
-        mnu = new JMenuItem("Save As...");
-        mnu.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent evt) {
-                savePictureAs();
-            }
-        });
-        menuFile.add(mnu);
-        mnu = new JMenuItem("Exit");
-        mnu.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent evt) {
-                dispatchEvent(new WindowEvent(JPaintMainWindow.this, WindowEvent.WINDOW_CLOSING));
-            }
-        });
-        
-        menuFile.add(mnu);
+		menuFile.add(mnu);
+		mnu = new JMenuItem("Open...");
+		mnu.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent evt) {
+				openPicture();
+			}
+		});
+		menuFile.add(mnu);
 
-        setJMenuBar(menuBar);
-    }
+		mnu = new JMenuItem("Save...");
+		mnu.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent evt) {
+				savePicture();
+			}
+		});
+		menuFile.add(mnu);
 
-    @Override
-    public void windowOpened(WindowEvent we) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+		mnu = new JMenuItem("Save As...");
+		mnu.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent evt) {
+				savePictureAs();
+			}
+		});
+		menuFile.add(mnu);
+		mnu = new JMenuItem("Exit");
+		mnu.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent evt) {
+				dispatchEvent(new WindowEvent(JPaintMainWindow.this, WindowEvent.WINDOW_CLOSING));
+			}
+		});
 
-    @Override
-    public void windowClosing(WindowEvent we) {
-        switch (JOptionPane.showConfirmDialog(JPaintMainWindow.this, "Do you want to save picture?", 
-        "Exit paint.java", JOptionPane.YES_NO_CANCEL_OPTION)) {
-            case JOptionPane.CANCEL_OPTION:
-                return;
-            case JOptionPane.YES_OPTION:
-                savePicture();
-            default:
+		menuFile.add(mnu);
+
+		setJMenuBar(menuBar);
+	}
+
+	@Override
+	public void windowOpened(WindowEvent we) {
+		//throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	}
+
+	@Override
+	public void windowClosing(WindowEvent we) {
+		switch (JOptionPane.showConfirmDialog(JPaintMainWindow.this, "Do you want to save picture?",
+		"Exit paint.java", JOptionPane.YES_NO_CANCEL_OPTION)) {
+			case JOptionPane.CANCEL_OPTION:
+				return;
+			case JOptionPane.YES_OPTION:
+				savePicture();
+			default:
 				setVisible(false);
 				windowCount--;
 				if(windowCount == 0)
-                	System.exit(0);
-                break;
-        }
-    }
+					System.exit(0);
+				break;
+		}
+	}
 
-    @Override
-    public void windowClosed(WindowEvent we) {
+	@Override
+	public void windowClosed(WindowEvent we) {
 		dispose();
-    }
+	}
 
-    @Override
-    public void windowIconified(WindowEvent we) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+	@Override
+	public void windowIconified(WindowEvent we) {
+		//throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	}
 
-    @Override
-    public void windowDeiconified(WindowEvent we) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+	@Override
+	public void windowDeiconified(WindowEvent we) {
+		//throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	}
 
-    @Override
-    public void windowActivated(WindowEvent we) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+	@Override
+	public void windowActivated(WindowEvent we) {
+		//throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	}
 
-    @Override
-    public void windowDeactivated(WindowEvent we) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+	@Override
+	public void windowDeactivated(WindowEvent we) {
+		//throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	}
 
-    @Override
-    public void setColorProvider(ColorProvider cp) {
-        colorProvider = cp;
-    }
+	/**
+	 * Shows open dile dialog and loads image from selected file
+	 */
+	public void openPicture()
+	{
+		try
+		{
+			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+			for(FileNameExtensionFilter filter: filters)
+			{
+				fileChooser.setFileFilter(filter);
+			}
 
-    /**
-     * Shows open dile dialog and loads image from selected file
-     */
-    public void openPicture()
-    {
-        try
-        {
-            JFileChooser fileChooser = new JFileChooser();            
-            fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
-            for(FileNameExtensionFilter filter: filters)
-            {
-                fileChooser.setFileFilter(filter);
-            }
+			int result = fileChooser.showOpenDialog(JPaintMainWindow.this);
+			if (result == JFileChooser.APPROVE_OPTION) {
+				File selectedFile = fileChooser.getSelectedFile();
+				BufferedImage bi = ImageIO.read(selectedFile);
+				drawingPanel.setImage(bi);
+				currentFile = selectedFile;
+				this.setTitle(TITLE + " - " + currentFile.getName());
+			}
+		}
+		catch(Exception ex)
+		{
+			JOptionPane.showMessageDialog(JPaintMainWindow.this, "Cannot open file");
+		}
+	}
 
-            int result = fileChooser.showOpenDialog(JPaintMainWindow.this);
-            if (result == JFileChooser.APPROVE_OPTION) {
-                File selectedFile = fileChooser.getSelectedFile();
-                BufferedImage bi = ImageIO.read(selectedFile);
-                drawingPanel.setImage(bi);
-                currentFile = selectedFile;
-                this.setTitle(TITLE + " - " + currentFile.getName());
-            }
-        }
-        catch(Exception ex)
-        {
-            JOptionPane.showMessageDialog(JPaintMainWindow.this, "Cannot open file");
-        }
-    }
+	/**
+	 * Saves current picture to the desired file
+	 * @param f File where to save the current picture
+	 */
+	public void savePicture(File f)
+	{
+		try
+		{
+			int index = f.getName().lastIndexOf('.');
+			String mode = "png";
+			if (index > 0) {
+				mode = f.getName().substring(index + 1).toLowerCase();
+			}
+			else
+			{
+				f = new File(f.getAbsolutePath()+"."+mode);
+			}
+			ImageIO.write(drawingPanel.getImage(), mode ,f );
+			currentFile = f;
+			this.setTitle(TITLE + " - " + currentFile.getName());
+		}
+		catch(Exception ex)
+		{
+			JOptionPane.showMessageDialog(JPaintMainWindow.this, "Cannot save file");
+		}
+	}
 
-    /**
-     * Saves current picture to the desired file
-     * @param f File where to save the current picture
-     */
-    public void savePicture(File f)
-    {
-        try
-        {
-            int index = f.getName().lastIndexOf('.');
-            String mode = "png";
-            if (index > 0) {
-                mode = f.getName().substring(index + 1).toLowerCase();
-            }
-            else
-            {
-                f = new File(f.getAbsolutePath()+"."+mode);
-            }
-            ImageIO.write(drawingPanel.getImage(), mode ,f );
-            currentFile = f;
-            this.setTitle(TITLE + " - " + currentFile.getName());
-        }
-        catch(Exception ex)
-        {
-            JOptionPane.showMessageDialog(JPaintMainWindow.this, "Cannot save file");
-        }
-    }
+	/**
+	 * Saves current picture to file. Asking for file if needed
+	 */
+	public void savePicture()
+	{
+		if(currentFile != null)
+		{
+			savePicture(currentFile);
+		}
+		else
+		{
+			savePictureAs();
+		}
+	}
 
-    /**
-     * Saves current picture to file. Asking for file if needed
-     */
-    public void savePicture()
-    {
-        if(currentFile != null)
-        {
-            savePicture(currentFile);
-        }
-        else
-        {
-            savePictureAs();
-        }
-    }
-
-    /**
-     * Shows save as Dialog and saves image in the selected file
-     */
-    public void savePictureAs()
-    {
-        try
-        {
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
-            fileChooser.setDialogTitle("Save image as...");
-            fileChooser.setApproveButtonText("Save");
-            for(FileNameExtensionFilter filter: filters)
-            {
-                fileChooser.setFileFilter(filter);
-            }
-            fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
-            int result = fileChooser.showSaveDialog(JPaintMainWindow.this);
-            if (result == JFileChooser.APPROVE_OPTION) {
-                savePicture(fileChooser.getSelectedFile());                
-            }
-        }
-        catch(Exception ex)
-        {
-            JOptionPane.showMessageDialog(JPaintMainWindow.this, "Cannot open file");
-        }
-    }
+	/**
+	 * Shows save as Dialog and saves image in the selected file
+	 */
+	public void savePictureAs()
+	{
+		try
+		{
+			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+			fileChooser.setDialogTitle("Save image as...");
+			fileChooser.setApproveButtonText("Save");
+			for(FileNameExtensionFilter filter: filters)
+			{
+				fileChooser.setFileFilter(filter);
+			}
+			fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+			int result = fileChooser.showSaveDialog(JPaintMainWindow.this);
+			if (result == JFileChooser.APPROVE_OPTION) {
+				savePicture(fileChooser.getSelectedFile());
+			}
+		}
+		catch(Exception ex)
+		{
+			JOptionPane.showMessageDialog(JPaintMainWindow.this, "Cannot open file");
+		}
+	}
 
 }

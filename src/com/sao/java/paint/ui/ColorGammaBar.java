@@ -6,6 +6,7 @@
 package com.sao.java.paint.ui;
 
 import com.sao.java.paint.divcompat.ColorPalette;
+import com.sao.java.paint.dialogs.ColorPickerDialog;
 import com.sao.java.paint.divcompat.ColorGamma;
 import java.awt.Color;
 import java.awt.GridLayout;
@@ -20,89 +21,81 @@ import javax.swing.JPanel;
  * @author julio
  */
 public class ColorGammaBar
-    extends JPanel
-    implements ColorProvider, Coloreable
+	extends JPanel
+	implements Coloreable
 {
-    ColorButton strokeButton;
-    ColorButton[] colorButtons;
-    ColorPalette palette;
-    ColorProvider colorProvider = null;
-        
-    public ColorGammaBar(ColorProvider p)
-    {
-        colorProvider = p;
-        setLayout(new GridLayout(1,ColorGamma.NUMCOLORS+2));
-        
-        /**
-         * Stroke Button
-         */
-        strokeButton = new ColorButton(Color.black);
-        strokeButton.addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                askForStrokeColor(); 
-            }
-        });
-        add(strokeButton);
-        
-        /**
-         * Color gamma buttons
-         */
-        Dimension d = new Dimension(10,10);
-		add(new Filler(d,d,d));        
-        ColorGamma gamma = colorProvider.getColorPalette().getGamma(Color.black);
-        colorButtons = new ColorButton[ColorGamma.NUMCOLORS];
+	ColorButton strokeButton;
+	ColorButton[] colorButtons;
+	ColorPalette palette;
+	ActionListener actionListener;
+		
+	public ColorGammaBar(ColorPalette p)
+	{
+		setLayout(new GridLayout(1,ColorGamma.NUMCOLORS+2));
+		
+		/**
+		 * Stroke Button
+		 */
+		palette = p;
+		strokeButton = new ColorButton(Color.black);
+		strokeButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ColorPickerDialog cpd = new ColorPickerDialog(null, palette);
+				final Color c = cpd.askForStrokeColor(strokeButton.getStrokeColor());                
+				ColorPalette newPalette = cpd.getColorPalette();
+				if(newPalette != palette)
+					palette = newPalette;
 
-        for(int i=0; i<ColorGamma.NUMCOLORS; i++)
-        {
-            ColorButton c = new ColorButton(gamma.getColor(i));
-            c.addActionListener(new ActionListener(){
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    setStrokeColor(c.getStrokeColor());
-                }
-            });
-            add(c);
-            colorButtons[i] = c;
-        }
-    }
+				ColorGamma gamma = palette.getGamma(c);
+				for(int i=0; i<ColorGamma.NUMCOLORS; i++)
+				{
+					colorButtons[i].setStrokeColor(gamma.getColor(i));
+				}
+				
+				setStrokeColor(c);				
+			}
+		});
+		add(strokeButton);
+		
+		
+		/**
+		 * Color gamma buttons
+		 */
+		Dimension d = new Dimension(10,10);
+		add(new Filler(d,d,d));  
+		
+		ColorGamma gamma = palette.getGamma(Color.black);
+		colorButtons = new ColorButton[ColorGamma.NUMCOLORS];
 
-    @Override
-    public void setStrokeColor(Color c) {
-        strokeButton.setBackground(c);
-        if(colorProvider != null)
-        {
-            ColorGamma gamma = colorProvider.getColorPalette().getGamma(c);
-            for(int i=0; i<ColorGamma.NUMCOLORS; i++)
-            {
-                colorButtons[i].setStrokeColor(gamma.getColor(i));
-            }
-        }
-    }
-    
-    @Override
-    public Color getStrokeColor() {
-        return strokeButton.getBackground();
-    }
-    
-    @Override
-    public void askForStrokeColor() {
-        if(colorProvider != null )
-        {
-			colorProvider.setStrokeColor(getStrokeColor());
-            colorProvider.askForStrokeColor(); 
-            setStrokeColor(colorProvider.getStrokeColor());
-        }
+		for(int i=0; i<ColorGamma.NUMCOLORS; i++)
+		{
+			ColorButton c = new ColorButton(gamma.getColor(i));
+			c.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					setStrokeColor(c.getStrokeColor());					
+				}
+			});
+			add(c);
+			colorButtons[i] = c;
+		}
+	}
 
-    }
+	@Override
+	public void setStrokeColor(Color c) {
+		strokeButton.setBackground(c);
+		if(actionListener != null)
+			actionListener.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "StrokeColor"));
+	}
+	
+	@Override
+	public Color getStrokeColor() {
+		return strokeButton.getBackground();
+	}
 
-    @Override
-    public void setColorProvider(ColorProvider cp) {
-        colorProvider = cp;
-    }
-    
-    @Override
-    public ColorPalette getColorPalette() {
-        return colorProvider.getColorPalette();
-    }
+	public void addActionListener(ActionListener l)
+	{
+		actionListener = l;
+	}
 }

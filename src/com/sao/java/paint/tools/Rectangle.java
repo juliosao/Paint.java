@@ -9,66 +9,56 @@ import java.awt.Point;
 
 
 public class Rectangle 
-	extends ColorDrawingTool
-	implements Strokable
+	extends DrawingTool
 {
-    Point old = null;
-    BufferedImage backupImage;
-    Graphics2D g;
-	StrokeProvider strokeProvider = null;
-
-    @Override
-    public void onMousePressed(DrawingPanel dp,  DrawingMouseEvent me)
-    {
-            BufferedImage image = dp.getImage();
-            backupImage = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
-            Graphics2D tmpG = (Graphics2D)backupImage.getGraphics();
-            tmpG.drawImage(image, 0, 0, null);
-            tmpG.dispose();
-
-            g = (Graphics2D)image.getGraphics();
-            g.setColor(colorProvider.getStrokeColor());
-
-			if(strokeProvider != null)
-				g.setStroke(strokeProvider.getStroke());
-
-            old=me.getPoint();
-            g.drawRect(old.x, old.y, 0, 0 );
-    }
-
-    @Override
-    public void onMouseReleased(DrawingPanel dp,  DrawingMouseEvent me)
-    {
-            Point current =  me.getPoint();
-            g.drawImage(backupImage, 0, 0, null);
-            int x = old.x < current.x ? old.x : current.x;
-            int y = old.y < current.y ? old.y : current.y;
-            int w = Math.abs(old.x - current.x);
-            int h = Math.abs(old.y - current.y);
-            g.drawRect(x,y,w,h);
-            g.dispose();
-    }
-
-    @Override
-    public void onMouseDragged(DrawingPanel dp,  DrawingMouseEvent me)
-    {
-            Point current =  me.getPoint();
-            g.drawImage(backupImage, 0, 0, null);
-            int x = old.x < current.x ? old.x : current.x;
-            int y = old.y < current.y ? old.y : current.y;
-            int w = Math.abs(old.x - current.x);
-            int h = Math.abs(old.y - current.y);
-            g.drawRect(x,y,w,h);
-    }
-
-    public String getDescription()
-    {
-            return "Rectangle";
-    }
+	Point old = null;
+	BufferedImage backupImage;
+	Graphics2D g;
 
 	@Override
-	public void setStrokeProvider(StrokeProvider sp) {
-		strokeProvider = sp;
-		
+	public void onMousePressed(DrawingPanel dp,  DrawingMouseEvent me)
+	{
+		BufferedImage image = dp.getImage();
+		backupImage = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+		Graphics2D tmpG = (Graphics2D)backupImage.getGraphics();
+		tmpG.drawImage(image, 0, 0, null);
+		tmpG.dispose();
+
+		g = (Graphics2D)image.getGraphics();
+		g.setColor(dp.getStrokeColor());
+		g.setStroke(dp.getStroke());
+		old=me.getPoint();
+		g.drawRect(old.x, old.y, 0, 0 );
 	}
+
+	@Override
+	public void onMouseReleased(DrawingPanel dp,  DrawingMouseEvent me)
+	{
+		Point current =  me.getPoint();
+		g.drawImage(backupImage, 0, 0, null);
+		int x = old.x < current.x ? old.x : current.x;
+		int y = old.y < current.y ? old.y : current.y;
+		int w = Math.abs(old.x - current.x);
+		int h = Math.abs(old.y - current.y);
+		g.drawRect(x,y,w,h);
+		g.dispose();
+	}
+
+	@Override
+	public void onMouseDragged(DrawingPanel dp,  DrawingMouseEvent me)
+	{
+		Point current =  me.getPoint();
+		g.drawImage(backupImage, 0, 0, null);
+		int x = old.x < current.x ? old.x : current.x;
+		int y = old.y < current.y ? old.y : current.y;
+		int w = Math.abs(old.x - current.x);
+		int h = Math.abs(old.y - current.y);
+		g.drawRect(x,y,w,h);
+	}
+
+	public String getDescription()
+	{
+		return "Rectangle";
+	}
+
 }

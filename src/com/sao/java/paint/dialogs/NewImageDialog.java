@@ -1,6 +1,7 @@
 package com.sao.java.paint.dialogs;
 import java.awt.FlowLayout;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -47,11 +48,11 @@ public class NewImageDialog
 		jp.add(txtHeight);
 		jp.add(new JLabel("Color"));
 		JButton btnColor = new JButton("...");
+		btnColor.setBackground(Color.WHITE);
 		btnColor.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
 				cp.setStrokeColor(btnColor.getBackground());
-				cp.askForStrokeColor();
-				btnColor.setBackground(cp.getStrokeColor());
+				btnColor.setBackground(cp.askForStrokeColor(Color.WHITE));
 			}
 		});
 		jp.add(btnColor);

@@ -8,29 +8,18 @@ import java.awt.image.BufferedImage;
 import java.awt.Color;
 import java.awt.Point;
 
-public class Fill extends ColorDrawingTool
+public class Fill extends DrawingTool
 {
-        protected Color strokeColor = null;
 
-    @Override
-    public void onMousePressed(DrawingPanel dp,  DrawingMouseEvent me)
-    {
-            strokeColor=colorProvider.getStrokeColor();
-    }
 
     @Override
     public void onMouseReleased(DrawingPanel dp,  DrawingMouseEvent me)
     {
-            standardFloodFill(dp.getImage(),me.x,me.y);
+            standardFloodFill(dp.getImage(),dp.getStrokeColor(),me.x,me.y);
     }
 
-    @Override
-    public void onMouseDragged(DrawingPanel dp,  DrawingMouseEvent me)
-    {
 
-    }
-
-    private void standardFloodFill(BufferedImage img, int x, int y)
+    private void standardFloodFill(BufferedImage img, Color strokeColor, int x, int y)
     {
             Stack<Point> pending = new Stack<>();
             int width = img.getWidth();

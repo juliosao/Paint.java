@@ -14,21 +14,21 @@ public abstract class DrawingTool {
 	 * @param g Graphics object where to paint
 	 * @param me Mouse event with coordinates
 	 */
-	abstract public void onMousePressed(DrawingPanel dp, DrawingMouseEvent me);
+	public void onMousePressed(DrawingPanel dp, DrawingMouseEvent me){}
 
 	/**
 	 * Occurs when mouse is released on canvas
 	 * @param g Graphics object where to paint
 	 * @param me Mouse event with coordinates
 	 */
-	abstract public void onMouseReleased(DrawingPanel dp, DrawingMouseEvent me);
+	public void onMouseReleased(DrawingPanel dp, DrawingMouseEvent me){}
 
 	/**
 	 * Occurs when mouse is moving while pressed on canvas
 	 * @param g Graphics object where to paint
 	 * @param me Mouse event with coordinates
 	 */
-	abstract public void onMouseDragged(DrawingPanel dp, DrawingMouseEvent me);
+	public void onMouseDragged(DrawingPanel dp, DrawingMouseEvent me){}
 
 	public String getDescription()
 	{

@@ -6,17 +6,13 @@ import com.sao.java.paint.ui.DrawingPanel;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Stroke;
 
 public class Ellipse 
-	extends ColorDrawingTool
-	implements Strokable
+	extends DrawingTool
 {
 	Point old = null;	
 	BufferedImage backupImage;
 	Graphics2D g;
-	Stroke stroke;
-	StrokeProvider strokeProvider;
 
 	@Override
 	public void onMousePressed(DrawingPanel dp,  DrawingMouseEvent me)
@@ -28,9 +24,8 @@ public class Ellipse
 		tmpG.dispose();
 
 		g = (Graphics2D)image.getGraphics();
-		g.setColor(colorProvider.getStrokeColor());
-		if(strokeProvider != null)
-			g.setStroke(strokeProvider.getStroke());
+		g.setColor(dp.getStrokeColor());		
+		g.setStroke(dp.getStroke());
 		old=me.getPoint();
 		g.drawOval(old.x, old.y, 0, 0 );
 	}
@@ -65,12 +60,5 @@ public class Ellipse
 	{
 		return "Ellipse";
 	}
-
-	@Override
-	public void setStrokeProvider(StrokeProvider sp) {
-		strokeProvider = sp;
-		
-	}
-
 
 }

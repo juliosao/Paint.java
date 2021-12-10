@@ -6,6 +6,7 @@ import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.awt.AlphaComposite;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -26,12 +27,13 @@ import com.sao.java.paint.tools.DrawingMouseEvent;
  * @author julio
  * Class where drawing is done
  */
-public class DrawingPanel 
+public class DrawingPanel
     extends JPanel
     implements MouseMotionListener, MouseListener, AdjustmentListener, Coloreable, Strokable
-        
+
 {
     private BufferedImage image;
+    private BufferedImage toolingLayer;
     private DrawingTool dtool;
     private int zoom,x,y;
     private boolean isMousePressed;
@@ -44,6 +46,7 @@ public class DrawingPanel
     {
         super();
         image = null;
+        toolingLayer = null;
         dtool = null;
         zoom = 100;
         x = 0;
@@ -51,14 +54,14 @@ public class DrawingPanel
         isMousePressed = false;
         addMouseMotionListener(this);
         addMouseListener(this);
-        
+
         setLayout(new BorderLayout());
-        
+
         vScrollBar = new JScrollBar();
         vScrollBar.setMaximum(0);
         vScrollBar.setMinimum(0);
         vScrollBar.setValue(0);
-        add(vScrollBar,BorderLayout.EAST);        
+        add(vScrollBar,BorderLayout.EAST);
         vScrollBar.addAdjustmentListener(this);
 
         hScrollBar = new JScrollBar(JScrollBar.HORIZONTAL);
@@ -87,13 +90,26 @@ public class DrawingPanel
             int h = image.getHeight();
             g2d.drawRect(-x-1,-y-1,zoom*w/100, zoom*h/100);
             g2d.drawImage(image, -x-1,-y-1, zoom*w/100, zoom*h/100 , this);
+
+            if(toolingLayer != null)
+            {
+                //AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.CLEAR,0.5F);
+                //g2d.setComposite(ac);
+                g2d.drawImage(toolingLayer, -x-1,-y-1, zoom*w/100, zoom*h/100 , this);
+            }
         }
     }
 
     public void setDrawingTool(DrawingTool t)
     {
+        if(dtool != null)
+            dtool.onFinished(this);
+
         dtool = t;
+        toolingLayer = null;
+        dtool.onSelected(this);
         setCursor(dtool.getCursor());
+        updateUI();
     }
 
     public DrawingTool getDrawingTool()
@@ -102,7 +118,7 @@ public class DrawingPanel
     }
 
     public void setImage(BufferedImage img)
-    {                
+    {
         image = img;
         updateScrolls();
         updateUI();
@@ -112,7 +128,7 @@ public class DrawingPanel
     {
         return image;
     }
-    
+
     @Override
     public void mouseDragged(java.awt.event.MouseEvent evt) {
         if(isMousePressed && dtool != null && image != null)
@@ -125,7 +141,7 @@ public class DrawingPanel
     }
 
    @Override
-   public void mousePressed(MouseEvent me) {        
+   public void mousePressed(MouseEvent me) {
         if(dtool != null && image != null)
         {
             Point current =  me.getPoint();
@@ -167,20 +183,20 @@ public class DrawingPanel
     public void mouseExited(MouseEvent e) {
         // Does nothing
     }
-    
+
     public void scrollTo(int newX, int newY) {
         x = newX;
         y = newY;
         updateUI();
     }
-    
+
     public void setZoom(int newZoom){
         zoom = newZoom;
         updateUI();
     }
 
-    
-    
+
+
     private void updateScrolls()
     {
         if(image == null)
@@ -216,7 +232,7 @@ public class DrawingPanel
     public void adjustmentValueChanged(AdjustmentEvent e) {
         this.x = hScrollBar.getValue();
         this.y = vScrollBar.getValue();
-        updateUI();        
+        updateUI();
     }
 
     @Override
@@ -227,7 +243,7 @@ public class DrawingPanel
     @Override
     public void setStrokeColor(Color c) {
         strokeColor = c;
-        
+
     }
 
     @Override
@@ -239,6 +255,25 @@ public class DrawingPanel
     public void setStroke(Stroke s)
     {
         stroke = s;
-    }            
-}
+    }
 
+    public BufferedImage createToolingLayer()
+    {
+        toolingLayer = new BufferedImage(image.getWidth(),image.getHeight(),BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = toolingLayer.createGraphics();
+        g.setPaint(new Color(255,255,255,0));
+        g.fillRect(0, 0, toolingLayer.getWidth(), toolingLayer.getHeight());
+        g.dispose();
+        return toolingLayer;
+    }
+
+    public BufferedImage getToolingLayer()
+    {
+        return toolingLayer;
+    }
+
+    public void destroyToolingLayer()
+    {
+        toolingLayer = null;
+    }
+}

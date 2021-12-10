@@ -26,6 +26,7 @@ import javax.swing.JOptionPane;
 
 import com.sao.java.paint.divcompat.ColorPalette;
 import com.sao.java.paint.ui.ColorGammaBar;
+import com.sao.java.paint.tools.RectangleSelection;
 import com.sao.java.paint.tools.ColorPicker;
 import com.sao.java.paint.tools.DrawingTool;
 import com.sao.java.paint.tools.Ellipse;
@@ -33,6 +34,7 @@ import com.sao.java.paint.tools.Line;
 import com.sao.java.paint.tools.Pencil;
 import com.sao.java.paint.tools.Rectangle;
 import com.sao.java.paint.tools.Fill;
+import com.sao.java.paint.tools.ImageSelection;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -41,6 +43,7 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.Toolkit;
 
 /**
  *
@@ -63,11 +66,19 @@ public class JPaintMainWindow extends JFrame
 	ColorGammaBar colorToolbar;
 	JMenuBar menuBar;
 	JMenu menuFile;
+	JMenu menuEdit;
 	JSlider zoomer;
 	Container container;
 	File currentFile = null;
 	static final String TITLE = "Paint.java v0.1";
 
+	Pencil pencil = new Pencil();
+	Line line = new Line();
+	Rectangle rectangle = new Rectangle();
+	Ellipse ellipse = new Ellipse();
+	Fill fill = new Fill();
+	ColorPicker colorPicker = new ColorPicker(colorToolbar);
+	RectangleSelection rectangleSelection = new RectangleSelection();
 	DrawingTool[] tools;
 
 
@@ -106,12 +117,7 @@ public class JPaintMainWindow extends JFrame
 		container.add(toolbox,BorderLayout.WEST);
 
 		tools = new DrawingTool[]{
-			new Pencil(),
-			new Line(),
-			new Rectangle(),
-			new Ellipse(),
-			new Fill(),
-			new ColorPicker(colorToolbar)
+			pencil, line, rectangle, ellipse, fill, colorPicker, rectangleSelection
 		};
 
 		for(DrawingTool t: tools)
@@ -193,8 +199,14 @@ public class JPaintMainWindow extends JFrame
 	private void createMenus()
 	{
 		menuBar = new JMenuBar();
+		createFileMenu();
+		createEditMenu();
+		setJMenuBar(menuBar);
+	}
+
+	void createFileMenu()
+	{
 		menuFile = new JMenu("File");
-		menuBar.add(menuFile);
 
 		JMenuItem mnu = new JMenuItem("New...");
 		mnu.addActionListener(new ActionListener(){
@@ -244,8 +256,48 @@ public class JPaintMainWindow extends JFrame
 		});
 
 		menuFile.add(mnu);
+		menuBar.add(menuFile);
+	}
 
-		setJMenuBar(menuBar);
+	void createEditMenu()
+	{
+		menuEdit = new JMenu("Edit");
+		JMenuItem mnu = new JMenuItem("Cut");
+		mnu.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent evt) {
+				BufferedImage img = rectangleSelection.cut();
+				ImageSelection imgSel = new ImageSelection(img);
+				Toolkit.getDefaultToolkit().getSystemClipboard().setContents(imgSel, null);
+			}
+		});
+		menuEdit.add(mnu);
+
+		mnu = new JMenuItem("Copy");
+		mnu.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent evt) {
+				BufferedImage img = rectangleSelection.copy();
+				ImageSelection imgSel = new ImageSelection(img);
+				imgSel.copyToClipboard();
+			}
+		});
+
+		menuEdit.add(mnu);
+		mnu = new JMenuItem("Paste");
+		mnu.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent evt) {
+				ImageSelection imgSel = ImageSelection.pasteFromClipboard();
+				if(imgSel != null)
+				{
+					drawingPanel.setDrawingTool(rectangleSelection);
+					rectangleSelection.paste(drawingPanel,imgSel.getImage());
+				}
+			}
+		});
+
+
+		menuEdit.add(mnu);
+		menuBar.add(menuEdit);
+
 	}
 
 	@Override

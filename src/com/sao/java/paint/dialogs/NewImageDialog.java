@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import java.awt.Window;
 
-public class NewImageDialog 
+public class NewImageDialog
 	extends javax.swing.JDialog
 {
 	public static final int CANCEL = 0;
@@ -26,17 +26,17 @@ public class NewImageDialog
 
 	int result = CANCEL;
 	BufferedImage img;
-	
+
 	public NewImageDialog(Window parent)
 	{
 		super(parent);
 		setTitle("New image");
-		setModal(true);		
+		setModal(true);
 		final ColorPalette palette = new ColorPalette();
 		final ColorPickerDialog cp = new ColorPickerDialog(this, palette);
 
 		setLayout(new BorderLayout());
-		JPanel jp = new JPanel();		
+		JPanel jp = new JPanel();
 		jp.setBorder(javax.swing.BorderFactory.createTitledBorder("Dimensions\n"));
 		add(jp,BorderLayout.CENTER);
 		jp.setLayout(new GridLayout(3,2));
@@ -58,14 +58,14 @@ public class NewImageDialog
 		jp.add(btnColor);
 
 		JPanel rstp = new JPanel();
-		rstp.setLayout(new FlowLayout());		
+		rstp.setLayout(new FlowLayout());
 		add(rstp,BorderLayout.SOUTH);
 
 		JButton btnOK = new JButton();
 		btnOK.setText("Ok");
 		btnOK.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
-                img = new BufferedImage((int)txtWidth.getValue(), (int)txtHeight.getValue(), BufferedImage.TYPE_INT_RGB);
+                img = new BufferedImage((int)txtWidth.getValue(), (int)txtHeight.getValue(), BufferedImage.TYPE_INT_ARGB);
 				Graphics2D g = (Graphics2D)img.createGraphics();
 				g.setPaint(btnColor.getBackground());
 				g.fillRect ( 0, 0, img.getWidth(), img.getHeight() );
@@ -82,7 +82,7 @@ public class NewImageDialog
 			public void actionPerformed(ActionEvent evt) {
 				result = CANCEL;
 				setVisible(false);
-			}           
+			}
 		});
 		rstp.add(btnCancel);
 
@@ -102,4 +102,3 @@ public class NewImageDialog
 
 
 }
-

@@ -11,6 +11,7 @@ At the present, these tools are implemented:
 - Pencil weight selection
 - Zoom
 - Color Picker
+- Smudge
 - Color Gamma: When a color from a palette is choosed, entire gamma is loaded into main UI
 - Copy and paste selection
 

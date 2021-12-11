@@ -6,15 +6,12 @@ import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.awt.AlphaComposite;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import com.sao.java.paint.tools.DrawingTool;
-import com.sao.java.paint.tools.Strokable;
 
 import java.awt.Point;
-import java.awt.Stroke;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.AdjustmentEvent;
@@ -29,7 +26,7 @@ import com.sao.java.paint.tools.DrawingMouseEvent;
  */
 public class DrawingPanel
     extends JPanel
-    implements MouseMotionListener, MouseListener, AdjustmentListener, Coloreable, Strokable
+    implements MouseMotionListener, MouseListener, AdjustmentListener, Coloreable
 
 {
     private BufferedImage image;
@@ -40,7 +37,7 @@ public class DrawingPanel
     private JScrollBar vScrollBar;
     private JScrollBar hScrollBar;
     private Color strokeColor;
-    private Stroke stroke;
+    private BasicStroke stroke;
 
     public DrawingPanel()
     {
@@ -246,13 +243,12 @@ public class DrawingPanel
 
     }
 
-    @Override
-    public Stroke getStroke() {
+    public BasicStroke getStroke() {
         return stroke;
     }
 
-    @Override
-    public void setStroke(Stroke s)
+
+    public void setStroke(BasicStroke s)
     {
         stroke = s;
     }

@@ -1,11 +1,9 @@
 package com.sao.java.paint.tools;
 
 import java.awt.image.BufferedImage;
-
-import com.sao.java.paint.ui.DrawingPanel;
-
 import java.awt.Graphics2D;
 import java.awt.Point;
+import com.sao.java.paint.ui.DrawingPanel;
 
 public class Pencil
 	extends DrawingTool

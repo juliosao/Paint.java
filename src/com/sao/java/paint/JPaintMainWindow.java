@@ -27,6 +27,7 @@ import javax.swing.JOptionPane;
 import com.sao.java.paint.divcompat.ColorPalette;
 import com.sao.java.paint.ui.ColorGammaBar;
 import com.sao.java.paint.tools.RectangleSelection;
+import com.sao.java.paint.tools.Smudge;
 import com.sao.java.paint.tools.ColorPicker;
 import com.sao.java.paint.tools.DrawingTool;
 import com.sao.java.paint.tools.Ellipse;
@@ -78,6 +79,7 @@ public class JPaintMainWindow extends JFrame
 	Ellipse ellipse = new Ellipse();
 	Fill fill = new Fill();
 	ColorPicker colorPicker = new ColorPicker(colorToolbar);
+	Smudge smudge = new Smudge();
 	RectangleSelection rectangleSelection = new RectangleSelection();
 	DrawingTool[] tools;
 
@@ -117,7 +119,7 @@ public class JPaintMainWindow extends JFrame
 		container.add(toolbox,BorderLayout.WEST);
 
 		tools = new DrawingTool[]{
-			pencil, line, rectangle, ellipse, fill, colorPicker, rectangleSelection
+			pencil, line, rectangle, ellipse, fill, colorPicker, smudge, rectangleSelection
 		};
 
 		for(DrawingTool t: tools)

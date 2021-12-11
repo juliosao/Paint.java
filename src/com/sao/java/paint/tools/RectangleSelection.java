@@ -121,7 +121,7 @@ extends DrawingTool
 
 			BufferedImage copyImage = new BufferedImage(w,h,originalImage.getType());
 			Graphics2D g2 = copyImage.createGraphics();
-			g2.drawImage(originalImage, 0, 0, w, h, x, y, x+w, x+h, null);
+			g2.drawImage(originalImage, 0, 0, w, h, x, y, x+w, y+h, null);
 
 			return copyImage;
 		}

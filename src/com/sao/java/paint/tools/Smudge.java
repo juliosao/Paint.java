@@ -112,9 +112,9 @@ public class Smudge extends DrawingTool {
 				return;
 			}
 
-			final int incX = diffX > 0 ? 1 : 0;
+			final int incX = diffX > 0 ? 1 : -1;
 			final double relation = diffY/diffX;
-			for(int x=x0; x<=x1; x+=incX)
+			for(int x=x0; x!=x1; x+=incX)
 			{
 				int y = (int)(y0 + relation*(x-x0));
 				apply(x, y);
@@ -128,9 +128,9 @@ public class Smudge extends DrawingTool {
 				return;
 			}
 
-			final int incY = diffY > 0 ? 1 : 0;
+			final int incY = diffY > 0 ? 1 : -1;
 			final double relation = diffX/diffY;
-			for(int y=y0; y<=y1; y+=incY)
+			for(int y=y0; y!=y1; y+=incY)
 			{
 				int x = (int)(x0 + relation*(y-y0));
 				apply(x, y);

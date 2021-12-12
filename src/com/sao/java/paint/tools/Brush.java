@@ -3,9 +3,11 @@ package com.sao.java.paint.tools;
 import java.awt.image.BufferedImage;
 import com.sao.java.paint.ui.DrawingPanel;
 
-public class Smudge extends BrushDrawingTool {
+public class Brush extends BrushDrawingTool
+{
 	BufferedImage image;
 	int oldX, oldY;
+	int r,g,b;
 	private static final int alpha = 255 << 24;
 
 	@Override
@@ -13,6 +15,10 @@ public class Smudge extends BrushDrawingTool {
 	{
 		image = dp.getImage();
 		initBrush((int)dp.getStroke().getLineWidth());
+		final int c = dp.getStrokeColor().getRGB();
+		r= (c >> 16) & 255;
+		g= (c >> 8) & 255;
+		b= c & 255;
 
 		oldX = me.getX();
 		oldY = me.getY();
@@ -38,10 +44,9 @@ public class Smudge extends BrushDrawingTool {
 				}
 				else
 				{
-					final int c = image.getRGB(x, y);
-					redInk[i][j]= (c >> 16) & 255;
-					greenInk[i][j]= (c >> 8) & 255;
-					blueInk[i][j]= c & 255;
+					redInk[i][j]=1;
+					greenInk[i][j]=1;
+					blueInk[i][j]=1;
 				}
 			}
 		}
@@ -86,14 +91,17 @@ public class Smudge extends BrushDrawingTool {
 					final int cR= (c >> 16) & 255;
 					final int cG= (c >> 8) & 255;
 					final int cB= c & 255;
-					final int newR = (int)(cR*0.6 + redInk[i][j]*0.4);
-					final int newG = (int)(cG*0.6 + greenInk[i][j]*0.4);
-					final int newB = (int)(cB*0.6 + blueInk[i][j]*0.4);
+
+					final double diff = 1-redInk[i][j];
+
+					final int newR = (int)(cR*diff + redInk[i][j]*r);
+					final int newG = (int)(cG*diff + greenInk[i][j]*g);
+					final int newB = (int)(cB*diff + blueInk[i][j]*b);
 					final int newC = alpha|(newR<<16)|(newG<<8)|newB;
 					image.setRGB(x, y, newC );
-					redInk[i][j] = redInk[i][j]*0.6 + cR*0.4;
-					greenInk[i][j] = greenInk[i][j]*0.6 + cG*0.4;
-					blueInk[i][j] = blueInk[i][j]*0.6 + cB*0.4;
+					redInk[i][j] *= 0.9;
+					greenInk[i][j] *= 0.9;
+					blueInk[i][j] *= 0.9;
 				}
 			}
 		}
@@ -103,7 +111,6 @@ public class Smudge extends BrushDrawingTool {
 
 	public String getDescription()
 	{
-		return "Smudge";
+		return "Brush";
 	}
-
 }

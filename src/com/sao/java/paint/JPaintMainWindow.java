@@ -1,6 +1,7 @@
 package com.sao.java.paint;
 
 import com.sao.java.paint.ui.DrawingPanel;
+import com.sao.java.paint.dialogs.AboutDialog;
 import com.sao.java.paint.dialogs.NewImageDialog;
 
 import java.awt.BorderLayout;
@@ -28,6 +29,7 @@ import com.sao.java.paint.divcompat.ColorPalette;
 import com.sao.java.paint.ui.ColorGammaBar;
 import com.sao.java.paint.tools.RectangleSelection;
 import com.sao.java.paint.tools.Smudge;
+import com.sao.java.paint.tools.Brush;
 import com.sao.java.paint.tools.ColorPicker;
 import com.sao.java.paint.tools.DrawingTool;
 import com.sao.java.paint.tools.Ellipse;
@@ -41,7 +43,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 import javax.swing.JPanel;
-import javax.swing.JSlider;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.Toolkit;
@@ -68,7 +71,7 @@ public class JPaintMainWindow extends JFrame
 	JMenuBar menuBar;
 	JMenu menuFile;
 	JMenu menuEdit;
-	JSlider zoomer;
+	JSpinner zoomer;
 	Container container;
 	File currentFile = null;
 	static final String TITLE = "Paint.java v0.1";
@@ -80,6 +83,7 @@ public class JPaintMainWindow extends JFrame
 	Fill fill = new Fill();
 	ColorPicker colorPicker = new ColorPicker(colorToolbar);
 	Smudge smudge = new Smudge();
+	Brush brush = new Brush();
 	RectangleSelection rectangleSelection = new RectangleSelection();
 	DrawingTool[] tools;
 
@@ -119,7 +123,7 @@ public class JPaintMainWindow extends JFrame
 		container.add(toolbox,BorderLayout.WEST);
 
 		tools = new DrawingTool[]{
-			pencil, line, rectangle, ellipse, fill, colorPicker, smudge, rectangleSelection
+			pencil, brush, line, rectangle, ellipse, fill, smudge, colorPicker, rectangleSelection
 		};
 
 		for(DrawingTool t: tools)
@@ -160,12 +164,12 @@ public class JPaintMainWindow extends JFrame
 
 		JLabel lblZoom = new JLabel("100 %");
 
-		zoomer = new JSlider(10,1000);
+		zoomer = new JSpinner(new SpinnerNumberModel(100, 5, 10000, 1));
 		zoomer.setValue(100);
 		zoomer.addChangeListener(new javax.swing.event.ChangeListener() {
 			@Override
 			public void stateChanged(javax.swing.event.ChangeEvent evt) {
-				drawingPanel.setZoom(zoomer.getValue());
+				drawingPanel.setZoom((int)zoomer.getValue());
 				lblZoom.setText(""+zoomer.getValue()+" %");
 			}
 		});
@@ -179,13 +183,13 @@ public class JPaintMainWindow extends JFrame
 		pnl.add(jlbl);
 		JLabel lblWidth = new JLabel("1 px");
 
-		JSlider jslWidth = new JSlider(1,100);
+		JSpinner jslWidth = new JSpinner(new SpinnerNumberModel(1, 1, 256, 1));
 		jslWidth.setValue(1);
 		jslWidth.addChangeListener(new javax.swing.event.ChangeListener() {
 			@Override
 			public void stateChanged(javax.swing.event.ChangeEvent evt) {
 				lblWidth.setText(""+jslWidth.getValue()+" px");
-				drawingPanel.setStroke(new BasicStroke(jslWidth.getValue(),BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));
+				drawingPanel.setStroke(new BasicStroke((int)jslWidth.getValue(),BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));
 			}
 		});
 
@@ -203,10 +207,11 @@ public class JPaintMainWindow extends JFrame
 		menuBar = new JMenuBar();
 		createFileMenu();
 		createEditMenu();
+		createHelpMenu();
 		setJMenuBar(menuBar);
 	}
 
-	void createFileMenu()
+	private void createFileMenu()
 	{
 		menuFile = new JMenu("File");
 
@@ -261,7 +266,7 @@ public class JPaintMainWindow extends JFrame
 		menuBar.add(menuFile);
 	}
 
-	void createEditMenu()
+	private void createEditMenu()
 	{
 		menuEdit = new JMenu("Edit");
 		JMenuItem mnu = new JMenuItem("Cut");
@@ -282,8 +287,8 @@ public class JPaintMainWindow extends JFrame
 				imgSel.copyToClipboard();
 			}
 		});
-
 		menuEdit.add(mnu);
+
 		mnu = new JMenuItem("Paste");
 		mnu.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
@@ -295,11 +300,37 @@ public class JPaintMainWindow extends JFrame
 				}
 			}
 		});
+		menuEdit.add(mnu);
 
+		mnu = new JMenuItem("Paste as new image...");
+		mnu.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent evt) {
+				ImageSelection imgSel = ImageSelection.pasteFromClipboard();
+				if(imgSel != null)
+				{
+					JPaintMainWindow jpmw = new JPaintMainWindow();
+					jpmw.setImage(imgSel.getImage());
+					jpmw.setVisible(true);
+				}
+			}
+		});
+		menuEdit.add(mnu);
 
+		menuBar.add(menuEdit);
+	}
+
+	void createHelpMenu()
+	{
+		menuEdit = new JMenu("Help");
+		JMenuItem mnu = new JMenuItem("About...");
+		mnu.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent evt) {
+				AboutDialog ad = new AboutDialog(JPaintMainWindow.this);
+				ad.setVisible(true);
+			}
+		});
 		menuEdit.add(mnu);
 		menuBar.add(menuEdit);
-
 	}
 
 	@Override

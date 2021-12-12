@@ -6,7 +6,7 @@ import com.sao.java.paint.ui.DrawingPanel;
 import java.awt.Graphics2D;
 import java.awt.Point;
 
-public class Line 
+public class Line
 	extends DrawingTool
 {
     Point old = null;
@@ -16,6 +16,7 @@ public class Line
     @Override
     public void onMousePressed(DrawingPanel dp,  DrawingMouseEvent me)
     {
+        dp.notifyChanged();
         BufferedImage image = dp.getImage();
         backupImage = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
         Graphics2D tmpG = (Graphics2D)backupImage.getGraphics();
@@ -23,7 +24,7 @@ public class Line
         tmpG.dispose();
 
         g = (Graphics2D)image.getGraphics();
-        g.setColor(dp.getStrokeColor());        
+        g.setColor(dp.getStrokeColor());
 		g.setStroke(dp.getStroke());
         old=me.getPoint();
         g.drawLine(old.x, old.y, old.x, old.y );

@@ -110,7 +110,7 @@ extends DrawingTool
 	}
 
 	/** */
-	public BufferedImage copy()
+	public BufferedImage copy(DrawingPanel dp)
 	{
 		if(originalImage != null)
 		{
@@ -130,10 +130,11 @@ extends DrawingTool
 
 	}
 
-	public BufferedImage cut()
+	public BufferedImage cut(DrawingPanel dp)
 	{
 		if(originalImage != null)
 		{
+			dp.notifyChanged();
 			int x = old.x < current.x ? old.x : current.x;
 			int y = old.y < current.y ? old.y : current.y;
 			int w = Math.abs(old.x - current.x);
@@ -156,6 +157,7 @@ extends DrawingTool
 
 	public void paste(DrawingPanel dp, BufferedImage img)
 	{
+		dp.notifyChanged();
 		pastedImage = img;
 		old = new Point(0,0);
 		current = new Point(img.getWidth(),img.getHeight());

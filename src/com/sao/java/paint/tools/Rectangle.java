@@ -8,7 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 
 
-public class Rectangle 
+public class Rectangle
 	extends DrawingTool
 {
 	Point old = null;
@@ -18,6 +18,7 @@ public class Rectangle
 	@Override
 	public void onMousePressed(DrawingPanel dp,  DrawingMouseEvent me)
 	{
+		dp.notifyChanged();
 		BufferedImage image = dp.getImage();
 		backupImage = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 		Graphics2D tmpG = (Graphics2D)backupImage.getGraphics();

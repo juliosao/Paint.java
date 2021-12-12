@@ -15,7 +15,8 @@ public class Fill extends DrawingTool
     @Override
     public void onMouseReleased(DrawingPanel dp,  DrawingMouseEvent me)
     {
-            standardFloodFill(dp.getImage(),dp.getStrokeColor(),me.x,me.y);
+        dp.notifyChanged();
+        standardFloodFill(dp.getImage(),dp.getStrokeColor(),me.x,me.y);
     }
 
 

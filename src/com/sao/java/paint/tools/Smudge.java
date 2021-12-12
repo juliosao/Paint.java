@@ -11,6 +11,7 @@ public class Smudge extends BrushDrawingTool {
 	@Override
 	public void onMousePressed(DrawingPanel dp,  DrawingMouseEvent me)
 	{
+		dp.notifyChanged();
 		image = dp.getImage();
 		initBrush((int)dp.getStroke().getLineWidth());
 

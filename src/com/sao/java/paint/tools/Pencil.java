@@ -14,6 +14,7 @@ public class Pencil
 	@Override
 	public void onMousePressed(DrawingPanel dp,  DrawingMouseEvent me)
 	{
+		dp.notifyChanged();
 		BufferedImage image = dp.getImage();
 		g = (Graphics2D)image.getGraphics();
 		g.setColor(dp.getStrokeColor());

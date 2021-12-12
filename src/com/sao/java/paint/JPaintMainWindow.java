@@ -23,6 +23,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JSeparator;
 import javax.swing.JOptionPane;
 
 import com.sao.java.paint.divcompat.ColorPalette;
@@ -255,6 +256,8 @@ public class JPaintMainWindow extends JFrame
 			}
 		});
 		menuFile.add(mnu);
+		menuFile.add(new JSeparator());
+
 		mnu = new JMenuItem("Exit");
 		mnu.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
@@ -269,10 +272,29 @@ public class JPaintMainWindow extends JFrame
 	private void createEditMenu()
 	{
 		menuEdit = new JMenu("Edit");
-		JMenuItem mnu = new JMenuItem("Cut");
+
+		JMenuItem mnu = new JMenuItem("Undo");
 		mnu.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
-				BufferedImage img = rectangleSelection.cut();
+				drawingPanel.undo();
+			}
+		});
+		menuEdit.add(mnu);
+
+		mnu = new JMenuItem("Redo");
+		mnu.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent evt) {
+				drawingPanel.redo();
+			}
+		});
+		menuEdit.add(mnu);
+
+		menuEdit.add(new JSeparator());
+
+		mnu = new JMenuItem("Cut");
+		mnu.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent evt) {
+				BufferedImage img = rectangleSelection.cut(drawingPanel);
 				ImageSelection imgSel = new ImageSelection(img);
 				Toolkit.getDefaultToolkit().getSystemClipboard().setContents(imgSel, null);
 			}
@@ -282,7 +304,7 @@ public class JPaintMainWindow extends JFrame
 		mnu = new JMenuItem("Copy");
 		mnu.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
-				BufferedImage img = rectangleSelection.copy();
+				BufferedImage img = rectangleSelection.copy(drawingPanel);
 				ImageSelection imgSel = new ImageSelection(img);
 				imgSel.copyToClipboard();
 			}

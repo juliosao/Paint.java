@@ -15,6 +15,7 @@ At the present, these tools are implemented:
 - Brush
 - Color Gamma: When a color from a palette is choosed, entire gamma is loaded into main UI
 - Copy and paste selection
+- Undo and redo changes
 
 At the moment, these image formats are supported:
 

@@ -13,6 +13,7 @@ public class Brush extends BrushDrawingTool
 	@Override
 	public void onMousePressed(DrawingPanel dp,  DrawingMouseEvent me)
 	{
+		dp.notifyChanged();
 		image = dp.getImage();
 		initBrush((int)dp.getStroke().getLineWidth());
 		final int c = dp.getStrokeColor().getRGB();

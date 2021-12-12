@@ -7,16 +7,17 @@ import com.sao.java.paint.ui.DrawingPanel;
 import java.awt.Graphics2D;
 import java.awt.Point;
 
-public class Ellipse 
+public class Ellipse
 	extends DrawingTool
 {
-	Point old = null;	
+	Point old = null;
 	BufferedImage backupImage;
 	Graphics2D g;
 
 	@Override
 	public void onMousePressed(DrawingPanel dp,  DrawingMouseEvent me)
 	{
+		dp.notifyChanged();
 		BufferedImage image = dp.getImage();
 		backupImage = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 		Graphics2D tmpG = (Graphics2D)backupImage.getGraphics();
@@ -24,7 +25,7 @@ public class Ellipse
 		tmpG.dispose();
 
 		g = (Graphics2D)image.getGraphics();
-		g.setColor(dp.getStrokeColor());		
+		g.setColor(dp.getStrokeColor());
 		g.setStroke(dp.getStroke());
 		old=me.getPoint();
 		g.drawOval(old.x, old.y, 0, 0 );

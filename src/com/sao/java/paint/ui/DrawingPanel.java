@@ -6,6 +6,8 @@ import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -38,6 +40,10 @@ public class DrawingPanel
     private JScrollBar hScrollBar;
     private Color strokeColor;
     private BasicStroke stroke;
+
+    private boolean delete2 = false;
+    private LinkedList<BufferedImage> history = new LinkedList<>();
+    private LinkedList<BufferedImage> fordwardHistory = new LinkedList<>();
 
     public DrawingPanel()
     {
@@ -109,6 +115,63 @@ public class DrawingPanel
         updateUI();
     }
 
+    public void notifyChanged()
+    {
+        if(history.size()>16)
+            history.removeFirst();
+
+        BufferedImage tmp = new BufferedImage(image.getWidth(),image.getHeight(),BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = tmp.createGraphics();
+        g.drawImage(image,0,0,null);
+        g.dispose();
+        fordwardHistory.clear();
+        history.push(tmp);
+    }
+
+    /**
+     * Undoes last change in the history buffer
+     */
+    public void undo()
+    {
+        if(history.size()==0)
+            return;
+
+        BufferedImage forward = new BufferedImage(image.getWidth(),image.getHeight(),BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = forward.createGraphics();
+        g.drawImage(image,0,0,null);
+        g.dispose();
+        fordwardHistory.push(forward);
+
+        BufferedImage tmp = history.pop();
+        g = image.createGraphics();
+        g.drawImage(tmp,0,0,null);
+        g.dispose();
+        updateUI();
+        dtool.onSelected(this);
+    }
+
+    /**
+     * Redoes last change in history fordward buffer
+     */
+    public void redo()
+    {
+        if(fordwardHistory.size()==0)
+            return;
+
+        BufferedImage tmp = new BufferedImage(image.getWidth(),image.getHeight(),BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = tmp.createGraphics();
+        g.drawImage(image,0,0,null);
+        g.dispose();
+        history.push(tmp);
+
+        tmp = fordwardHistory.pop();
+        g = image.createGraphics();
+        g.drawImage(tmp,0,0,null);
+        g.dispose();
+        updateUI();
+        dtool.onSelected(this);
+    }
+
     public DrawingTool getDrawingTool()
     {
         return dtool;
@@ -119,6 +182,7 @@ public class DrawingPanel
         image = img;
         updateScrolls();
         updateUI();
+        notifyChanged();
     }
 
     public BufferedImage getImage()

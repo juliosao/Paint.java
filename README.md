@@ -12,6 +12,9 @@ At the present, these tools are implemented:
 - Zoom
 - Color Picker
 - Smudge
+- Blur
+- Sharpen
+- Clone
 - Brush
 - Color Gamma: When a color from a palette is choosed, entire gamma is loaded into main UI
 - Copy and paste selection

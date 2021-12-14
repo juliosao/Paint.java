@@ -9,6 +9,11 @@ import java.awt.Cursor;
  */
 public abstract class DrawingTool {
 	/**
+	 * Opaque alpha component int RGB
+	 */
+	public static final int opaque = 255 << 24;
+
+	/**
 	 * Occurs when user selects the tool
 	 * @param dp Drawing pannel where to paint
 	 */
@@ -42,6 +47,13 @@ public abstract class DrawingTool {
 	public void onMouseDragged(DrawingPanel dp, DrawingMouseEvent me){}
 
 	/**
+	 * Occurs when mouse is moved over the DrawingPanel but no mouse button is pressed
+	 * @param dp Drawing pannel where to paint
+	 * @param me Mouse event with coordinates
+	 */
+	public void onMouseFlight(DrawingPanel dp, DrawingMouseEvent me){}
+
+	/**
 	 * Gets tool description
 	 * @return The tool description as string
 	 */
@@ -57,5 +69,31 @@ public abstract class DrawingTool {
 	public Cursor getCursor()
 	{
 		return DEFAULTCURSOR;
+	}
+
+	/**
+	 * Gets RGB from components, with 100%alpha
+	 * @param r
+	 * @param g
+	 * @param b
+	 * @return
+	 */
+	public static final int rgb(int r, int g, int b)
+	{
+		if(r>255)
+			r = 255;
+		if(g>255)
+			g = 255;
+		if(b>255)
+			b = 255;
+
+		if(r<0)
+			r = 0;
+		if(g<0)
+			g = 0;
+		if(b<0)
+			b = 0;
+
+		return opaque | (r<<16) | (g<<8) | b;
 	}
 }

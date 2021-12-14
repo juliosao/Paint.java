@@ -28,23 +28,14 @@ import javax.swing.JOptionPane;
 
 import com.sao.java.paint.divcompat.ColorPalette;
 import com.sao.java.paint.ui.ColorGammaBar;
-import com.sao.java.paint.tools.RectangleSelection;
-import com.sao.java.paint.tools.Smudge;
-import com.sao.java.paint.tools.Brush;
-import com.sao.java.paint.tools.ColorPicker;
-import com.sao.java.paint.tools.DrawingTool;
-import com.sao.java.paint.tools.Ellipse;
-import com.sao.java.paint.tools.Line;
-import com.sao.java.paint.tools.Pencil;
-import com.sao.java.paint.tools.Rectangle;
-import com.sao.java.paint.tools.Fill;
-import com.sao.java.paint.tools.ImageSelection;
+import com.sao.java.paint.tools.*;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.JToolBar;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -58,16 +49,16 @@ public class JPaintMainWindow extends JFrame
 	implements WindowListener
 {
 	static FileNameExtensionFilter filters[] = new FileNameExtensionFilter[]{
-		new FileNameExtensionFilter("All Images", "JPEG","JPG","PNG","BMP"),
 		new FileNameExtensionFilter("JPEG Image", "JPEG","JPG"),
 		new FileNameExtensionFilter("PNG Image", "PNG"),
 		new FileNameExtensionFilter("BMP Image", "BMP"),
+		new FileNameExtensionFilter("All Images", "JPEG","JPG","PNG","BMP"),
 	};
 	static int windowCount = 0;
 	final static Dimension preferredDimension = new Dimension(1024,768);
 
 	DrawingPanel drawingPanel;
-	JPanel toolbox;
+	JToolBar toolbox;
 	ColorGammaBar colorToolbar;
 	JMenuBar menuBar;
 	JMenu menuFile;
@@ -86,6 +77,10 @@ public class JPaintMainWindow extends JFrame
 	Smudge smudge = new Smudge();
 	Brush brush = new Brush();
 	RectangleSelection rectangleSelection = new RectangleSelection();
+	Text text = new Text(this,rectangleSelection);
+	Clone clone = new Clone();
+	Blur blur = new Blur();
+	Sharpen sharpen = new Sharpen();
 	DrawingTool[] tools;
 
 
@@ -119,12 +114,12 @@ public class JPaintMainWindow extends JFrame
 
 	private void createToolBox()
 	{
-		toolbox = new JPanel();
+		toolbox = new JToolBar();
 		toolbox.setLayout(new GridLayout(0,1));
 		container.add(toolbox,BorderLayout.WEST);
 
 		tools = new DrawingTool[]{
-			pencil, brush, line, rectangle, ellipse, fill, smudge, colorPicker, rectangleSelection
+			pencil, brush, line, rectangle, ellipse, text, fill, smudge, blur, sharpen, clone, colorPicker, rectangleSelection
 		};
 
 		for(DrawingTool t: tools)
@@ -334,6 +329,26 @@ public class JPaintMainWindow extends JFrame
 					jpmw.setImage(imgSel.getImage());
 					jpmw.setVisible(true);
 				}
+			}
+		});
+		menuEdit.add(mnu);
+
+		menuEdit.add(new JSeparator());
+
+		mnu = new JMenuItem("Select all");
+		mnu.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent evt) {
+				drawingPanel.setDrawingTool(rectangleSelection);
+				rectangleSelection.selectAll(drawingPanel);
+			}
+		});
+		menuEdit.add(mnu);
+
+		mnu = new JMenuItem("Select none");
+		mnu.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent evt) {
+				drawingPanel.setDrawingTool(rectangleSelection);
+				rectangleSelection.selectNone(drawingPanel);
 			}
 		});
 		menuEdit.add(mnu);

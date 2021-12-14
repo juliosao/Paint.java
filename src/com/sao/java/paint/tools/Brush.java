@@ -100,9 +100,9 @@ public class Brush extends BrushDrawingTool
 					final int newB = (int)(cB*diff + blueInk[i][j]*b);
 					final int newC = alpha|(newR<<16)|(newG<<8)|newB;
 					image.setRGB(x, y, newC );
-					redInk[i][j] *= 0.9;
-					greenInk[i][j] *= 0.9;
-					blueInk[i][j] *= 0.9;
+					redInk[i][j] *= 0.95;
+					greenInk[i][j] *= 0.95;
+					blueInk[i][j] *= 0.95;
 				}
 			}
 		}

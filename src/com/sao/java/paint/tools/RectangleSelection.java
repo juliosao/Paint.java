@@ -11,7 +11,8 @@ public class RectangleSelection
 extends DrawingTool
 {
 	static final BasicStroke selectionStroke = new BasicStroke(1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER );
-	static final Color selectionColor = Color.BLUE;
+	static final Color selectionColor = new Color(0,0,255,50);
+	static final Color selectionBorderColor = Color.BLUE;
 	static final Color selectionBColor = new Color(255,255,255,0);
 	Graphics2D g;
 	Point old;
@@ -70,6 +71,8 @@ extends DrawingTool
 
 		g.setColor(selectionColor);
 		g.drawRect(old.x, old.y, 1, 1 );
+		g.setColor(selectionBorderColor);
+		g.drawRect(old.x, old.y, 1, 1 );
 	}
 
 	@Override
@@ -87,7 +90,9 @@ extends DrawingTool
 		{
 			g.drawImage(pastedImage, x, y, w, h, null);
 		}
-		g.setColor(selectionColor);
+		g.setColor(selectionColor);;
+		g.fillRect(x, y, w, h);
+		g.setColor(selectionBorderColor);
 		g.drawRect(x,y,w,h);
 	}
 
@@ -105,11 +110,18 @@ extends DrawingTool
 		{
 			g.drawImage(pastedImage, x, y, w, h, null);
 		}
-		g.setColor(selectionColor);
+
+		g.setColor(selectionColor);;
+		g.fillRect(x, y, w, h);
+		g.setColor(selectionBorderColor);
 		g.drawRect(x,y,w,h);
 	}
 
-	/** */
+	/**
+	 * Gets the selected area on a drawing pannel and clears it
+	 * @param dp Affected drawing pannel
+	 * @return A buffered image with the selected data
+	*/
 	public BufferedImage copy(DrawingPanel dp)
 	{
 		if(originalImage != null)
@@ -123,6 +135,8 @@ extends DrawingTool
 			Graphics2D g2 = copyImage.createGraphics();
 			g2.drawImage(originalImage, 0, 0, w, h, x, y, x+w, y+h, null);
 
+			selectNone(dp);
+
 			return copyImage;
 		}
 
@@ -130,9 +144,14 @@ extends DrawingTool
 
 	}
 
+	/**
+	 * Gets the selected area on a drawing pannel and clears it
+	 * @param dp Affected drawing pannel
+	 * @return A buffered image with the selected data
+	 */
 	public BufferedImage cut(DrawingPanel dp)
 	{
-		if(originalImage != null)
+		if(originalImage != null && old != null )
 		{
 			dp.notifyChanged();
 			int x = old.x < current.x ? old.x : current.x;
@@ -150,11 +169,18 @@ extends DrawingTool
 			g2.clearRect(x,y,w,h);
 			g2.dispose();
 
+			selectNone(dp);
+
 			return copyImage;
 		}
 		return null;
 	}
 
+	/**
+	 * Puts image on selecction tool
+	 * @param dp Affected drawing panel
+	 * @param img Image to put
+	 */
 	public void paste(DrawingPanel dp, BufferedImage img)
 	{
 		dp.notifyChanged();
@@ -162,6 +188,50 @@ extends DrawingTool
 		old = new Point(0,0);
 		current = new Point(img.getWidth(),img.getHeight());
 		g.drawImage(img, 0, 0, null);
+	}
+
+	/**
+	 * Selects complete image on display panel
+	 * @param dp Affected drawing panel
+	 */
+	public void selectAll(DrawingPanel dp)
+	{
+		old = new Point(0,0);
+		current =  new Point(width,height);
+
+		int x = old.x < current.x ? old.x : current.x;
+		int y = old.y < current.y ? old.y : current.y;
+		int w = Math.abs(old.x - current.x);
+		int h = Math.abs(old.y - current.y);
+		g.setColor(selectionBColor);
+		g.clearRect(0, 0, width,height);
+		if(pastedImage != null)
+		{
+			pastedImage = null;
+		}
+		g.setColor(selectionColor);;
+		g.fillRect(x, y, w, h);
+		g.setColor(selectionBorderColor);
+		g.drawRect(x, y, w, h);
+		dp.updateUI();
+	}
+
+	/**
+	 * Clean selection on a display panel
+	 * @param dp Affected drawinf panel
+	 */
+	public void selectNone(DrawingPanel dp)
+	{
+		old = null;
+		current = null;
+
+		g.setColor(selectionBColor);
+		g.clearRect(0, 0, width,height);
+		if(pastedImage != null)
+		{
+			pastedImage = null;
+		}
+		dp.updateUI();
 	}
 
 	public String getDescription()

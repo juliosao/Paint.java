@@ -41,7 +41,6 @@ public class DrawingPanel
     private Color strokeColor;
     private BasicStroke stroke;
 
-    private boolean delete2 = false;
     private LinkedList<BufferedImage> history = new LinkedList<>();
     private LinkedList<BufferedImage> fordwardHistory = new LinkedList<>();
 
@@ -96,8 +95,6 @@ public class DrawingPanel
 
             if(toolingLayer != null)
             {
-                //AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.CLEAR,0.5F);
-                //g2d.setComposite(ac);
                 g2d.drawImage(toolingLayer, -x-1,-y-1, zoom*w/100, zoom*h/100 , this);
             }
         }

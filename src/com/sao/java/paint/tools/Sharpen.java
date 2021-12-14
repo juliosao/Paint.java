@@ -1,11 +1,17 @@
 package com.sao.java.paint.tools;
 
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import com.sao.java.paint.ui.DrawingPanel;
 
-public class Smudge extends BrushDrawingTool {
+public class Sharpen extends BrushDrawingTool {
 	BufferedImage image;
+	BufferedImage backImage;
 	int oldX, oldY;
+	double adjust = 1.0/3.0;
+	double convolution[][] = new double[][]{
+		{0,-adjust,0},{-adjust,7*adjust,-adjust},{-adjust,0,-adjust}
+	};
 
 
 	@Override
@@ -13,12 +19,17 @@ public class Smudge extends BrushDrawingTool {
 	{
 		dp.notifyChanged();
 		image = dp.getImage();
+
 		initBrush((int)dp.getStroke().getLineWidth());
 
 		oldX = me.getX();
 		oldY = me.getY();
 		final int maxW = image.getWidth();
 		final int maxH = image.getHeight();
+
+		backImage = new BufferedImage(maxW,maxH,image.getType());
+		Graphics2D g = backImage.createGraphics();
+		g.drawImage(image, 0, 0, null);
 
 		for(int i=0; i<width; i++)
 		{
@@ -39,10 +50,9 @@ public class Smudge extends BrushDrawingTool {
 				}
 				else
 				{
-					final int c = image.getRGB(x, y);
-					redInk[i][j]= (c >> 16) & 255;
-					greenInk[i][j]= (c >> 8) & 255;
-					blueInk[i][j]= c & 255;
+					redInk[i][j]= 1;
+					greenInk[i][j]= 1;
+					blueInk[i][j]= 1;
 				}
 			}
 		}
@@ -81,21 +91,34 @@ public class Smudge extends BrushDrawingTool {
 			{
 				final int y = dy-width/2+j;
 
-				if( !(x<0 || x>=maxW || y<0 || y>=maxH || redInk[i][j]==-1))
+				if( x<0 || x>=maxW || y<0 || y>=maxH || redInk[i][j]==-1)
+					continue;
+
+				double newR = 0;
+				double newG = 0;
+				double newB = 0;
+
+				for(int ax=0; ax<3; ax++)
 				{
-					final int c = image.getRGB(x, y);
-					final int cR= (c >> 16) & 255;
-					final int cG= (c >> 8) & 255;
-					final int cB= c & 255;
-					final int newR = (int)(cR*0.6 + redInk[i][j]*0.4);
-					final int newG = (int)(cG*0.6 + greenInk[i][j]*0.4);
-					final int newB = (int)(cB*0.6 + blueInk[i][j]*0.4);
-					final int newC = opaque|(newR<<16)|(newG<<8)|newB;
-					image.setRGB(x, y, newC );
-					redInk[i][j] = redInk[i][j]*0.6 + cR*0.4;
-					greenInk[i][j] = greenInk[i][j]*0.6 + cG*0.4;
-					blueInk[i][j] = blueInk[i][j]*0.6 + cB*0.4;
+					final int tmpX = x-1+ax;
+					if( tmpX<0 || tmpX>=maxW)
+						continue;
+
+					for(int ay = 0; ay<3; ay++)
+					{
+						final int tmpY = y-1+ay;
+						if(y-1+ay<0 || y-1+ay>=maxH)
+							continue;
+
+						final int newRGB = backImage.getRGB(tmpX,tmpY);
+						newR += (double)((newRGB>>16) & 255) * convolution[ax][ay];
+						newG += (double)((newRGB>>8) & 255) * convolution[ax][ay];
+						newB += (double)(newRGB & 255) * convolution[ax][ay];
+					}
 				}
+
+				image.setRGB(x, y, rgb((int)newR,(int)newG,(int)newB));
+
 			}
 		}
 	}
@@ -104,7 +127,7 @@ public class Smudge extends BrushDrawingTool {
 
 	public String getDescription()
 	{
-		return "Smudge";
+		return "Sharpen";
 	}
 
 }

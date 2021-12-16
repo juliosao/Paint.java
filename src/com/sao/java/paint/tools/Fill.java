@@ -16,7 +16,8 @@ public class Fill extends DrawingTool
     public void onMouseReleased(DrawingPanel dp,  DrawingMouseEvent me)
     {
         dp.notifyChanged();
-        standardFloodFill(dp.getImage(),dp.getStrokeColor(),me.x,me.y);
+        Color c = me.button == 1 ? dp.getStrokeColor() : dp.getFillColor();
+        standardFloodFill(dp.getImage(),c,me.x,me.y);
     }
 
 

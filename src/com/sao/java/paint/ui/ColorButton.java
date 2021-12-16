@@ -14,7 +14,7 @@ import javax.swing.JButton;
  *
  * @author julio
  */
-public class ColorButton 
+public class ColorButton
         extends JButton
         implements Coloreable
 {
@@ -30,9 +30,9 @@ public class ColorButton
         Dimension s = new Dimension(24,24);
         setMinimumSize(s);
         setPreferredSize(s);
-        setFocusPainted(false);     
+        setFocusPainted(false);
     }
-    
+
     @Override
     public void setStrokeColor(Color c) {
         setBackground(c);
@@ -43,4 +43,14 @@ public class ColorButton
     public Color getStrokeColor() {
         return getBackground();
     }
+
+    @Override
+	public Color getFillColor() {
+		return null;
+	}
+
+	@Override
+	public void setFillColor(Color c) {
+		// Does nothing
+	}
 }

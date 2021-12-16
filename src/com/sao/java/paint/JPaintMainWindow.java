@@ -1,7 +1,9 @@
 package com.sao.java.paint;
 
 import com.sao.java.paint.ui.DrawingPanel;
+import com.sao.java.paint.ui.ShapeModeCombo;
 import com.sao.java.paint.dialogs.AboutDialog;
+import com.sao.java.paint.dialogs.FilterDialog;
 import com.sao.java.paint.dialogs.NewImageDialog;
 
 import java.awt.BorderLayout;
@@ -14,9 +16,10 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
 
 import javax.imageio.ImageIO;
-import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -27,6 +30,7 @@ import javax.swing.JSeparator;
 import javax.swing.JOptionPane;
 
 import com.sao.java.paint.divcompat.ColorPalette;
+import com.sao.java.paint.filter.ImageFilter;
 import com.sao.java.paint.ui.ColorGammaBar;
 import com.sao.java.paint.tools.*;
 
@@ -35,6 +39,7 @@ import java.io.File;
 
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.WindowConstants;
@@ -52,7 +57,8 @@ public class JPaintMainWindow extends JFrame
 		new FileNameExtensionFilter("JPEG Image", "JPEG","JPG"),
 		new FileNameExtensionFilter("PNG Image", "PNG"),
 		new FileNameExtensionFilter("BMP Image", "BMP"),
-		new FileNameExtensionFilter("All Images", "JPEG","JPG","PNG","BMP"),
+		new FileNameExtensionFilter("Div Games Studio MAP Image", "MAP"),
+		new FileNameExtensionFilter("All Images", "JPEG","JPG","PNG","BMP","MAP"),
 	};
 	static int windowCount = 0;
 	final static Dimension preferredDimension = new Dimension(1024,768);
@@ -63,6 +69,7 @@ public class JPaintMainWindow extends JFrame
 	JMenuBar menuBar;
 	JMenu menuFile;
 	JMenu menuEdit;
+	JMenu menuFilter;
 	JSpinner zoomer;
 	Container container;
 	File currentFile = null;
@@ -73,6 +80,7 @@ public class JPaintMainWindow extends JFrame
 	Rectangle rectangle = new Rectangle();
 	Ellipse ellipse = new Ellipse();
 	Fill fill = new Fill();
+	Erase erase = new Erase();
 	ColorPicker colorPicker = new ColorPicker(colorToolbar);
 	Smudge smudge = new Smudge();
 	Brush brush = new Brush();
@@ -81,7 +89,11 @@ public class JPaintMainWindow extends JFrame
 	Clone clone = new Clone();
 	Blur blur = new Blur();
 	Sharpen sharpen = new Sharpen();
+	Light light = new Light();
+	Dark dark = new Dark();
+	Airbrush airbrush = new Airbrush();
 	DrawingTool[] tools;
+	JToggleButton[] buttons;
 
 
 	public JPaintMainWindow()
@@ -116,29 +128,44 @@ public class JPaintMainWindow extends JFrame
 	{
 		toolbox = new JToolBar();
 		toolbox.setLayout(new GridLayout(0,1));
+		toolbox.setOrientation(JToggleButton.VERTICAL);
 		container.add(toolbox,BorderLayout.WEST);
 
 		tools = new DrawingTool[]{
-			pencil, brush, line, rectangle, ellipse, text, fill, smudge, blur, sharpen, clone, colorPicker, rectangleSelection
+			pencil, brush, airbrush, erase, line, rectangle, ellipse, text, fill,
+			smudge, blur, sharpen, light, dark, clone,
+			colorPicker, rectangleSelection
 		};
+		buttons = new JToggleButton[tools.length];
 
+		int i = 0;
 		for(DrawingTool t: tools)
 		{
-			if(drawingPanel.getDrawingTool() == null)
-			{
-				drawingPanel.setDrawingTool(t);
-			}
-
-			JButton btn = new JButton(t.getDescription());
-			btn.addActionListener(new ActionListener(){
+			buttons[i] = new JToggleButton(tools[i].getDescription());
+			buttons[i].addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e)
 				{
-					drawingPanel.setDrawingTool(t);
+					setDrawingTool(t);
 				}
 			});
-			toolbox.add(btn);
+			toolbox.add(buttons[i]);
+			i++;
 		}
 
+		setDrawingTool(pencil);
+	}
+
+	/**
+	 * Selects current tool
+	 * @param t Tool to select
+	 */
+	public void setDrawingTool(DrawingTool t)
+	{
+		drawingPanel.setDrawingTool(t);
+		for(int i=0; i<tools.length; i++)
+		{
+			buttons[i].setSelected( tools[i] == t );
+		}
 	}
 
 	private void createBotomToolBar()
@@ -147,11 +174,16 @@ public class JPaintMainWindow extends JFrame
 		pnl.setLayout(new FlowLayout());
 
 		colorToolbar = new ColorGammaBar(new ColorPalette());
+		colorToolbar.setStrokeColor(drawingPanel.getStrokeColor());
+		colorToolbar.setFillColor(drawingPanel.getFillColor());
 		pnl.add(colorToolbar);//,BorderLayout.CENTER);
 		colorToolbar.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				drawingPanel.setStrokeColor(colorToolbar.getStrokeColor());
+				if(e.getActionCommand() == ColorGammaBar.ACTIONSTROKE)
+					drawingPanel.setStrokeColor(colorToolbar.getStrokeColor());
+				else
+					drawingPanel.setFillColor(colorToolbar.getFillColor());
 			}
 		});
 
@@ -180,7 +212,6 @@ public class JPaintMainWindow extends JFrame
 		JLabel lblWidth = new JLabel("1 px");
 
 		JSpinner jslWidth = new JSpinner(new SpinnerNumberModel(1, 1, 256, 1));
-		jslWidth.setValue(1);
 		jslWidth.addChangeListener(new javax.swing.event.ChangeListener() {
 			@Override
 			public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -188,9 +219,21 @@ public class JPaintMainWindow extends JFrame
 				drawingPanel.setStroke(new BasicStroke((int)jslWidth.getValue(),BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));
 			}
 		});
+		jslWidth.setValue(10);
 
 		pnl.add(jslWidth);
 		pnl.add(lblWidth);//,BorderLayout.EAST);
+
+
+		ShapeModeCombo cmbFill = new ShapeModeCombo();
+		cmbFill.addItemListener(new ItemListener(){
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				drawingPanel.setShapeMode(cmbFill.getValue());
+			}
+		});
+		pnl.add(cmbFill);
+
 	}
 
 	public void setImage(BufferedImage bi)
@@ -203,6 +246,7 @@ public class JPaintMainWindow extends JFrame
 		menuBar = new JMenuBar();
 		createFileMenu();
 		createEditMenu();
+		createFilterMenu();
 		createHelpMenu();
 		setJMenuBar(menuBar);
 	}
@@ -312,7 +356,7 @@ public class JPaintMainWindow extends JFrame
 				ImageSelection imgSel = ImageSelection.pasteFromClipboard();
 				if(imgSel != null)
 				{
-					drawingPanel.setDrawingTool(rectangleSelection);
+					setDrawingTool(rectangleSelection);
 					rectangleSelection.paste(drawingPanel,imgSel.getImage());
 				}
 			}
@@ -338,7 +382,7 @@ public class JPaintMainWindow extends JFrame
 		mnu = new JMenuItem("Select all");
 		mnu.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
-				drawingPanel.setDrawingTool(rectangleSelection);
+				setDrawingTool(rectangleSelection);
 				rectangleSelection.selectAll(drawingPanel);
 			}
 		});
@@ -347,13 +391,45 @@ public class JPaintMainWindow extends JFrame
 		mnu = new JMenuItem("Select none");
 		mnu.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
-				drawingPanel.setDrawingTool(rectangleSelection);
+				setDrawingTool(rectangleSelection);
 				rectangleSelection.selectNone(drawingPanel);
 			}
 		});
 		menuEdit.add(mnu);
 
 		menuBar.add(menuEdit);
+	}
+
+	void createFilterMenu()
+	{
+		menuFilter = new JMenu("Filter");
+		ImageFilter filters[] = new ImageFilter[]{
+			new com.sao.java.paint.filter.Blur(),
+			new com.sao.java.paint.filter.Sharpen(),
+			new com.sao.java.paint.filter.Emboss(),
+			new com.sao.java.paint.filter.Highrelief(),
+			new com.sao.java.paint.filter.EdgeDetect(),
+			new com.sao.java.paint.filter.Light(),
+			new com.sao.java.paint.filter.Dark(),
+			new com.sao.java.paint.filter.Invert(),
+			new com.sao.java.paint.filter.DropColor(),
+			new com.sao.java.paint.filter.GrayScale(),
+		};
+
+		for(ImageFilter f: filters)
+		{
+			JMenuItem mnu = new JMenuItem(f.getDescription()+"...");
+			mnu.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e)
+				{
+					FilterDialog fd = new FilterDialog(JPaintMainWindow.this,drawingPanel,f);
+					fd.setVisible(true);
+				}
+			});
+			menuFilter.add(mnu);
+		}
+
+		menuBar.add(menuFilter);
 	}
 
 	void createHelpMenu()

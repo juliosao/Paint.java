@@ -15,4 +15,15 @@ public interface Coloreable {
     */
    void setStrokeColor(Color c);
 
+   /**
+    * Gets actual fill color
+    * @return The actual fill color
+    */
+    Color getFillColor();
+
+    /**
+     * Sets actual fill color
+     */
+    void setFillColor(Color c);
+
 }

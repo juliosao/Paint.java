@@ -1,10 +1,14 @@
 package com.sao.java.paint.tools;
 
+import java.awt.Shape;
+import java.awt.geom.PathIterator;
+
 public abstract class BrushDrawingTool
 	extends DrawingTool
 {
 	protected double[][] redInk, greenInk, blueInk;
 	protected int width;
+
 
 	/**
 	 * Initialices array for color components

@@ -10,6 +10,8 @@ import java.awt.Color;
 import java.io.IOException;
 import java.util.Arrays;
 
+import javax.imageio.stream.ImageInputStream;
+
 /**
  * @author julio
  *         Represents a Color Palete from original DIV GAMES STUDIO
@@ -22,6 +24,7 @@ public class ColorPalette {
 	public static final byte[] PALHDR = new byte[] { 0x70, 0x61, 0x6c, 0x1A, 0x0D, 0x0A, 0x00 };
 	public static final byte[] FPGHDR = new byte[] { 0x66, 0x70, 0x67, 0x1A, 0x0D, 0x0A, 0x00 };
 	public static final byte[] MAPHDR = new byte[] { 0x6d, 0x61, 0x70, 0x1A, 0x0D, 0x0A, 0x00 };
+	private static final int OFFSET = 9;
 	private static final int PALSKIP = 0;
 	private static final int FPGSKIP = 0;
 	private static final int MAPSKIP = 40;
@@ -60,10 +63,10 @@ public class ColorPalette {
 
 	/**
 	 * Reads a palette from a stream
-	 * 
+	 *
 	 * @param sr Stream with the palete
 	 * @throws IOException
-	 * 
+	 *
 	 *                     The palette in the stream must be a DIV GAMES STUDIO PAL
 	 *                     MAP, or FPG file.
 	 */
@@ -82,19 +85,9 @@ public class ColorPalette {
 		else
 			throw new IOException("NOT a palette file");
 
-		sr.skip(skip);
 		version = sr.read(); // read lee un unico byte pero lo devuelve como int
-
-		readColors64(sr);
-	}
-
-	/**
-	 * Reads color from a DIV GAMES palette
-	 * 
-	 * @param sr InpurStream where the colors are saved
-	 * @throws IOException
-	 */
-	private void readColors64(InputStream sr) throws IOException {
+		sr.skip(skip);
+		
 		byte color[] = new byte[3];
 		colors = new Color[NUMCOLORS];
 
@@ -108,8 +101,36 @@ public class ColorPalette {
 	}
 
 	/**
+	 * Reads a palette from a stream
+	 *
+	 * @param sr Stream with the palete
+	 * @throws IOException
+	 *
+	 * The palette in the stream must be a DIV GAMES STUDIO PAL
+	 * MAP, or FPG file, this constructor is indeed to read palette
+	 * from a graphic format sequentially, preserving stream for image 
+	 * read. Use ColorPalette(InputStream sr) if you only want to 
+	 * read the palette data.
+	 */
+	public ColorPalette(ImageInputStream sr)
+			throws IOException {
+
+		byte color[] = new byte[3];
+		colors = new Color[NUMCOLORS];
+
+		for (int i = 0; i < NUMCOLORS; i++) {
+			sr.read(color);
+			colors[i] = new Color(
+					255 * (int) color[0] / 64,
+					255 * (int) color[1] / 64,
+					255 * (int) color[2] / 64);
+		}
+	}
+
+
+	/**
 	 * Gets gamma from selected color
-	 * 
+	 *
 	 * @param c
 	 * @return
 	 */
@@ -134,7 +155,7 @@ public class ColorPalette {
 
 	/**
 	 * Returns gamam from color #idx
-	 * 
+	 *
 	 * @param idx Color for gamma
 	 * @return The fidnded gamma
 	 */
@@ -145,7 +166,7 @@ public class ColorPalette {
 
 	/**
 	 * Puts a gamma into pal data
-	 * 
+	 *
 	 * @param idx Where to put the gamma colors
 	 * @param cg  Gamma to put
 	 */
@@ -157,7 +178,7 @@ public class ColorPalette {
 
 	/**
 	 * Returns color at index
-	 * 
+	 *
 	 * @param idx Index where the color is placed (0-255)
 	 * @return Finded color
 	 */
@@ -167,11 +188,21 @@ public class ColorPalette {
 
 	/**
 	 * Puts a color into the palette
-	 * 
+	 *
 	 * @param idx Index where to put the color (0-255)
 	 * @param c   Color to put
 	 */
 	public void setColor(int idx, Color c) {
 		colors[idx] = new Color(c.getRGB());
 	}
+
+	/**
+	 * Returns color RGB components
+	 * @param idx index of the color to get
+	 * @return The RGB components of the color as int
+	 */
+	public int getRGB(int idx){
+		return colors[idx].getRGB();
+	}
+
 }

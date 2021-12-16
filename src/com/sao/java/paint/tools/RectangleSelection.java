@@ -165,7 +165,7 @@ extends DrawingTool
 			g2.dispose();
 
 			g2 = originalImage.createGraphics();
-			g2.setBackground(Color.WHITE);
+			g2.setBackground(dp.getFillColor());
 			g2.clearRect(x,y,w,h);
 			g2.dispose();
 
@@ -183,11 +183,37 @@ extends DrawingTool
 	 */
 	public void paste(DrawingPanel dp, BufferedImage img)
 	{
+		int x,y,w,h;
 		dp.notifyChanged();
 		pastedImage = img;
-		old = new Point(0,0);
-		current = new Point(img.getWidth(),img.getHeight());
-		g.drawImage(img, 0, 0, null);
+
+		g.setColor(selectionBColor);
+		g.clearRect(0, 0, width,height);
+
+		if(old==null)
+		{
+			old = new Point(0,0);
+			current = new Point(img.getWidth(),img.getHeight());
+			x = old.x < current.x ? old.x : current.x;
+			y = old.y < current.y ? old.y : current.y;
+			w = Math.abs(old.x - current.x);
+			h = Math.abs(old.y - current.y);
+			g.drawImage(img, 0, 0, null);
+		}
+		else
+		{
+			x = old.x < current.x ? old.x : current.x;
+			y = old.y < current.y ? old.y : current.y;
+			w = Math.abs(old.x - current.x);
+			h = Math.abs(old.y - current.y);
+			g.drawImage(pastedImage, x, y, w, h, null);
+		}
+
+		g.setColor(selectionColor);;
+		g.fillRect(x, y, w, h);
+		g.setColor(selectionBorderColor);
+		g.drawRect(x,y,w,h);
+		dp.updateUI();
 	}
 
 	/**

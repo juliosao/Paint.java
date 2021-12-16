@@ -16,7 +16,7 @@ public class Brush extends BrushDrawingTool
 		dp.notifyChanged();
 		image = dp.getImage();
 		initBrush((int)dp.getStroke().getLineWidth());
-		final int c = dp.getStrokeColor().getRGB();
+		final int c = me.button == 1 ? dp.getStrokeColor().getRGB() : dp.getFillColor().getRGB();
 		r= (c >> 16) & 255;
 		g= (c >> 8) & 255;
 		b= c & 255;

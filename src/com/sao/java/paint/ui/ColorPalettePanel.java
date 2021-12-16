@@ -15,15 +15,15 @@ import javax.swing.JPanel;
 /**
  * @author Julio
  */
-public class ColorPalettePanel 
+public class ColorPalettePanel
         extends JPanel
         implements Coloreable, ActionListener {
-    
+
     int idx = 0;
     ColorPalette palette;
     ColorButton buttons[] = new ColorButton[ColorPalette.NUMCOLORS];
     ActionListener listener = null;
-    
+
     public ColorPalettePanel(ColorPalette cp){
 
         setLayout(new GridLayout(16,16,2,2));
@@ -58,7 +58,7 @@ public class ColorPalettePanel
 
 
     @Override
-    public void setStrokeColor(Color c) 
+    public void setStrokeColor(Color c)
     {
         // Does nothing?
     }
@@ -67,7 +67,7 @@ public class ColorPalettePanel
     public Color getStrokeColor() {
         return buttons[idx].getBackground();
     }
-    
+
     public ColorPalette getColorPalette() {
         return palette;
     }
@@ -77,8 +77,21 @@ public class ColorPalettePanel
         palette = p;
         for(int i=0; i<ColorPalette.NUMCOLORS; i++)
         {
-            buttons[i].setStrokeColor(p.getColor(i));            
+            buttons[i].setStrokeColor(p.getColor(i));
         }
     }
+
+    @Override
+    public Color getFillColor() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setFillColor(Color c) {
+        // TODO Auto-generated method stub
+
+    }
+
 
 }

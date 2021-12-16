@@ -3,15 +3,28 @@
 		Simple paint program written in java
 	</description>
 	<property name="src" location="src"/>
+	<property name="extras" location="extras"/>
 	<property name="build" location="build"/>
 	<property name="dist" location="dist"/>
 
 	<target name="compile" description="compile the source">
 		<mkdir dir="${build}"/>
 		<javac srcdir="${src}" destdir="${build}"/>
+		<copy todir="${build}">
+			<fileset dir="${src}" >
+				<include name="**/*.png" />
+				<include name="**/*.jpg" />
+			</fileset>
+    	</copy>
+		<mkdir dir="${build}/META-INF/services"/>
+		<copy todir="${build}/META-INF/services">
+			<fileset dir="${extras}" >
+				<include name="javax.imageio.spi.ImageReaderSpi"/>
+			</fileset>
+		</copy>
 	</target>
 
-	<target name="dist" depends="compile" description="generate the distribution">	
+	<target name="dist" depends="compile" description="generate the distribution">
 		<mkdir dir="${dist}/lib"/>
 		<jar jarfile="${dist}/lib/paintjava.jar" basedir="${build}">
 			<manifest>
@@ -21,7 +34,7 @@
 		</jar>
 	</target>
 
-	<target name="clean" description="clean up">	
+	<target name="clean" description="clean up">
 		<delete dir="${build}"/>
 		<delete dir="${dist}"/>
 	</target>

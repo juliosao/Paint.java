@@ -31,7 +31,7 @@ import javax.swing.JPanel;
  *
  * @author julio
  */
-public class ColorPickerDialog 
+public class ColorPickerDialog
         extends javax.swing.JDialog
         implements Coloreable
 {
@@ -40,19 +40,19 @@ public class ColorPickerDialog
 	Container container;
 	ColorBuilder colorBuilder;
 	Color currentColor;
-	
-	static FileNameExtensionFilter filters[] = new FileNameExtensionFilter[]{ 
+
+	static FileNameExtensionFilter filters[] = new FileNameExtensionFilter[]{
         new FileNameExtensionFilter("DIV palette files", "PAL")
     };
-        
+
     /**
      * Creates new form ColorPicker
      */
     public ColorPickerDialog(Window parent, ColorPalette p) {
-        super(parent); 
-        
+        super(parent);
+
         palette = p;
-              
+
 		container = getContentPane();
 		setLayout(new BorderLayout());
         setModal(true);
@@ -70,13 +70,13 @@ public class ColorPickerDialog
 	@Override
 	public void setStrokeColor(Color c) {
 		currentColor = c;
-		colorBuilder.setStrokeColor(c);		
+		colorBuilder.setStrokeColor(c);
 	}
 
-	public Color askForStrokeColor(Color defColor) 
-	{	
+	public Color askForStrokeColor(Color defColor)
+	{
 		setStrokeColor(defColor);
-		setVisible(true);	
+		setVisible(true);
 		return currentColor;
 	}
 
@@ -93,7 +93,7 @@ public class ColorPickerDialog
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				currentColor = colorBuilder.getStrokeColor();
-				ColorPickerDialog.this.setVisible(false);				
+				ColorPickerDialog.this.setVisible(false);
 			}
 		});
 		jp.add(btnOk);
@@ -101,8 +101,8 @@ public class ColorPickerDialog
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.addActionListener(new ActionListener(){
 			@Override
-			public void actionPerformed(ActionEvent e) {				
-				ColorPickerDialog.this.setVisible(false);				
+			public void actionPerformed(ActionEvent e) {
+				ColorPickerDialog.this.setVisible(false);
 			}
 		});
 
@@ -112,7 +112,7 @@ public class ColorPickerDialog
 
 	public <JPaintMainWindow> void addMainPanel()
 	{
-		JPanel jp = new JPanel();		
+		JPanel jp = new JPanel();
 		jp.setLayout(new FlowLayout());
 
 		JPanel pnlBuilder = new JPanel();
@@ -120,7 +120,7 @@ public class ColorPickerDialog
 		pnlBuilder.setBorder(BorderFactory.createTitledBorder("Color Builder"));
 		pnlBuilder.add(colorBuilder);
 		jp.add(pnlBuilder);
-		
+
 		JPanel pnlPalette = new JPanel();
 		pnlPalette.setBorder(BorderFactory.createTitledBorder("Palette"));
 		pnlPalette.setLayout(new BoxLayout(pnlPalette,BoxLayout.Y_AXIS));
@@ -129,7 +129,7 @@ public class ColorPickerDialog
 		colorPalettePanel.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				setStrokeColor(colorPalettePanel.getStrokeColor());				
+				setStrokeColor(colorPalettePanel.getStrokeColor());
 			}
 		});
 		pnlPalette.add(colorPalettePanel);
@@ -141,7 +141,7 @@ public class ColorPickerDialog
 			public void actionPerformed(ActionEvent e) {
 				try
 				{
-					JFileChooser fileChooser = new JFileChooser();            
+					JFileChooser fileChooser = new JFileChooser();
 					fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
 					for(FileNameExtensionFilter filter: filters)
 					{
@@ -165,8 +165,20 @@ public class ColorPickerDialog
 
 		});
 		pnlPalette.add(btnLoad);
-		
+
 		add(jp,BorderLayout.CENTER);
 	}
-   
+
+	@Override
+	public Color getFillColor() {
+		// Does nothing
+		return null;
+	}
+
+	@Override
+	public void setFillColor(Color c) {
+		// Does nothing
+
+	}
+
 }

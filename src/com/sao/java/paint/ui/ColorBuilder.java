@@ -10,7 +10,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-public class ColorBuilder extends JPanel 
+public class ColorBuilder extends JPanel
 	implements Coloreable, ChangeListener  {
 
 	ColorButton btnResult;
@@ -23,7 +23,7 @@ public class ColorBuilder extends JPanel
 
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		JPanel pnlComponents = new JPanel();
-		pnlComponents.setBorder(BorderFactory.createTitledBorder("RGB"));		
+		pnlComponents.setBorder(BorderFactory.createTitledBorder("RGB"));
 		pnlComponents.setLayout(new BoxLayout(pnlComponents,BoxLayout.X_AXIS));
 
 		JPanel pnl = new JPanel();
@@ -37,7 +37,7 @@ public class ColorBuilder extends JPanel
 		sldR.addChangeListener(this);
 		pnl.add(sldR);
 		pnlComponents.add(pnl);
-		
+
 		pnl = new JPanel();
 		pnl.setLayout(new BoxLayout(pnl,BoxLayout.Y_AXIS));
 		lbl = new JLabel("G");
@@ -52,14 +52,14 @@ public class ColorBuilder extends JPanel
 		pnl = new JPanel();
 		pnl.setLayout(new BoxLayout(pnl,BoxLayout.Y_AXIS));
 		lbl = new JLabel("B");
-		pnl.add(lbl);	
+		pnl.add(lbl);
 		lblB = new JLabel("255");
-		pnl.add(lblB);	
+		pnl.add(lblB);
 		sldB = new JSlider(JSlider.VERTICAL, 0, 255, 0);
 		sldB.addChangeListener(this);
 		pnl.add(sldB);
-		pnlComponents.add(pnl);	
-		
+		pnlComponents.add(pnl);
+
 		add(pnlComponents);
 
 		JPanel pnlResult = new JPanel();
@@ -80,7 +80,7 @@ public class ColorBuilder extends JPanel
 		final int r = c.getRed();
 		final int g = c.getGreen();
 		final int b = c.getBlue();
-		
+
 		sldR.setValue(r);
 		sldG.setValue(g);
 		sldB.setValue(b);
@@ -88,12 +88,22 @@ public class ColorBuilder extends JPanel
 		lblR.setText(String.format("%03d", r));
 		lblG.setText(String.format("%03d", g));
 		lblB.setText(String.format("%03d", b));
-		
+
 	}
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		btnResult.setStrokeColor(new Color(sldR.getValue(), sldG.getValue(), sldB.getValue()));		
+		btnResult.setStrokeColor(new Color(sldR.getValue(), sldG.getValue(), sldB.getValue()));
 	}
-	
+
+	@Override
+	public Color getFillColor() {
+		return null;
+	}
+
+	@Override
+	public void setFillColor(Color c) {
+		// Does nothing
+	}
+
 }

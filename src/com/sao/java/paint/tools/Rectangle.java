@@ -12,6 +12,7 @@ public class Rectangle
 	extends DrawingTool
 {
 	Point old = null;
+	Point current = null;
 	BufferedImage backupImage;
 	Graphics2D g;
 
@@ -21,40 +22,53 @@ public class Rectangle
 		dp.notifyChanged();
 		BufferedImage image = dp.getImage();
 		backupImage = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+
 		Graphics2D tmpG = (Graphics2D)backupImage.getGraphics();
 		tmpG.drawImage(image, 0, 0, null);
 		tmpG.dispose();
 
+		old = me.getPoint();
+		current = old;
 		g = (Graphics2D)image.getGraphics();
-		g.setColor(dp.getStrokeColor());
-		g.setStroke(dp.getStroke());
-		old=me.getPoint();
-		g.drawRect(old.x, old.y, 0, 0 );
+		draw(dp);
 	}
 
 	@Override
 	public void onMouseReleased(DrawingPanel dp,  DrawingMouseEvent me)
 	{
-		Point current =  me.getPoint();
-		g.drawImage(backupImage, 0, 0, null);
-		int x = old.x < current.x ? old.x : current.x;
-		int y = old.y < current.y ? old.y : current.y;
-		int w = Math.abs(old.x - current.x);
-		int h = Math.abs(old.y - current.y);
-		g.drawRect(x,y,w,h);
-		g.dispose();
+		current =  me.getPoint();
+		draw(dp);
 	}
 
 	@Override
 	public void onMouseDragged(DrawingPanel dp,  DrawingMouseEvent me)
 	{
-		Point current =  me.getPoint();
+		current =  me.getPoint();
+		draw(dp);
+	}
+
+	private void draw(DrawingPanel dp)
+	{
 		g.drawImage(backupImage, 0, 0, null);
 		int x = old.x < current.x ? old.x : current.x;
 		int y = old.y < current.y ? old.y : current.y;
 		int w = Math.abs(old.x - current.x);
 		int h = Math.abs(old.y - current.y);
-		g.drawRect(x,y,w,h);
+
+		int mode = dp.getShapeMode();
+
+		if((mode & DrawingPanel.FILL) != 0 )
+		{
+			g.setColor(dp.getFillColor());
+			g.fillRect(x,y,w,h);
+		}
+
+		if((mode & DrawingPanel.BORDER) != 0 )
+		{
+			g.setStroke(dp.getStroke());
+			g.setColor(dp.getStrokeColor());
+			g.drawRect(x, y, w, h);
+		}
 	}
 
 	public String getDescription()

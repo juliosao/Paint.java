@@ -18,7 +18,10 @@ public class ColorPicker extends DrawingTool {
 
 	@Override
 	public void onMousePressed(DrawingPanel dp,  DrawingMouseEvent me) {
-		coloreable.setStrokeColor(new Color( dp.getImage().getRGB(me.x, me.y)));
+		if(me.button == 1)
+			coloreable.setStrokeColor(new Color( dp.getImage().getRGB(me.x, me.y)));
+		else
+			coloreable.setFillColor(new Color( dp.getImage().getRGB(me.x, me.y)));
 	}
 
 	public String getDescription() {

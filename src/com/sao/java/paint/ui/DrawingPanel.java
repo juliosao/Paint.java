@@ -7,7 +7,6 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
-import java.util.Queue;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -31,6 +30,9 @@ public class DrawingPanel
     implements MouseMotionListener, MouseListener, AdjustmentListener, Coloreable
 
 {
+    public static final int BORDER = 1;
+	public static final int FILL = 2;
+
     private BufferedImage image;
     private BufferedImage toolingLayer;
     private DrawingTool dtool;
@@ -39,7 +41,9 @@ public class DrawingPanel
     private JScrollBar vScrollBar;
     private JScrollBar hScrollBar;
     private Color strokeColor;
+    private Color fillColor;
     private BasicStroke stroke;
+    private int shapeMode = BORDER;
 
     private LinkedList<BufferedImage> history = new LinkedList<>();
     private LinkedList<BufferedImage> fordwardHistory = new LinkedList<>();
@@ -73,6 +77,7 @@ public class DrawingPanel
         add(hScrollBar,BorderLayout.SOUTH);
         hScrollBar.addAdjustmentListener(this);
 
+        fillColor = Color.WHITE;
         strokeColor = Color.BLACK;
         stroke = new BasicStroke();
     }
@@ -192,7 +197,7 @@ public class DrawingPanel
         if(isMousePressed && dtool != null && image != null)
         {
             Point current =  evt.getPoint();
-            DrawingMouseEvent dme = new DrawingMouseEvent((int)((current.getX()+x)*100/zoom),(int)((current.getY()+y)*100/zoom));
+            DrawingMouseEvent dme = new DrawingMouseEvent((int)((current.getX()+x)*100/zoom),(int)((current.getY()+y)*100/zoom),evt.getButton());
             dtool.onMouseDragged(this,dme);
         }
         updateUI();
@@ -203,7 +208,7 @@ public class DrawingPanel
         if(dtool != null && image != null)
         {
             Point current =  me.getPoint();
-            DrawingMouseEvent dme = new DrawingMouseEvent((int)((current.getX()+x)*100/zoom),(int)((current.getY()+y)*100/zoom) );
+            DrawingMouseEvent dme = new DrawingMouseEvent((int)((current.getX()+x)*100/zoom),(int)((current.getY()+y)*100/zoom),me.getButton());
             dtool.onMousePressed(this, dme);
         }
         isMousePressed = true;
@@ -215,7 +220,7 @@ public class DrawingPanel
         if(dtool != null && image != null)
         {
             Point current =  me.getPoint();
-            DrawingMouseEvent dme = new DrawingMouseEvent((int)((current.getX()+x)*100/zoom),(int)((current.getY()+y)*100/zoom) );
+            DrawingMouseEvent dme = new DrawingMouseEvent((int)((current.getX()+x)*100/zoom),(int)((current.getY()+y)*100/zoom),me.getButton() );
             dtool.onMouseReleased(this, dme);
         }
         isMousePressed = false;
@@ -332,5 +337,25 @@ public class DrawingPanel
     public void destroyToolingLayer()
     {
         toolingLayer = null;
+    }
+
+    @Override
+    public Color getFillColor() {
+        return fillColor;
+    }
+
+    @Override
+    public void setFillColor(Color c) {
+        fillColor = c;
+    }
+
+    public int getShapeMode()
+    {
+        return shapeMode;
+    }
+
+    public void setShapeMode(int s)
+    {
+        shapeMode = s;
     }
 }

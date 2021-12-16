@@ -24,7 +24,7 @@ public class Line
         tmpG.dispose();
 
         g = (Graphics2D)image.getGraphics();
-        g.setColor(dp.getStrokeColor());
+        g.setColor(me.button == 1 ? dp.getStrokeColor() : dp.getFillColor());
 		g.setStroke(dp.getStroke());
         old=me.getPoint();
         g.drawLine(old.x, old.y, old.x, old.y );

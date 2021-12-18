@@ -1,0 +1,6 @@
+Package: paintjava
+Version: 0.1
+Multi-Arch: allowed
+Architecture: all
+Maintainer: Julio A. García <juliosao@gmail.com>
+Description: A Simple drawing program

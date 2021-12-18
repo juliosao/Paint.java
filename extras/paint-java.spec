@@ -18,26 +18,24 @@ A Simple drawing program written in java. This program aims to be compatible wit
 %prep
 %setup -q
 
-%build
-ant
-
 %install
 mkdir -p $RPM_BUILD_ROOT/opt/sao/paintjava/
-cp dist/lib/paintjava.jar $RPM_BUILD_ROOT/opt/sao/paintjava/
-cp extras/paintjava.sh $RPM_BUILD_ROOT/opt/sao/paintjava/
+cp LICENSE $RPM_BUILD_ROOT/opt/sao/paintjava/
+cp README.md $RPM_BUILD_ROOT/opt/sao/paintjava/
+cp paintjava.sh $RPM_BUILD_ROOT/opt/sao/paintjava/
+cp paintjava.jar $RPM_BUILD_ROOT/opt/sao/paintjava/
 
 mkdir -p $RPM_BUILD_ROOT/usr/share/applications
-cp extras/paintjava.desktop  $RPM_BUILD_ROOT/usr/share/applications
-
-%post
+cp paintjava.desktop  $RPM_BUILD_ROOT/usr/share/applications
 
 %clean
-ant clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(444,root,root,555)
 /opt/sao/paintjava/paintjava.jar
+/opt/sao/paintjava/LICENSE
+/opt/sao/paintjava/README.md
 %attr(555,root,root)/opt/sao/paintjava/paintjava.sh
 /usr/share/applications/paintjava.desktop
 

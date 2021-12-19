@@ -13,6 +13,7 @@ public class AboutDialog extends JDialog{
 	{
 		super(parent);
 		setTitle("About paint.java");
+		setLocationRelativeTo(parent);
 		setLayout(new BoxLayout(this.getContentPane(),BoxLayout.Y_AXIS));
 		JLabel l = new JLabel("Paint.java");
 		l.setAlignmentX(CENTER_ALIGNMENT);

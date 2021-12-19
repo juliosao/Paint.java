@@ -9,10 +9,10 @@ import java.awt.FontMetrics;
 import java.awt.Window;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.WindowEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.event.WindowFocusListener;
 import java.awt.font.GlyphVector;
 import java.awt.image.BufferedImage;
 import java.awt.GraphicsEnvironment;
@@ -20,7 +20,9 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.Graphics2D;
 
+import java.awt.geom.AffineTransform;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -35,17 +37,23 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import com.sao.java.paint.tools.RectangleSelection;
+import com.sao.java.paint.ui.AlignSelector;
 import com.sao.java.paint.ui.DrawingPanel;
 
-
+/**
+ * Dialog for create text shapes
+ */
 public class StrokeTextDialog
 	extends JDialog
-	implements FocusListener
+	implements WindowFocusListener
 {
+
+
 	RectangleSelection selectionTool;
 	DrawingPanel drawingPanel;
 	JTextArea textArea;
 	int fontSize = 34;
+	int align = AlignSelector.ALIGN_LEFT;
 	boolean italic = false;
 	boolean bold = false;
 	boolean drawBorder = true;
@@ -53,14 +61,22 @@ public class StrokeTextDialog
 	String fontName;
 	Color strokeColor = Color.BLACK;
 
+	/**
+	 * Class constructor
+	 * @param parent Parent window for the dialog
+	 * @param selection A selecction tool used to put seleccion on drawing panel
+	 * @param dp A drawing panel where to put the results
+	 */
 	public StrokeTextDialog(Window parent, RectangleSelection selection, DrawingPanel dp)
 	{
 		super(parent);
 		setTitle("Insert text");
 		setLayout(new BorderLayout());
+		setLocationRelativeTo(parent);
+		addWindowFocusListener(this);
 		addToolbar();
-		addRightBar();
-		textArea = new JTextArea("New text");
+		addBottomBar();
+		textArea = new JTextArea("New\ntext");
 		textArea.setPreferredSize(new Dimension(320,200));
 		textArea.getDocument().addDocumentListener( new DocumentListener() {
 
@@ -98,6 +114,9 @@ public class StrokeTextDialog
 		}
 	}
 
+	/**
+	 * Puts toolbar for customizing text
+	 */
 	private void addToolbar()
 	{
 		JToolBar jt = new JToolBar();
@@ -106,22 +125,20 @@ public class StrokeTextDialog
 
 		String fonts[] = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
 
-		JLabel jl = new JLabel("Font:") ;
+		jt.add(new JLabel("Font:"));
 		JComboBox<String> jcb = new JComboBox<>(fonts);
 		jcb.addItemListener(new ItemListener(){
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				fontName = (String)jcb.getSelectedItem();
 				updateImage();
-
 			}
 		});
 		fontName = (String)jcb.getSelectedItem();
-
 		jt.add(jcb);
 
-		jl = new JLabel(" Size:");
-		jt.add(jl);
+		jt.add(new JToolBar.Separator());
+		jt.add(new JLabel(" Size:"));
 
 		JSpinner spn = new JSpinner(new SpinnerNumberModel(32, 5, 100, 1));
 		spn.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -133,8 +150,9 @@ public class StrokeTextDialog
 		});
 		jt.add(spn);
 
-		JToggleButton btnB = new JToggleButton(" B ");
-		btnB.setFont(new Font("Serif", Font.BOLD, 14));
+		jt.add(new JToolBar.Separator());
+		JToggleButton btnB = new JToggleButton();
+		btnB.setIcon(new ImageIcon(getClass().getResource("../ui/img/italic.png")));
 		btnB.addItemListener(new ItemListener(){
 			@Override
 			public void itemStateChanged(ItemEvent e)
@@ -145,8 +163,8 @@ public class StrokeTextDialog
 		});
 		jt.add(btnB);
 
-		JToggleButton btnI = new JToggleButton(" I ");
-		btnI.setFont(new Font("Serif", Font.ITALIC, 14));
+		JToggleButton btnI = new JToggleButton();
+		btnI.setIcon(new ImageIcon(getClass().getResource("../ui/img/bold.png")));
 		btnI.addItemListener(new ItemListener(){
 			@Override
 			public void itemStateChanged(ItemEvent e)
@@ -157,6 +175,20 @@ public class StrokeTextDialog
 		});
 		jt.add(btnI);
 
+		jt.add(new JToolBar.Separator());
+
+		AlignSelector as = new AlignSelector();
+		as.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				align = as.getAlign();
+				updateImage();
+			}
+
+		});
+		jt.add(new AlignSelector());
+
+		jt.add(new JToolBar.Separator());
 		JToggleButton btnBorder = new JToggleButton("Border");
 		btnBorder.setFont(new Font("Serif", Font.PLAIN, 14));
 		btnBorder.setSelected(true);
@@ -185,7 +217,10 @@ public class StrokeTextDialog
 
 	}
 
-	void addRightBar()
+	/**
+	 * Puts controls to apply results or cancel text insertion
+	 */
+	void addBottomBar()
 	{
 		JPanel jp = new JPanel();
 		//jp.setLayout(new BoxLayout(jp, BoxLayout.X_AXIS));
@@ -214,7 +249,9 @@ public class StrokeTextDialog
 
 	}
 
-
+	/**
+	 * Updates text image on destination drawing panel
+	 */
 	void updateImage()
 	{
 
@@ -230,61 +267,90 @@ public class StrokeTextDialog
 			s=" ";
 		}
 
-		int lines = 1;
-		for(int i=0; i<s.length(); i++)
-		{
-			if(s.charAt(i) == '\n')
-				lines++;
-		}
-
+		//Composes font
 		int style = bold ? Font.BOLD : Font.PLAIN;
 		if(italic) style |= Font.ITALIC;
-
 		Font f = new Font(fontName, style, fontSize);
+
+		//Calculates text dimensions
+		String[] lines = s.split("\n");
+
 		FontMetrics fm = drawingPanel.getGraphics().getFontMetrics(f);
-		GlyphVector v = f.createGlyphVector(getFontMetrics(f).getFontRenderContext(), s);
-    	Shape shape = v.getOutline();
+		int width = 0;
+		for(String l:lines)
+		{
+			final int w = fm.stringWidth(l);
+			if(w>width)
+				width=w;
+		}
 
-		Rectangle bounds = shape.getBounds();
-		int height = fm.getHeight() * lines;
-		int width = fm.stringWidth(s);
+		// Draws lines in selection
+		int height = fm.getHeight();
+		int margin = drawBorder ? (int)(drawingPanel.getStroke().getLineWidth() + 3) : 3;
 
-		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
+		BufferedImage img = new BufferedImage(width, height*lines.length+margin, BufferedImage.TYPE_4BYTE_ABGR);
 		Graphics2D g = img.createGraphics();
-		g.translate(
-            (width - bounds.width) / 2 - bounds.x,
-            (height - bounds.height) / 2 - bounds.y
-    	);
-
 		g.setBackground(new Color(255,255,255,0));
-		g.clearRect(0, 0, width, height);
+		g.clearRect(0, 0, width, height*lines.length);
 
-		if(drawFill)
-		{
-			g.setColor(drawingPanel.getFillColor());
-			g.fill(shape);
-		}
+		final AffineTransform at = g.getTransform();
 
-		if(drawBorder)
+		for(int i=0; i<lines.length; i++)
 		{
-			g.setColor(drawingPanel.getStrokeColor());
-			g.setStroke(drawingPanel.getStroke());
-			g.draw(shape);
-			g.dispose();
+			final GlyphVector v = f.createGlyphVector(getFontMetrics(f).getFontRenderContext(), lines[i]);
+			final Shape shape = v.getOutline();
+			final Rectangle bounds = shape.getBounds();
+
+			g.setTransform(at);
+
+			int x;
+			switch(align)
+			{
+				case AlignSelector.ALIGN_CENTER:
+					x = (width - bounds.width) / 2 - bounds.x;
+					break;
+				case AlignSelector.ALIGN_RIGHT:
+					x=(width-bounds.width)/2;
+					break;
+				case AlignSelector.ALIGN_LEFT:
+				default:
+					x = -bounds.x;
+					break;
+			}
+			final int y = (height+margin/2)+height*i;
+			g.translate(x,y);
+			//System.out.println(String.format("Render: '%s' x=%d, y=%d h=%d w=%d",lines[i],x,y,height,bounds.width));
+
+			if(drawFill)
+			{
+				g.setColor(drawingPanel.getFillColor());
+				g.fill(shape);
+			}
+
+			if(drawBorder)
+			{
+				g.setColor(drawingPanel.getStrokeColor());
+				g.setStroke(drawingPanel.getStroke());
+				g.draw(shape);
+			}
 		}
+		g.dispose();
 
 		selectionTool.paste(drawingPanel, img);
 	}
 
+	/**
+	 * Occurs when the user returns from other window
+	 */
 	@Override
-	public void focusGained(FocusEvent e) {
+	public void windowGainedFocus(WindowEvent e) {
 		updateImage();
 
 	}
 
 	@Override
-	public void focusLost(FocusEvent e) {
-		// TODO Auto-generated method stub
+	public void windowLostFocus(WindowEvent e) {
+		// Does nothing
 
 	}
 

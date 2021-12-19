@@ -65,6 +65,8 @@ public class DrawingPanel
         vScrollBar.setMaximum(0);
         vScrollBar.setMinimum(0);
         vScrollBar.setValue(0);
+        vScrollBar.setUnitIncrement(10);
+        vScrollBar.setBlockIncrement(100);
         add(vScrollBar,BorderLayout.EAST);
         vScrollBar.addAdjustmentListener(this);
 
@@ -72,6 +74,8 @@ public class DrawingPanel
         hScrollBar.setMaximum(0);
         hScrollBar.setMinimum(0);
         hScrollBar.setValue(0);
+        hScrollBar.setUnitIncrement(10);
+        hScrollBar.setBlockIncrement(100);
         add(hScrollBar,BorderLayout.SOUTH);
         hScrollBar.addAdjustmentListener(this);
 
@@ -180,7 +184,6 @@ public class DrawingPanel
     public void setImage(BufferedImage img)
     {
         image = img;
-        updateScrolls();
         updateUI();
         notifyChanged();
     }
@@ -255,13 +258,18 @@ public class DrawingPanel
         updateUI();
     }
 
+    /**
+     * Sets current zoom
+     * @param newZoom
+     */
     public void setZoom(int newZoom){
         zoom = newZoom;
         updateUI();
     }
 
-
-
+    /**
+     * Updates scroolbar position and visibility
+     */
     private void updateScrolls()
     {
         if(image == null)
@@ -272,7 +280,13 @@ public class DrawingPanel
         final int iWidth = image.getWidth() * zoom / 100;
         final int iHeight = image.getHeight() * zoom / 100;
 
-        if(iWidth <= hVisible)
+        if(iWidth<getWidth())
+            x=0;
+
+        if(iHeight<getHeight())
+            y=0;
+
+        if(iWidth + this.x <= hVisible)
         {
             hScrollBar.setVisible(false);
         }
@@ -282,7 +296,7 @@ public class DrawingPanel
             hScrollBar.setVisible(true);
         }
 
-        if(iHeight <= vVisible)
+        if(iHeight + this.y <= vVisible)
         {
             vScrollBar.setVisible(false);
         }
@@ -293,6 +307,9 @@ public class DrawingPanel
         }
     }
 
+    /**
+     * Occurs when user changes a scrollbar position
+     */
     @Override
     public void adjustmentValueChanged(AdjustmentEvent e) {
         this.x = hScrollBar.getValue();

@@ -55,6 +55,7 @@ public class ColorPickerDialog
 
 		container = getContentPane();
 		setLayout(new BorderLayout());
+		setLocationRelativeTo(parent);
         setModal(true);
 
 		addMainPanel();

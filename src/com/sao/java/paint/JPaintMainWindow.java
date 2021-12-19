@@ -3,11 +3,12 @@ package com.sao.java.paint;
 import com.sao.java.paint.ui.DrawingPanel;
 import com.sao.java.paint.ui.ShapeModeCombo;
 import com.sao.java.paint.dialogs.AboutDialog;
+import com.sao.java.paint.dialogs.CropDialog;
 import com.sao.java.paint.dialogs.FilterDialog;
 import com.sao.java.paint.dialogs.NewImageDialog;
+import com.sao.java.paint.dialogs.ScaleDialog;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -40,15 +41,12 @@ import com.sao.java.paint.tools.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.WindowConstants;
-import javax.swing.event.MouseInputAdapter;
-import javax.swing.event.MouseInputListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.Toolkit;
 
@@ -75,6 +73,7 @@ public class JPaintMainWindow extends JFrame
 	JMenuBar menuBar;
 	JMenu menuFile;
 	JMenu menuEdit;
+	JMenu menuImage;
 	JMenu menuFilter;
 	JSpinner zoomer;
 	Container container;
@@ -238,10 +237,10 @@ public class JPaintMainWindow extends JFrame
 			@Override
 			public void stateChanged(javax.swing.event.ChangeEvent evt) {
 				lblWidth.setText(""+jslWidth.getValue()+" px");
-				drawingPanel.setStroke(new BasicStroke((int)jslWidth.getValue(),BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));
+				drawingPanel.setStroke(new BasicStroke((int)jslWidth.getValue(),BasicStroke.CAP_BUTT,BasicStroke.JOIN_MITER));
 			}
 		});
-		jslWidth.setValue(10);
+		jslWidth.setValue(5);
 
 		pnl.add(jslWidth);
 		pnl.add(lblWidth);//,BorderLayout.EAST);
@@ -273,6 +272,7 @@ public class JPaintMainWindow extends JFrame
 		menuBar = new JMenuBar();
 		createFileMenu();
 		createEditMenu();
+		createImageMenu();
 		createFilterMenu();
 		createHelpMenu();
 		setJMenuBar(menuBar);
@@ -435,6 +435,38 @@ public class JPaintMainWindow extends JFrame
 		menuEdit.add(mnu);
 
 		menuBar.add(menuEdit);
+	}
+
+	void createImageMenu()
+	{
+		menuImage = new JMenu("Image");
+		ActionListener al = new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				switch(e.getActionCommand())
+				{
+					case "Resize...":
+						ScaleDialog scd = new ScaleDialog(JPaintMainWindow.this, drawingPanel);
+						scd.setVisible(true);
+						break;
+					case "Crop/Expand...":
+						CropDialog cd = new CropDialog(JPaintMainWindow.this, drawingPanel);
+						cd.setVisible(true);
+						break;
+				}
+			}
+		};
+
+		JMenuItem mnu = new JMenuItem("Resize...");
+		mnu.addActionListener(al);
+		menuImage.add(mnu);
+
+		mnu = new JMenuItem("Crop/Expand...");
+		mnu.addActionListener(al);
+		menuImage.add(mnu);
+
+		menuBar.add(menuImage);
 	}
 
 	void createFilterMenu()

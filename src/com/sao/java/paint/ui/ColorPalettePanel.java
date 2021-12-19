@@ -83,14 +83,12 @@ public class ColorPalettePanel
 
     @Override
     public Color getFillColor() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public void setFillColor(Color c) {
-        // TODO Auto-generated method stub
-
+        //Does nothing
     }
 
 

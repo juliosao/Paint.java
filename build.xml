@@ -2,7 +2,7 @@
 	<description>
 		Simple paint program written in java
 	</description>
-	<property name="version" value="0.1"/>
+	<property name="version" value="0.2"/>
 	<property name="src" location="src"/>
 	<property name="extras" location="extras"/>
 	<property name="build" location="build"/>

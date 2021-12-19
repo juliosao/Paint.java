@@ -32,6 +32,7 @@ public class NewImageDialog
 		super(parent);
 		setTitle("New image");
 		setModal(true);
+		setLocationRelativeTo(parent);
 		final ColorPalette palette = new ColorPalette();
 		final ColorPickerDialog cp = new ColorPickerDialog(this, palette);
 

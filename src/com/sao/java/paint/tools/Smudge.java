@@ -1,6 +1,8 @@
 package com.sao.java.paint.tools;
 
 import java.awt.image.BufferedImage;
+
+import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
 public class Smudge extends BrushDrawingTool {
@@ -104,7 +106,7 @@ public class Smudge extends BrushDrawingTool {
 
 	public String getDescription()
 	{
-		return "Smudge";
+		return Translator.m("Smudge");
 	}
 
 }

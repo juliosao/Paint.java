@@ -2,6 +2,8 @@ package com.sao.java.paint.tools;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+
+import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
 public class Sharpen extends BrushDrawingTool {
@@ -10,7 +12,7 @@ public class Sharpen extends BrushDrawingTool {
 	int oldX, oldY;
 	double adjust = 1.0/3.0;
 	double convolution[][] = new double[][]{
-		{0,-adjust,0},{-adjust,7*adjust,-adjust},{-adjust,0,-adjust}
+		{0,-adjust,0},{-adjust,8*adjust,-adjust},{-adjust,0,-adjust}
 	};
 
 
@@ -127,7 +129,7 @@ public class Sharpen extends BrushDrawingTool {
 
 	public String getDescription()
 	{
-		return "Sharpen";
+		return Translator.m("Sharpen");
 	}
 
 }

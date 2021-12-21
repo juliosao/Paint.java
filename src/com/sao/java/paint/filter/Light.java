@@ -10,6 +10,6 @@ public class Light extends ConvolutionFilter {
 
 	@Override
 	public String getDescription() {
-		return "Light";
+		return "Illuminate";
 	}
 }

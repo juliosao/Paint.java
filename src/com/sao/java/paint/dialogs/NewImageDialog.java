@@ -11,6 +11,7 @@ import java.awt.Graphics2D;
 import javax.swing.SpinnerNumberModel;
 
 import com.sao.java.paint.divcompat.ColorPalette;
+import com.sao.java.paint.i18n.Translator;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -38,16 +39,16 @@ public class NewImageDialog
 
 		setLayout(new BorderLayout());
 		JPanel jp = new JPanel();
-		jp.setBorder(javax.swing.BorderFactory.createTitledBorder("Dimensions\n"));
+		jp.setBorder(javax.swing.BorderFactory.createTitledBorder(Translator.m("Dimensions")));
 		add(jp,BorderLayout.CENTER);
 		jp.setLayout(new GridLayout(3,2));
-		jp.add(new JLabel("Width"));
+		jp.add(new JLabel(Translator.m("NewWidth")));
 		JSpinner txtWidth = new JSpinner(new SpinnerNumberModel(800, 1, 10240, 1));
 		jp.add(txtWidth);
-		jp.add(new JLabel("Height"));
+		jp.add(new JLabel(Translator.m("NewHeight")));
 		JSpinner txtHeight = new JSpinner(new SpinnerNumberModel(600, 1, 10240, 1));
 		jp.add(txtHeight);
-		jp.add(new JLabel("Color"));
+		jp.add(new JLabel(Translator.m("Color")));
 		JButton btnColor = new JButton("...");
 		btnColor.setBackground(Color.WHITE);
 		btnColor.addActionListener(new ActionListener(){
@@ -63,7 +64,7 @@ public class NewImageDialog
 		add(rstp,BorderLayout.SOUTH);
 
 		JButton btnOK = new JButton();
-		btnOK.setText("Ok");
+		btnOK.setText(Translator.m("Ok"));
 		btnOK.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
                 img = new BufferedImage((int)txtWidth.getValue(), (int)txtHeight.getValue(), BufferedImage.TYPE_INT_ARGB);
@@ -78,7 +79,7 @@ public class NewImageDialog
 		rstp.add(btnOK);
 
 		JButton btnCancel = new JButton();
-		btnCancel.setText("Cancel");
+		btnCancel.setText(Translator.m("Cancel"));
 		btnCancel.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
 				result = CANCEL;
@@ -100,6 +101,4 @@ public class NewImageDialog
 	{
 		return result;
 	}
-
-
 }

@@ -1,13 +1,15 @@
 package com.sao.java.paint.filter;
 
 import java.awt.image.BufferedImage;
+
+import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
 public class GrayScale
 	implements ImageFilter {
 
 	@Override
-	public void applyTo(DrawingPanel dp, int mode)
+	public void applyTo(DrawingPanel dp, int mode, int x0, int y0, int x1, int y1)
 	{
 		BufferedImage image = dp.getImage();
 		if(mode==0)
@@ -29,9 +31,9 @@ public class GrayScale
 		}
 
 		dp.notifyChanged();
-		for(int x=0; x<image.getWidth(); x++)
+		for(int x=x0; x<y0; x++)
 		{
-			for(int y=0; y<image.getHeight(); y++)
+			for(int y=x0; y<y1; y++)
 			{
 				final int oldColor = image.getRGB(x, y);
 				int a = ((oldColor) >> 24) & 255;
@@ -72,6 +74,6 @@ public class GrayScale
 
 	public String getDescription()
 	{
-		return "Gray Scale";
+		return Translator.m("GrayScale");
 	}
 }

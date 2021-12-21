@@ -1,5 +1,7 @@
 package com.sao.java.paint.filter;
 
+import com.sao.java.paint.i18n.Translator;
+
 public class Blur extends ConvolutionFilter {
 	public Blur()
 	{
@@ -11,7 +13,7 @@ public class Blur extends ConvolutionFilter {
 
 	@Override
 	public String getDescription() {
-		return "Blur";
+		return Translator.m("Blur");
 	}
 
 

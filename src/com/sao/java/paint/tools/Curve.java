@@ -5,6 +5,7 @@ import java.awt.geom.QuadCurve2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
+import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
 public class Curve
@@ -107,7 +108,7 @@ public class Curve
 
 	public String getDescription()
 	{
-		return "Curve";
+		return Translator.m("Curve");
 	}
 
 }

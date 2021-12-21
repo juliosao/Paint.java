@@ -10,7 +10,7 @@ public abstract class ConvolutionFilter
 {
 	protected double convolutionMatrix[][];
 
-	public void applyTo(DrawingPanel dp, int mode)
+	public void applyTo(DrawingPanel dp, int mode, int x0, int y0, int x1, int y1)
 	{
 		int mi = convolutionMatrix.length;
 		int mj = convolutionMatrix.length;
@@ -21,9 +21,9 @@ public abstract class ConvolutionFilter
 		BufferedImage result = new BufferedImage(width,height,image.getType());
 
 		dp.notifyChanged();
-		for(int x=0; x<image.getWidth(); x++)
+		for(int x=x0; x<x1; x++)
 		{
-			for(int y=0; y<image.getHeight(); y++)
+			for(int y=y0; y<y1; y++)
 			{
 				final int oldColor = image.getRGB(x, y);
 				final int a = ((oldColor) >> 24) & 255;

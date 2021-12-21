@@ -1,10 +1,13 @@
 package com.sao.java.paint.tools;
 
+import java.awt.Rectangle;
 import java.awt.BasicStroke;
 import java.awt.image.BufferedImage;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+
+import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
 public class RectangleSelection
@@ -14,6 +17,9 @@ extends DrawingTool
 	static final Color selectionColor = new Color(0,0,255,50);
 	static final Color selectionBorderColor = Color.BLUE;
 	static final Color selectionBColor = new Color(255,255,255,0);
+	static final int TRANSPARENT = 0x00FFFFFF;
+	static final int OPAQUE = 0xFF000000;
+	boolean transparenSelection;
 	Graphics2D g;
 	Point old;
 	Point current;
@@ -50,6 +56,8 @@ extends DrawingTool
 			g2.drawImage(pastedImage, x, y, w, h, null);
 			g2.dispose();
 		}
+		old=null;
+		current=null;
 	}
 
 	/**
@@ -58,12 +66,14 @@ extends DrawingTool
 	 * @param me Mouse event with coordinates
 	 */
 	@Override
-	public void onMousePressed(DrawingPanel dp, DrawingMouseEvent me){
+	public void onMousePressed(DrawingPanel dp, DrawingMouseEvent me)
+	{
 		old=me.getPoint();
 		current=old;
 
 		g.setBackground(selectionBColor);
 		g.clearRect(0, 0, width,height);
+
 		if(pastedImage != null)
 		{
 			g.drawImage(pastedImage, old.x, old.y, 1, 1, null);
@@ -124,20 +134,11 @@ extends DrawingTool
 	*/
 	public BufferedImage copy(DrawingPanel dp)
 	{
-		if(originalImage != null)
+		if(originalImage != null && old !=null)
 		{
-			int x = old.x < current.x ? old.x : current.x;
-			int y = old.y < current.y ? old.y : current.y;
-			int w = Math.abs(old.x - current.x);
-			int h = Math.abs(old.y - current.y);
-
-			BufferedImage copyImage = new BufferedImage(w,h,originalImage.getType());
-			Graphics2D g2 = copyImage.createGraphics();
-			g2.drawImage(originalImage, 0, 0, w, h, x, y, x+w, y+h, null);
-
+			BufferedImage copy = getSelectedImage();
 			selectNone(dp);
-
-			return copyImage;
+			return copy;
 		}
 
 		return null;
@@ -154,24 +155,14 @@ extends DrawingTool
 		if(originalImage != null && old != null )
 		{
 			dp.notifyChanged();
-			int x = old.x < current.x ? old.x : current.x;
-			int y = old.y < current.y ? old.y : current.y;
-			int w = Math.abs(old.x - current.x);
-			int h = Math.abs(old.y - current.y);
-
-			BufferedImage copyImage = new BufferedImage(w,h,originalImage.getType());
-			Graphics2D g2 = copyImage.createGraphics();
-			g2.drawImage(originalImage, 0, 0, w, h, x, y, x+w, y+h, null);
-			g2.dispose();
-
-			g2 = originalImage.createGraphics();
+			BufferedImage copy = getSelectedImage();
+			Graphics2D g2 = originalImage.createGraphics();
 			g2.setBackground(dp.getFillColor());
-			g2.clearRect(x,y,w,h);
+			Rectangle b = getBounds();
+			g2.clearRect(b.x,b.y,b.width,b.height);
 			g2.dispose();
-
 			selectNone(dp);
-
-			return copyImage;
+			return copy;
 		}
 		return null;
 	}
@@ -186,6 +177,7 @@ extends DrawingTool
 		int x,y,w,h;
 		dp.notifyChanged();
 		pastedImage = img;
+		updateTransparency(dp);
 
 		g.setColor(selectionBColor);
 		g.clearRect(0, 0, width,height);
@@ -198,6 +190,7 @@ extends DrawingTool
 			y = old.y < current.y ? old.y : current.y;
 			w = Math.abs(old.x - current.x);
 			h = Math.abs(old.y - current.y);
+
 			g.drawImage(img, 0, 0, null);
 		}
 		else
@@ -260,9 +253,99 @@ extends DrawingTool
 		dp.updateUI();
 	}
 
+	public Rectangle getBounds(){
+		if(old == null)
+			return null;
+
+		int x = old.x < current.x ? old.x : current.x;
+		int y = old.y < current.y ? old.y : current.y;
+		int w = Math.abs(old.x - current.x);
+		int h = Math.abs(old.y - current.y);
+		return new java.awt.Rectangle(x,y,w,h);
+	}
+
+	/**
+	 * Sets if selection pixeles of the background color may be transparent
+	 */
+	public void setTransparentSelection(DrawingPanel dp, boolean v)
+	{
+		transparenSelection = v;
+		updateTransparency(dp);
+		if(old!=null)
+			dp.updateUI();
+
+	}
+
+	/**
+	 * Sets if selection pixeles of the background color may be transparent
+	 */
+	public boolean getTransparentSelection()
+	{
+		return transparenSelection;
+	}
+
+	/**
+	 * Updates pasted image with the trasparency hits
+	 * @param dp Drawing panel where to render
+	 */
+	private void updateTransparency(DrawingPanel dp, BufferedImage img)
+	{
+		if(img == null)
+			return;
+
+		final int W = img.getWidth();
+		final int H = img.getHeight();
+		int color;
+		int background = dp.getFillColor().getRGB();
+
+		for(int x=0; x<W; x++)
+		{
+			for(int y=0; y<H; y++)
+			{
+				color = img.getRGB(x,y);
+				if(transparenSelection && color==background)
+					img.setRGB(x, y, color & TRANSPARENT);
+				else if(transparenSelection==false && (color & OPAQUE) == 0)
+					img.setRGB(x, y, color | OPAQUE);
+			}
+		}
+	}
+
+	/**
+	 * Updates pasted image with the trasparency hits
+	 * @param dp Drawing panel where to render
+	 */
+	private void updateTransparency(DrawingPanel dp)
+	{
+		if(pastedImage == null)
+			return;
+
+		updateTransparency(dp, pastedImage);
+	}
+
+	/**
+	 * Gets selected image
+	 * @return The currently selected image
+	 */
+	public BufferedImage getSelectedImage()
+	{
+		if(old == null)
+			return null;
+
+		int x = old.x < current.x ? old.x : current.x;
+		int y = old.y < current.y ? old.y : current.y;
+		int w = Math.abs(old.x - current.x);
+		int h = Math.abs(old.y - current.y);
+
+		BufferedImage copyImage = new BufferedImage(w,h,originalImage.getType());
+		Graphics2D g2 = copyImage.createGraphics();
+		g2.drawImage(originalImage, 0, 0, w, h, x, y, x+w, y+h, null);
+		return copyImage;
+	}
+
 	public String getDescription()
 	{
-		return "Selection";
+		return Translator.m("Selection");
 	}
 
 }

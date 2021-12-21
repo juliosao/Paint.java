@@ -1,5 +1,7 @@
 package com.sao.java.paint.filter;
 
+import com.sao.java.paint.i18n.Translator;
+
 public class EdgeDetect extends ConvolutionFilter {
 	public EdgeDetect()
 	{
@@ -10,6 +12,6 @@ public class EdgeDetect extends ConvolutionFilter {
 
 	@Override
 	public String getDescription() {
-		return "Edge detect";
+		return Translator.m("EdgeDetect");
 	}
 }

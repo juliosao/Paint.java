@@ -1,5 +1,7 @@
 package com.sao.java.paint.filter;
 
+import com.sao.java.paint.i18n.Translator;
+
 public class Highrelief extends ConvolutionFilter {
 	public Highrelief()
 	{
@@ -10,6 +12,6 @@ public class Highrelief extends ConvolutionFilter {
 
 	@Override
 	public String getDescription() {
-		return "Highrelief";
+		return Translator.m("Highrelief");
 	}
 }

@@ -19,6 +19,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeListener;
 
+import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
 /**
@@ -53,7 +54,7 @@ public class ScaleDialog
 	 */
 	protected final void setup()
 	{
-		setTitle("Change image size");
+		setTitle(Translator.m("ChangeImageSize"));
 		setLayout(new BorderLayout());
 		setModal(true);
 
@@ -62,17 +63,17 @@ public class ScaleDialog
 		mainPanel.setBorder(BorderFactory.createTitledBorder("New size"));
 		add(mainPanel,BorderLayout.CENTER);
 
-		mainPanel.add(new JLabel("New Width:"));
+		mainPanel.add(new JLabel(Translator.m("New Width:")));
 		newWidth = new JSpinner(new SpinnerNumberModel(800, 1, 10240, 1));
 		newWidth.addChangeListener(this);
 		mainPanel.add(newWidth);
 
-		mainPanel.add(new JLabel("New Height:"));
+		mainPanel.add(new JLabel(Translator.m("New Height:")));
 		newHeight = new JSpinner(new SpinnerNumberModel(800, 1, 10240, 1));
 		newHeight.addChangeListener(this);
 		mainPanel.add(newHeight);
 
-		mainPanel.add(new JLabel("Keep proportions"));
+		mainPanel.add(new JLabel(Translator.m("Keep proportions")));
 		keepProportions = new JCheckBox();
 		mainPanel.add(keepProportions);
 
@@ -80,7 +81,7 @@ public class ScaleDialog
 		actions.setLayout(new FlowLayout());
 		add(actions,BorderLayout.SOUTH);
 
-		JButton btnOk = new JButton("OK");
+		JButton btnOk = new JButton(Translator.m("Ok"));
 		btnOk.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -97,7 +98,7 @@ public class ScaleDialog
 		});
 		actions.add(btnOk);
 
-		JButton btnReset = new JButton("Reset");
+		JButton btnReset = new JButton(Translator.m("Reset"));
 		btnReset.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -106,7 +107,7 @@ public class ScaleDialog
 		});
 		actions.add(btnReset);
 
-		JButton btnCancel = new JButton("Cancel");
+		JButton btnCancel = new JButton(Translator.m("Cancel"));
 		btnCancel.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -169,6 +170,5 @@ public class ScaleDialog
 		}
 
 		computing = false;
-
 	}
 }

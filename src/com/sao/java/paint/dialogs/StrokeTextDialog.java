@@ -48,12 +48,11 @@ public class StrokeTextDialog
 	implements WindowFocusListener
 {
 
-
+	AlignSelector alignSelector;
 	RectangleSelection selectionTool;
 	DrawingPanel drawingPanel;
 	JTextArea textArea;
 	int fontSize = 34;
-	int align = AlignSelector.ALIGN_LEFT;
 	boolean italic = false;
 	boolean bold = false;
 	boolean drawBorder = true;
@@ -177,16 +176,15 @@ public class StrokeTextDialog
 
 		jt.add(new JToolBar.Separator());
 
-		AlignSelector as = new AlignSelector();
-		as.addActionListener(new ActionListener(){
+		alignSelector = new AlignSelector();
+		alignSelector.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				align = as.getAlign();
 				updateImage();
 			}
 
 		});
-		jt.add(new AlignSelector());
+		jt.add(alignSelector);
 
 		jt.add(new JToolBar.Separator());
 		JToggleButton btnBorder = new JToggleButton("Border");
@@ -304,13 +302,13 @@ public class StrokeTextDialog
 			g.setTransform(at);
 
 			int x;
-			switch(align)
+			switch(alignSelector.getAlign())
 			{
 				case AlignSelector.ALIGN_CENTER:
 					x = (width - bounds.width) / 2 - bounds.x;
 					break;
 				case AlignSelector.ALIGN_RIGHT:
-					x=(width-bounds.width)/2;
+					x=width-bounds.width;
 					break;
 				case AlignSelector.ALIGN_LEFT:
 				default:

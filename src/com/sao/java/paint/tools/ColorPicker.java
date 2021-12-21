@@ -1,5 +1,6 @@
 package com.sao.java.paint.tools;
 
+import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.Coloreable;
 import com.sao.java.paint.ui.DrawingPanel;
 import java.awt.Color;
@@ -30,7 +31,7 @@ public class ColorPicker extends DrawingTool {
 	}
 
 	public String getDescription() {
-		return "Color Picker";
+		return Translator.m("ColorPicker");
 	}
 
 }

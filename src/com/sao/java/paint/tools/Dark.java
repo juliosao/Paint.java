@@ -2,6 +2,8 @@ package com.sao.java.paint.tools;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+
+import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
 public class Dark extends BrushDrawingTool {
@@ -126,7 +128,7 @@ public class Dark extends BrushDrawingTool {
 
 	public String getDescription()
 	{
-		return "Dark";
+		return Translator.m("Darken");
 	}
 
 }

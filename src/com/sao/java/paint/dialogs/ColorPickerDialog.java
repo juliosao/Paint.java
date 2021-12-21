@@ -6,6 +6,7 @@
 package com.sao.java.paint.dialogs;
 
 import com.sao.java.paint.divcompat.ColorPalette;
+import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.ColorBuilder;
 import com.sao.java.paint.ui.ColorPalettePanel;
 import com.sao.java.paint.ui.Coloreable;
@@ -42,7 +43,7 @@ public class ColorPickerDialog
 	Color currentColor;
 
 	static FileNameExtensionFilter filters[] = new FileNameExtensionFilter[]{
-        new FileNameExtensionFilter("DIV palette files", "PAL")
+        new FileNameExtensionFilter("DIVPaletteFiles", "PAL")
     };
 
     /**
@@ -89,7 +90,7 @@ public class ColorPickerDialog
 	{
 		JPanel jp = new JPanel();
 		jp.setLayout(new FlowLayout());
-		JButton btnOk = new JButton("Ok");
+		JButton btnOk = new JButton(Translator.m("Ok"));
 		btnOk.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -99,7 +100,7 @@ public class ColorPickerDialog
 		});
 		jp.add(btnOk);
 
-		JButton btnCancel = new JButton("Cancel");
+		JButton btnCancel = new JButton(Translator.m("Cancel"));
 		btnCancel.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -118,12 +119,12 @@ public class ColorPickerDialog
 
 		JPanel pnlBuilder = new JPanel();
 		colorBuilder = new ColorBuilder();
-		pnlBuilder.setBorder(BorderFactory.createTitledBorder("Color Builder"));
+		pnlBuilder.setBorder(BorderFactory.createTitledBorder(Translator.m("ColorBuilder")));
 		pnlBuilder.add(colorBuilder);
 		jp.add(pnlBuilder);
 
 		JPanel pnlPalette = new JPanel();
-		pnlPalette.setBorder(BorderFactory.createTitledBorder("Palette"));
+		pnlPalette.setBorder(BorderFactory.createTitledBorder(Translator.m("Palette")));
 		pnlPalette.setLayout(new BoxLayout(pnlPalette,BoxLayout.Y_AXIS));
 
 		colorPalettePanel = new ColorPalettePanel(palette);
@@ -136,7 +137,7 @@ public class ColorPickerDialog
 		pnlPalette.add(colorPalettePanel);
 		jp.add(pnlPalette);
 
-		JButton btnLoad = new JButton("Load palette...");
+		JButton btnLoad = new JButton(Translator.m("LoadPalette"));
 		btnLoad.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -160,7 +161,7 @@ public class ColorPickerDialog
 				}
 				catch(Exception ex)
 				{
-					JOptionPane.showMessageDialog(ColorPickerDialog.this, "Cannot open file");
+					JOptionPane.showMessageDialog(ColorPickerDialog.this, Translator.m("Cannot_open_file"));
 				}
 			}
 

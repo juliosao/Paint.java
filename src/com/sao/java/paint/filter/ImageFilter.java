@@ -8,6 +8,6 @@ public interface ImageFilter {
 	final int MODE_B = 4;
 	final int MODE_RGB = 7;
 
-	void applyTo(DrawingPanel i, int mode);
+	void applyTo(DrawingPanel i, int mode, int x0, int y0, int x1, int y1);
 	String getDescription();
 }

@@ -1,20 +1,22 @@
 package com.sao.java.paint.filter;
 
 import java.awt.image.BufferedImage;
+
+import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
 public class DropColor
 	implements ImageFilter {
 
 	@Override
-	public void applyTo(DrawingPanel dp, int mode)
+	public void applyTo(DrawingPanel dp, int mode, int x0, int y0, int x1, int y1)
 	{
 		BufferedImage image = dp.getImage();
 
 		dp.notifyChanged();
-		for(int x=0; x<image.getWidth(); x++)
+		for(int x=x0; x<x1; x++)
 		{
-			for(int y=0; y<image.getHeight(); y++)
+			for(int y=y0; y<y1; y++)
 			{
 				final int oldColor = image.getRGB(x, y);
 				int a = ((oldColor) >> 24) & 255;
@@ -52,6 +54,6 @@ public class DropColor
 
 	public String getDescription()
 	{
-		return "Drop color";
+		return Translator.m("DropColor");
 	}
 }

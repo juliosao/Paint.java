@@ -1,6 +1,8 @@
 package com.sao.java.paint.tools;
 
 import java.awt.image.BufferedImage;
+
+import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
 public class Airbrush extends BrushDrawingTool
@@ -109,6 +111,6 @@ public class Airbrush extends BrushDrawingTool
 
 	public String getDescription()
 	{
-		return "Airbrush";
+		return Translator.m("Airbrush");
 	}
 }

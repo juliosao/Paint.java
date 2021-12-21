@@ -19,6 +19,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeListener;
 
+import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
 /**
@@ -53,26 +54,26 @@ public class CropDialog
 	 */
 	protected final void setup()
 	{
-		setTitle("Crop/Expand");
+		setTitle(Translator.m("Crop/Expand"));
 		setLayout(new BorderLayout());
 		setModal(true);
 
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new GridLayout(0,2,5,5));
-		mainPanel.setBorder(BorderFactory.createTitledBorder("New size"));
+		mainPanel.setBorder(BorderFactory.createTitledBorder(Translator.m("NewSize")));
 		add(mainPanel,BorderLayout.CENTER);
 
-		mainPanel.add(new JLabel("New Width:"));
+		mainPanel.add(new JLabel(Translator.m("NewWidth")));
 		newWidth = new JSpinner(new SpinnerNumberModel(800, 1, 10240, 1));
 		newWidth.addChangeListener(this);
 		mainPanel.add(newWidth);
 
-		mainPanel.add(new JLabel("New Height:"));
+		mainPanel.add(new JLabel(Translator.m("NewHeight")));
 		newHeight = new JSpinner(new SpinnerNumberModel(800, 1, 10240, 1));
 		newHeight.addChangeListener(this);
 		mainPanel.add(newHeight);
 
-		mainPanel.add(new JLabel("Keep proportions"));
+		mainPanel.add(new JLabel(Translator.m("KeepProportions")));
 		keepProportions = new JCheckBox();
 		mainPanel.add(keepProportions);
 
@@ -80,7 +81,7 @@ public class CropDialog
 		actions.setLayout(new FlowLayout());
 		add(actions,BorderLayout.SOUTH);
 
-		JButton btnOk = new JButton("OK");
+		JButton btnOk = new JButton(Translator.m("Ok"));
 		btnOk.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -97,7 +98,7 @@ public class CropDialog
 		});
 		actions.add(btnOk);
 
-		JButton btnReset = new JButton("Reset");
+		JButton btnReset = new JButton(Translator.m("Reset"));
 		btnReset.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -106,7 +107,7 @@ public class CropDialog
 		});
 		actions.add(btnReset);
 
-		JButton btnCancel = new JButton("Cancel");
+		JButton btnCancel = new JButton(Translator.m("Cancel"));
 		btnCancel.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {

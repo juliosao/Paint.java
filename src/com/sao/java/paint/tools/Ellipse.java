@@ -2,6 +2,7 @@ package com.sao.java.paint.tools;
 
 import java.awt.image.BufferedImage;
 
+import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
 import java.awt.Graphics2D;
@@ -70,7 +71,7 @@ public class Ellipse
 
 	public String getDescription()
 	{
-		return "Ellipse";
+		return Translator.m("Ellipse");
 	}
 
 }

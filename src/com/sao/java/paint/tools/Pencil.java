@@ -3,6 +3,8 @@ package com.sao.java.paint.tools;
 import java.awt.image.BufferedImage;
 import java.awt.Graphics2D;
 import java.awt.Point;
+
+import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
 public class Pencil
@@ -42,7 +44,7 @@ public class Pencil
 
 	public String getDescription()
 	{
-		return "Pencil";
+		return Translator.m("Pencil");
 	}
 
 }

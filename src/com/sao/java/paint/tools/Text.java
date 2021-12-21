@@ -3,6 +3,7 @@ package com.sao.java.paint.tools;
 import java.awt.Window;
 
 import com.sao.java.paint.dialogs.StrokeTextDialog;
+import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
 public class Text extends DrawingTool{
@@ -24,6 +25,6 @@ public class Text extends DrawingTool{
 
 	public String getDescription()
 	{
-		return "Text";
+		return Translator.m("Text");
 	}
 }

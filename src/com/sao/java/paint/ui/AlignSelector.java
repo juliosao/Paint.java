@@ -5,7 +5,6 @@ import java.awt.FlowLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -34,7 +33,7 @@ public class AlignSelector
 
 	private String command = "";
 	private boolean updating = false;
-	private int align;
+	private int align = ALIGN_LEFT;
 	private JToggleButton[] selectors;
 	private HashSet<ActionListener> aListeners;
 
@@ -49,6 +48,7 @@ public class AlignSelector
 		JToggleButton btnLeft = new JToggleButton();
 		btnLeft.setIcon(new ImageIcon(getClass().getResource("img/left.png")) );
 		btnLeft.setPreferredSize(d);
+		btnLeft.setSelected(true);
 		btnLeft.addItemListener(this);
 		add(btnLeft);
 
@@ -82,8 +82,14 @@ public class AlignSelector
 		JToggleButton source = (JToggleButton)e.getItem();
 		for(int i=0; i<selectors.length; i++)
 		{
-			selectors[i].setSelected(selectors[i]==source);
-			align = i;
+			if(selectors[i]==source)
+			{
+				source.setSelected(true);
+				align = i;
+			}
+			else
+				selectors[i].setSelected(false);
+
 		}
 
 		ActionEvent ae = new ActionEvent(this,ActionEvent.ACTION_PERFORMED,command);
@@ -108,7 +114,7 @@ public class AlignSelector
 	 * Gets the action command to send to the listeners
 	 * @return A string with the action command to send
 	 */
-	public String getActionCOmmand()
+	public String getActionCommand()
 	{
 		return command;
 	}
@@ -151,8 +157,14 @@ public class AlignSelector
 
 		for(int i=0; i<selectors.length; i++)
 		{
-			selectors[i].setSelected(i==a);
-			align = i;
+			if(i==a)
+			{
+				selectors[i].setSelected(true);
+				align = i;
+			}
+			else
+				selectors[i].setSelected(false);
+
 		}
 
 		updating = false;

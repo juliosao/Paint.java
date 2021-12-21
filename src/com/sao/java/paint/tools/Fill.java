@@ -2,6 +2,7 @@ package com.sao.java.paint.tools;
 
 import java.util.Stack;
 
+import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
 import java.awt.image.BufferedImage;
@@ -55,7 +56,7 @@ public class Fill extends DrawingTool
 
     public String getDescription()
     {
-            return "Fill";
+            return Translator.m("Fill");
     }
 
 }

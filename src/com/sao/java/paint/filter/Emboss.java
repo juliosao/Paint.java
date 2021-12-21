@@ -1,5 +1,7 @@
 package com.sao.java.paint.filter;
 
+import com.sao.java.paint.i18n.Translator;
+
 public class Emboss extends ConvolutionFilter {
 	public Emboss()
 	{
@@ -10,6 +12,6 @@ public class Emboss extends ConvolutionFilter {
 
 	@Override
 	public String getDescription() {
-		return "Emboss";
+		return Translator.m("Emboss");
 	}
 }

@@ -5,6 +5,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+
+import com.sao.java.paint.i18n.Translator;
+
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 
@@ -12,7 +15,7 @@ public class AboutDialog extends JDialog{
 	public AboutDialog(Window parent)
 	{
 		super(parent);
-		setTitle("About paint.java");
+		setTitle(Translator.m("About_paint.java"));
 		setLocationRelativeTo(parent);
 		setLayout(new BoxLayout(this.getContentPane(),BoxLayout.Y_AXIS));
 		JLabel l = new JLabel("Paint.java");

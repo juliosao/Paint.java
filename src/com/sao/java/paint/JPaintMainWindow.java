@@ -24,6 +24,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.ItemEvent;
 
 import javax.imageio.ImageIO;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -35,6 +36,7 @@ import javax.swing.JOptionPane;
 
 import com.sao.java.paint.divcompat.ColorPalette;
 import com.sao.java.paint.filter.ImageFilter;
+import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.ColorGammaBar;
 import com.sao.java.paint.tools.*;
 
@@ -51,18 +53,21 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.Toolkit;
 
 /**
- *
  * @author julio
+ * This class is the main window iteself
  */
 public class JPaintMainWindow extends JFrame
 	implements WindowListener
 {
-	static FileNameExtensionFilter filters[] = new FileNameExtensionFilter[]{
-		new FileNameExtensionFilter("JPEG Image", "JPEG","JPG"),
-		new FileNameExtensionFilter("PNG Image", "PNG"),
-		new FileNameExtensionFilter("BMP Image", "BMP"),
-		new FileNameExtensionFilter("Div Games Studio MAP Image", "MAP"),
-		new FileNameExtensionFilter("All Images", "JPEG","JPG","PNG","BMP","MAP"),
+	/**
+	 * Allowed file types
+	*/
+	static final FileNameExtensionFilter filters[] = new FileNameExtensionFilter[]{
+		new FileNameExtensionFilter(Translator.m("JPEG_Image"), "JPEG","JPG"),
+		new FileNameExtensionFilter(Translator.m("PNG_Image"), "PNG"),
+		new FileNameExtensionFilter(Translator.m("BMP_Image"), "BMP"),
+		new FileNameExtensionFilter(Translator.m("MAP_Image"), "MAP"),
+		new FileNameExtensionFilter(Translator.m("All_Images"), "JPEG","JPG","PNG","BMP","MAP"),
 	};
 	static int windowCount = 0;
 	final static Dimension preferredDimension = new Dimension(1024,768);
@@ -78,7 +83,7 @@ public class JPaintMainWindow extends JFrame
 	JSpinner zoomer;
 	Container container;
 	File currentFile = null;
-	static final String TITLE = "Paint.java v0.1";
+	static final String TITLE = "Paint.java v0.2";
 
 	Pencil pencil = new Pencil();
 	Line line = new Line();
@@ -102,6 +107,9 @@ public class JPaintMainWindow extends JFrame
 	JToggleButton[] buttons;
 	JLabel lblCoords;
 
+	/**
+	 * Class constructor
+	 */
 	public JPaintMainWindow()
 	{
 		super();
@@ -123,6 +131,9 @@ public class JPaintMainWindow extends JFrame
 		pack();
 	}
 
+	/**
+	 * Puts the drawing panel
+	 */
 	private void createDrawingPanel()
 	{
 		drawingPanel=new DrawingPanel();
@@ -143,6 +154,9 @@ public class JPaintMainWindow extends JFrame
 		container.add(drawingPanel,BorderLayout.CENTER);
 	}
 
+	/**
+	 * Puts the painting tools toolbar
+	 */
 	private void createToolBox()
 	{
 		toolbox = new JToolBar("Toolbox");
@@ -187,12 +201,15 @@ public class JPaintMainWindow extends JFrame
 		}
 	}
 
+	/**
+	 * Puts the control toolbar
+	 */
 	private void createBotomToolBar()
 	{
-		JToolBar pnl = new JToolBar("Drawing control");
+		JToolBar pnl = new JToolBar(Translator.m("Drawing_control"));
 		container.add(pnl,BorderLayout.SOUTH);
 
-		pnl.add(new JLabel("Color:"));
+		pnl.add(new JLabel(Translator.m("Color:")));
 
 		colorToolbar = new ColorGammaBar(new ColorPalette());
 		colorToolbar.setStrokeColor(drawingPanel.getStrokeColor());
@@ -211,7 +228,7 @@ public class JPaintMainWindow extends JFrame
 
 		pnl.add(new JToolBar.Separator());
 
-		pnl.add(new JLabel("Zoom:"));
+		pnl.add(new JLabel(Translator.m("Zoom:")));
 		JLabel lblZoom = new JLabel(" 100%");
 
 		zoomer = new JSpinner(new SpinnerNumberModel(100, 5, 10000, 1));
@@ -229,7 +246,7 @@ public class JPaintMainWindow extends JFrame
 
 		pnl.add(new JToolBar.Separator());
 
-		pnl.add(new JLabel(" Width:"));
+		pnl.add(new JLabel(Translator.m("Width:")));
 		JLabel lblWidth = new JLabel("1 px");
 
 		JSpinner jslWidth = new JSpinner(new SpinnerNumberModel(1, 1, 256, 1));
@@ -247,7 +264,7 @@ public class JPaintMainWindow extends JFrame
 
 		pnl.add(new JToolBar.Separator());
 
-		pnl.add(new JLabel("Fill:"));
+		pnl.add(new JLabel(Translator.m("Fill:")));
 		ShapeModeCombo cmbFill = new ShapeModeCombo();
 		cmbFill.addItemListener(new ItemListener(){
 			@Override
@@ -262,11 +279,18 @@ public class JPaintMainWindow extends JFrame
 		pnl.add(lblCoords);
 	}
 
+	/**
+	 * Sets image to edit
+	 * @param bi
+	 */
 	public void setImage(BufferedImage bi)
 	{
 		drawingPanel.setImage(bi);
 	}
 
+	/**
+	 * Create all menus
+	 */
 	private void createMenus()
 	{
 		menuBar = new JMenuBar();
@@ -278,11 +302,14 @@ public class JPaintMainWindow extends JFrame
 		setJMenuBar(menuBar);
 	}
 
+	/**
+	 * Creates file menus
+	 */
 	private void createFileMenu()
 	{
 		menuFile = new JMenu("File");
 
-		JMenuItem mnu = new JMenuItem("New...");
+		JMenuItem mnu = new JMenuItem(Translator.m("New"));
 		mnu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,ActionEvent.CTRL_MASK));
 		mnu.addActionListener(new ActionListener(){
 			@Override
@@ -299,7 +326,7 @@ public class JPaintMainWindow extends JFrame
 		});
 
 		menuFile.add(mnu);
-		mnu = new JMenuItem("Open...");
+		mnu = new JMenuItem(Translator.m("Open"));
 		mnu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,ActionEvent.CTRL_MASK));
 		mnu.addActionListener(new ActionListener()
 		{
@@ -309,7 +336,7 @@ public class JPaintMainWindow extends JFrame
 		});
 		menuFile.add(mnu);
 
-		mnu = new JMenuItem("Save...");
+		mnu = new JMenuItem(Translator.m("Save"));
 		mnu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,ActionEvent.CTRL_MASK));
 		mnu.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
@@ -318,7 +345,7 @@ public class JPaintMainWindow extends JFrame
 		});
 		menuFile.add(mnu);
 
-		mnu = new JMenuItem("Save As...");
+		mnu = new JMenuItem(Translator.m("Save_As"));
 		mnu.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
 				savePictureAs();
@@ -327,7 +354,7 @@ public class JPaintMainWindow extends JFrame
 		menuFile.add(mnu);
 		menuFile.add(new JSeparator());
 
-		mnu = new JMenuItem("Exit");
+		mnu = new JMenuItem(Translator.m("Exit_paint"));
 		mnu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4 ,ActionEvent.ALT_MASK));
 		mnu.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
@@ -339,11 +366,14 @@ public class JPaintMainWindow extends JFrame
 		menuBar.add(menuFile);
 	}
 
+	/**
+	 * Creates edit menus
+	 */
 	private void createEditMenu()
 	{
-		menuEdit = new JMenu("Edit");
+		menuEdit = new JMenu(Translator.m("Edit"));
 
-		JMenuItem mnu = new JMenuItem("Undo");
+		JMenuItem mnu = new JMenuItem(Translator.m("Undo"));
 		mnu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,ActionEvent.CTRL_MASK));
 		mnu.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
@@ -352,7 +382,7 @@ public class JPaintMainWindow extends JFrame
 		});
 		menuEdit.add(mnu);
 
-		mnu = new JMenuItem("Redo");
+		mnu = new JMenuItem(Translator.m("Redo"));
 		mnu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y,ActionEvent.CTRL_MASK));
 		mnu.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
@@ -363,7 +393,7 @@ public class JPaintMainWindow extends JFrame
 
 		menuEdit.add(new JSeparator());
 
-		mnu = new JMenuItem("Cut");
+		mnu = new JMenuItem(Translator.m("Cut"));
 		mnu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,ActionEvent.CTRL_MASK));
 		mnu.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
@@ -374,7 +404,7 @@ public class JPaintMainWindow extends JFrame
 		});
 		menuEdit.add(mnu);
 
-		mnu = new JMenuItem("Copy");
+		mnu = new JMenuItem(Translator.m("Copy"));
 		mnu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,ActionEvent.CTRL_MASK));
 		mnu.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
@@ -385,7 +415,7 @@ public class JPaintMainWindow extends JFrame
 		});
 		menuEdit.add(mnu);
 
-		mnu = new JMenuItem("Paste");
+		mnu = new JMenuItem(Translator.m("Paste"));
 		mnu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V,ActionEvent.CTRL_MASK));
 		mnu.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
@@ -393,20 +423,20 @@ public class JPaintMainWindow extends JFrame
 				if(imgSel != null)
 				{
 					setDrawingTool(rectangleSelection);
-					rectangleSelection.paste(drawingPanel,imgSel.getImage());
+					rectangleSelection.paste(drawingPanel,imgSel.getPngImage());
 				}
 			}
 		});
 		menuEdit.add(mnu);
 
-		mnu = new JMenuItem("Paste as new image...");
+		mnu = new JMenuItem(Translator.m("Paste_as_new"));
 		mnu.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
 				ImageSelection imgSel = ImageSelection.pasteFromClipboard();
 				if(imgSel != null)
 				{
 					JPaintMainWindow jpmw = new JPaintMainWindow();
-					jpmw.setImage(imgSel.getImage());
+					jpmw.setImage(imgSel.getPngImage());
 					jpmw.setVisible(true);
 				}
 			}
@@ -415,7 +445,7 @@ public class JPaintMainWindow extends JFrame
 
 		menuEdit.add(new JSeparator());
 
-		mnu = new JMenuItem("Select all");
+		mnu = new JMenuItem(Translator.m("Select_all"));
 		mnu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A,ActionEvent.CTRL_MASK));
 		mnu.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
@@ -425,7 +455,7 @@ public class JPaintMainWindow extends JFrame
 		});
 		menuEdit.add(mnu);
 
-		mnu = new JMenuItem("Select none");
+		mnu = new JMenuItem(Translator.m("Select_none"));
 		mnu.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
 				setDrawingTool(rectangleSelection);
@@ -434,23 +464,35 @@ public class JPaintMainWindow extends JFrame
 		});
 		menuEdit.add(mnu);
 
+		JCheckBoxMenuItem ts = new JCheckBoxMenuItem(Translator.m("Transparent_selection"));
+		ts.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e)
+			{
+				rectangleSelection.setTransparentSelection(drawingPanel, ts.getState());
+			}
+		});
+		menuEdit.add(ts);
+
 		menuBar.add(menuEdit);
 	}
 
+	/**
+	 * Creates image menus
+	 */
 	void createImageMenu()
 	{
-		menuImage = new JMenu("Image");
+		menuImage = new JMenu(Translator.m("Image"));
 		ActionListener al = new ActionListener()
 		{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				switch(e.getActionCommand())
 				{
-					case "Resize...":
+					case "Resize":
 						ScaleDialog scd = new ScaleDialog(JPaintMainWindow.this, drawingPanel);
 						scd.setVisible(true);
 						break;
-					case "Crop/Expand...":
+					case "Crop":
 						CropDialog cd = new CropDialog(JPaintMainWindow.this, drawingPanel);
 						cd.setVisible(true);
 						break;
@@ -458,20 +500,25 @@ public class JPaintMainWindow extends JFrame
 			}
 		};
 
-		JMenuItem mnu = new JMenuItem("Resize...");
+		JMenuItem mnu = new JMenuItem(Translator.m("Resize"));
+		mnu.setActionCommand("Resize");
 		mnu.addActionListener(al);
 		menuImage.add(mnu);
 
-		mnu = new JMenuItem("Crop/Expand...");
+		mnu = new JMenuItem(Translator.m("Crop/Expand"));
+		mnu.setActionCommand("Crop");
 		mnu.addActionListener(al);
 		menuImage.add(mnu);
 
 		menuBar.add(menuImage);
 	}
 
+	/**
+	 * Creates filter menu
+	 */
 	void createFilterMenu()
 	{
-		menuFilter = new JMenu("Filter");
+		menuFilter = new JMenu(Translator.m("Filter"));
 		ImageFilter filters[] = new ImageFilter[]{
 			new com.sao.java.paint.filter.Blur(),
 			new com.sao.java.paint.filter.Sharpen(),
@@ -501,10 +548,13 @@ public class JPaintMainWindow extends JFrame
 		menuBar.add(menuFilter);
 	}
 
+	/**
+	 * Creates help menu
+	 */
 	void createHelpMenu()
 	{
-		menuEdit = new JMenu("Help");
-		JMenuItem mnu = new JMenuItem("About...");
+		menuEdit = new JMenu(Translator.m("Help"));
+		JMenuItem mnu = new JMenuItem(Translator.m("About"));
 		mnu.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
 				AboutDialog ad = new AboutDialog(JPaintMainWindow.this);
@@ -515,15 +565,19 @@ public class JPaintMainWindow extends JFrame
 		menuBar.add(menuEdit);
 	}
 
-	@Override
-	public void windowOpened(WindowEvent we) {
-		//throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
 
 	@Override
+	public void windowOpened(WindowEvent we) {
+		//Not used
+	}
+
+	/**
+	 * Occurs whe user is clossing the window
+	 */
+	@Override
 	public void windowClosing(WindowEvent we) {
-		switch (JOptionPane.showConfirmDialog(JPaintMainWindow.this, "Do you want to save picture?",
-		"Exit paint.java", JOptionPane.YES_NO_CANCEL_OPTION)) {
+		switch (JOptionPane.showConfirmDialog(JPaintMainWindow.this, Translator.m("save_picture?"),
+		Translator.m("Exit_paint"), JOptionPane.YES_NO_CANCEL_OPTION)) {
 			case JOptionPane.CANCEL_OPTION:
 				return;
 			case JOptionPane.YES_OPTION:
@@ -537,6 +591,9 @@ public class JPaintMainWindow extends JFrame
 		}
 	}
 
+	/**
+	 * Ocuurs when window is closed
+	 */
 	@Override
 	public void windowClosed(WindowEvent we) {
 		dispose();
@@ -587,7 +644,7 @@ public class JPaintMainWindow extends JFrame
 		}
 		catch(Exception ex)
 		{
-			JOptionPane.showMessageDialog(JPaintMainWindow.this, "Cannot open file");
+			JOptionPane.showMessageDialog(JPaintMainWindow.this, Translator.m("Cannot_open_file"));
 		}
 	}
 
@@ -604,17 +661,13 @@ public class JPaintMainWindow extends JFrame
 			if (index > 0) {
 				mode = f.getName().substring(index + 1).toLowerCase();
 			}
-			else
-			{
-				f = new File(f.getAbsolutePath()+"."+mode);
-			}
 			ImageIO.write(drawingPanel.getImage(), mode ,f );
 			currentFile = f;
 			this.setTitle(TITLE + " - " + currentFile.getName());
 		}
 		catch(Exception ex)
 		{
-			JOptionPane.showMessageDialog(JPaintMainWindow.this, "Cannot save file");
+			JOptionPane.showMessageDialog(JPaintMainWindow.this, Translator.m("Cannot_save_file"));
 		}
 	}
 
@@ -642,21 +695,30 @@ public class JPaintMainWindow extends JFrame
 		{
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
-			fileChooser.setDialogTitle("Save image as...");
-			fileChooser.setApproveButtonText("Save");
+			fileChooser.setDialogTitle(Translator.m("Save_as"));
+			fileChooser.setApproveButtonText(Translator.m("Save"));
 			for(FileNameExtensionFilter filter: filters)
 			{
 				fileChooser.setFileFilter(filter);
 			}
+
 			fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
 			int result = fileChooser.showSaveDialog(JPaintMainWindow.this);
 			if (result == JFileChooser.APPROVE_OPTION) {
-				savePicture(fileChooser.getSelectedFile());
+				File f = fileChooser.getSelectedFile();
+
+				int index = f.getName().lastIndexOf('.');
+				if (index < 0) {
+					FileNameExtensionFilter ff = (FileNameExtensionFilter)fileChooser.getFileFilter();
+					f = new File(f.getAbsolutePath()+"."+ff.getExtensions()[0] );
+				}
+
+				savePicture(f);
 			}
 		}
 		catch(Exception ex)
 		{
-			JOptionPane.showMessageDialog(JPaintMainWindow.this, "Cannot open file");
+			JOptionPane.showMessageDialog(JPaintMainWindow.this, Translator.m("Cannot_save_file"));
 		}
 	}
 

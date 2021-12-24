@@ -67,7 +67,7 @@
 	<target name="rpm" depends="clean,spec,tarball" description="generates rpm">
 		<exec dir="." executable="rpmbuild" >
 			<env key="LANG" value="en_US.utf8" />
-			<arg line="-tb dist/paint-java-${version}.tar.bz2"/>
+			<arg line="-tb dist/paint-java-${version}.tar.bz2 --define '_version ${version}'"/>
 		</exec>
 	</target>
 

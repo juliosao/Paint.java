@@ -27,7 +27,7 @@ public class FilterDialog
 {
 	DrawingPanel drawingPanel;
 	ImageFilter imageFilter;
-	JCheckBox chkRed, chkGreen, chkBlue;
+	JCheckBox chkRed, chkGreen, chkBlue, chkAlpha;
 
 	public FilterDialog(Window parent, DrawingPanel dp, ImageFilter f)
 	{
@@ -70,6 +70,12 @@ public class FilterDialog
 		chkBlue.setSelected(true);
 		p.add(chkBlue);
 
+		lbl = new JLabel(Translator.m("Alpha"));
+		p.add(lbl);
+		chkAlpha = new JCheckBox();
+		chkAlpha.setSelected(true);
+		p.add(chkAlpha);
+
 		add(p,BorderLayout.CENTER);
 	}
 
@@ -82,6 +88,7 @@ public class FilterDialog
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				int mode = 0;
+				if(chkAlpha.isSelected())mode|=ImageFilter.MODE_A;
 				if(chkRed.isSelected())mode|=ImageFilter.MODE_R;
 				if(chkGreen.isSelected())mode|=ImageFilter.MODE_G;
 				if(chkBlue.isSelected())mode|=ImageFilter.MODE_B;

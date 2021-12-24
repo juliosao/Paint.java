@@ -3,6 +3,7 @@ package com.sao.java.paint.filter;
 import java.awt.image.BufferedImage;
 
 import com.sao.java.paint.i18n.Translator;
+import com.sao.java.paint.tools.DrawingTool;
 import com.sao.java.paint.ui.DrawingPanel;
 
 public class Invert
@@ -26,6 +27,10 @@ public class Invert
 
 				if((mode & ImageFilter.MODE_R) != 0)
 				{
+					a = 255-a;
+				}
+				if((mode & ImageFilter.MODE_R) != 0)
+				{
 					r = 255-r;
 				}
 				if((mode & ImageFilter.MODE_G) != 0)
@@ -37,14 +42,7 @@ public class Invert
 					b = 255-b;
 				}
 
-				if(r > 255)r=255;
-				if(g > 255)g=255;
-				if(b > 255)b=255;
-				if(r < 0)r=0;
-				if(g < 0)g=0;
-				if(b < 0)b=0;
-
-				image.setRGB(x,y, a<<24 | r<<16 | g<<8 | b);
+				image.setRGB(x,y,DrawingTool.rgb((int)a, (int)r, (int)g, (int)b));
 			}
 		}
 

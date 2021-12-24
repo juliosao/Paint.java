@@ -45,15 +45,17 @@ public class Light extends BrushDrawingTool {
 
 				if(dist>r || x<0 || x>=maxW || y<0 || y>maxH )
 				{
+					alphaInk[i][j]=-1;
 					redInk[i][j]=-1;
 					greenInk[i][j]=-1;
 					blueInk[i][j]=-1;
 				}
 				else
 				{
-					redInk[i][j]= 1;
-					greenInk[i][j]= 1;
-					blueInk[i][j]= 1;
+					alphaInk[i][j]=1;
+					redInk[i][j]=1;
+					greenInk[i][j]=1;
+					blueInk[i][j]=1;
 				}
 			}
 		}
@@ -95,6 +97,7 @@ public class Light extends BrushDrawingTool {
 				if( x<0 || x>=maxW || y<0 || y>=maxH || redInk[i][j]==-1)
 					continue;
 
+				double newA = 0;
 				double newR = 0;
 				double newG = 0;
 				double newB = 0;
@@ -112,13 +115,14 @@ public class Light extends BrushDrawingTool {
 							continue;
 
 						final int newRGB = backImage.getRGB(tmpX,tmpY);
+						newA += (double)((newRGB>>24) & 255) * convolution[ax][ay];
 						newR += (double)((newRGB>>16) & 255) * convolution[ax][ay];
 						newG += (double)((newRGB>>8) & 255) * convolution[ax][ay];
 						newB += (double)(newRGB & 255) * convolution[ax][ay];
 					}
 				}
 
-				image.setRGB(x, y, rgb((int)newR,(int)newG,(int)newB));
+				image.setRGB(x, y, rgb((int)newA,(int)newR,(int)newG,(int)newB));
 
 			}
 		}

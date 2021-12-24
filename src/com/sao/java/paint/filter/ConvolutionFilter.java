@@ -3,6 +3,7 @@ package com.sao.java.paint.filter;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
+import com.sao.java.paint.tools.DrawingTool;
 import com.sao.java.paint.ui.DrawingPanel;
 
 public abstract class ConvolutionFilter
@@ -31,7 +32,7 @@ public abstract class ConvolutionFilter
 				final int g = ((oldColor) >> 8) & 255;
 				final int b = oldColor & 255;
 
-				double na = a;
+				double na = ((mode & ImageFilter.MODE_R) != 0) ? 0 : a;
 				double nr = ((mode & ImageFilter.MODE_R) != 0) ? 0 : r;
 				double ng = ((mode & ImageFilter.MODE_G) != 0) ? 0 : g;
 				double nb = ((mode & ImageFilter.MODE_B) != 0) ? 0 : b;
@@ -52,6 +53,10 @@ public abstract class ConvolutionFilter
 						final int c = image.getRGB(fx, fy);
 						if((mode & ImageFilter.MODE_R) != 0)
 						{
+							na += (double)((c >> 24 ) & 255) * convolutionMatrix[i][j];
+						}
+						if((mode & ImageFilter.MODE_R) != 0)
+						{
 							nr += (double)((c >> 16 ) & 255) * convolutionMatrix[i][j];
 						}
 						if((mode & ImageFilter.MODE_G) != 0)
@@ -65,14 +70,8 @@ public abstract class ConvolutionFilter
 					}
 				}
 
-				if(nr > 255)nr=255;
-				if(ng > 255)ng=255;
-				if(nb > 255)nb=255;
-				if(nr < 0)nr=0;
-				if(ng < 0)ng=0;
-				if(nb < 0)nb=0;
 
-				result.setRGB(x,y,((int)na)<<24 | ((int)nr)<<16 | ((int)ng)<<8 | (int)nb);
+				result.setRGB(x,y,DrawingTool.rgb((int)na, (int)nr, (int)ng, (int)nb));
 			}
 		}
 

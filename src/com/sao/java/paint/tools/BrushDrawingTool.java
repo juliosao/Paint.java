@@ -3,7 +3,7 @@ package com.sao.java.paint.tools;
 public abstract class BrushDrawingTool
 	extends DrawingTool
 {
-	protected double[][] redInk, greenInk, blueInk;
+	protected double[][] redInk, greenInk, blueInk, alphaInk;
 	protected int width;
 
 
@@ -17,6 +17,7 @@ public abstract class BrushDrawingTool
 		redInk = new double[width][width];
 		greenInk = new double[width][width];
 		blueInk = new double[width][width];
+		alphaInk = new double[width][width];
 	}
 
 	/**

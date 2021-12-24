@@ -13,6 +13,9 @@ import com.sao.java.paint.ui.DrawingPanel;
 public class RectangleSelection
 extends DrawingTool
 {
+	static final int SELECTING=0;
+	static final int SELECTED=1;
+
 	static final BasicStroke selectionStroke = new BasicStroke(1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER );
 	static final Color selectionColor = new Color(0,0,255,50);
 	static final Color selectionBorderColor = Color.BLUE;
@@ -27,6 +30,7 @@ extends DrawingTool
 	int height;
 	BufferedImage originalImage;
 	BufferedImage pastedImage;
+	int status=SELECTING;
 
 	@Override
 	public void onSelected(DrawingPanel dp)
@@ -40,6 +44,7 @@ extends DrawingTool
 		g.clearRect(0, 0, width,height);
 		g.setStroke(selectionStroke);
 		pastedImage = null;
+		status = SELECTING;
 	}
 
 	@Override
@@ -68,63 +73,78 @@ extends DrawingTool
 	@Override
 	public void onMousePressed(DrawingPanel dp, DrawingMouseEvent me)
 	{
-		old=me.getPoint();
-		current=old;
-
-		g.setBackground(selectionBColor);
-		g.clearRect(0, 0, width,height);
-
-		if(pastedImage != null)
+		switch(status)
 		{
-			g.drawImage(pastedImage, old.x, old.y, 1, 1, null);
+			case SELECTING:
+				old=me.getPoint();
+				current=old;
+
+				g.setBackground(selectionBColor);
+				g.clearRect(0, 0, width,height);
+
+				if(pastedImage != null)
+				{
+					g.drawImage(pastedImage, old.x, old.y, 1, 1, null);
+				}
+				g.setColor(selectionColor);
+				g.drawRect(old.x, old.y, 1, 1 );
+				g.setColor(selectionBorderColor);
+				g.drawRect(old.x, old.y, 1, 1 );
+				break;
 		}
 
-		g.setColor(selectionColor);
-		g.drawRect(old.x, old.y, 1, 1 );
-		g.setColor(selectionBorderColor);
-		g.drawRect(old.x, old.y, 1, 1 );
 	}
 
 	@Override
 	public void onMouseReleased(DrawingPanel dp,  DrawingMouseEvent me)
 	{
-		current =  me.getPoint();
-		int x = old.x < current.x ? old.x : current.x;
-		int y = old.y < current.y ? old.y : current.y;
-		int w = Math.abs(old.x - current.x);
-		int h = Math.abs(old.y - current.y);
-
-		g.setBackground(selectionBColor);
-		g.clearRect(0, 0, width,height);
-		if(pastedImage != null)
+		switch(status)
 		{
-			g.drawImage(pastedImage, x, y, w, h, null);
+			case SELECTING:
+				current =  me.getPoint();
+				int x = old.x < current.x ? old.x : current.x;
+				int y = old.y < current.y ? old.y : current.y;
+				int w = Math.abs(old.x - current.x);
+				int h = Math.abs(old.y - current.y);
+
+				g.setBackground(selectionBColor);
+				g.clearRect(0, 0, width,height);
+				if(pastedImage != null)
+				{
+					g.drawImage(pastedImage, x, y, w, h, null);
+				}
+				g.setColor(selectionColor);;
+				g.fillRect(x, y, w, h);
+				g.setColor(selectionBorderColor);
+				g.drawRect(x,y,w,h);
 		}
-		g.setColor(selectionColor);;
-		g.fillRect(x, y, w, h);
-		g.setColor(selectionBorderColor);
-		g.drawRect(x,y,w,h);
 	}
 
 	@Override
 	public void onMouseDragged(DrawingPanel dp,  DrawingMouseEvent me)
 	{
-		current =  me.getPoint();
-		int x = old.x < current.x ? old.x : current.x;
-		int y = old.y < current.y ? old.y : current.y;
-		int w = Math.abs(old.x - current.x);
-		int h = Math.abs(old.y - current.y);
-		g.setColor(selectionBColor);
-		g.clearRect(0, 0, width,height);
-		if(pastedImage != null)
+		switch(status)
 		{
-			g.drawImage(pastedImage, x, y, w, h, null);
+			case SELECTING:
+				current =  me.getPoint();
+				int x = old.x < current.x ? old.x : current.x;
+				int y = old.y < current.y ? old.y : current.y;
+				int w = Math.abs(old.x - current.x);
+				int h = Math.abs(old.y - current.y);
+				g.setColor(selectionBColor);
+				g.clearRect(0, 0, width,height);
+				if(pastedImage != null)
+				{
+					g.drawImage(pastedImage, x, y, w, h, null);
+				}
+				g.setColor(selectionColor);;
+				g.fillRect(x, y, w, h);
+				g.setColor(selectionBorderColor);
+				g.drawRect(x,y,w,h);
+				break;
 		}
 
-		g.setColor(selectionColor);;
-		g.fillRect(x, y, w, h);
-		g.setColor(selectionBorderColor);
-		g.drawRect(x,y,w,h);
+
 	}
 
 	/**

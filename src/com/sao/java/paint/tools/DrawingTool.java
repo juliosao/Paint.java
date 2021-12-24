@@ -78,8 +78,10 @@ public abstract class DrawingTool {
 	 * @param b
 	 * @return
 	 */
-	public static final int rgb(int r, int g, int b)
+	public static final int rgb(int a,int r, int g, int b)
 	{
+		if(a>255)
+			a = 255;
 		if(r>255)
 			r = 255;
 		if(g>255)
@@ -87,6 +89,8 @@ public abstract class DrawingTool {
 		if(b>255)
 			b = 255;
 
+		if(a<0)
+			a = 0;
 		if(r<0)
 			r = 0;
 		if(g<0)
@@ -94,6 +98,6 @@ public abstract class DrawingTool {
 		if(b<0)
 			b = 0;
 
-		return opaque | (r<<16) | (g<<8) | b;
+		return (a<<25) | (r<<16) | (g<<8) | b;
 	}
 }

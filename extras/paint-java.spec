@@ -1,6 +1,6 @@
 Summary: A Simple drawing program written in java
 Name: paint-java
-Version: 0.1
+Version: %{_version}
 Release: 1%{?dist}
 URL: https://github.com/juliosao/Paint.java
 License: Privative

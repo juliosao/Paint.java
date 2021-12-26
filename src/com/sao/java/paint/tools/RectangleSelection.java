@@ -191,13 +191,16 @@ extends DrawingTool
 	 * Puts image on selecction tool
 	 * @param dp Affected drawing panel
 	 * @param img Image to put
+	 * @param forceTransparency Disables to change alpha to fill and viceversa
 	 */
-	public void paste(DrawingPanel dp, BufferedImage img)
+	public void paste(DrawingPanel dp, BufferedImage img, boolean forceTransparency)
 	{
 		int x,y,w,h;
 		dp.notifyChanged();
 		pastedImage = img;
-		updateTransparency(dp);
+
+		if(!forceTransparency)
+			updateTransparency(dp);
 
 		g.setColor(selectionBColor);
 		g.clearRect(0, 0, width,height);

@@ -14,8 +14,8 @@ public class ColorBuilder extends JPanel
 	implements Coloreable, ChangeListener  {
 
 	ColorButton btnResult;
-	JLabel lblR, lblG, lblB;
-	JSlider sldR, sldG, sldB;
+	JLabel lblR, lblG, lblB, lblA;
+	JSlider sldR, sldG, sldB, sldA;
 
 	public ColorBuilder()
 	{
@@ -60,6 +60,17 @@ public class ColorBuilder extends JPanel
 		pnl.add(sldB);
 		pnlComponents.add(pnl);
 
+		pnl = new JPanel();
+		pnl.setLayout(new BoxLayout(pnl,BoxLayout.Y_AXIS));
+		lbl = new JLabel("A");
+		pnl.add(lbl);
+		lblA = new JLabel("255");
+		pnl.add(lblA);
+		sldA = new JSlider(JSlider.VERTICAL, 0, 255, 0);
+		sldA.addChangeListener(this);
+		pnl.add(sldA);
+		pnlComponents.add(pnl);
+
 		add(pnlComponents);
 
 		JPanel pnlResult = new JPanel();
@@ -77,6 +88,7 @@ public class ColorBuilder extends JPanel
 
 	@Override
 	public void setStrokeColor(Color c) {
+		final int a = c.getAlpha();
 		final int r = c.getRed();
 		final int g = c.getGreen();
 		final int b = c.getBlue();
@@ -84,16 +96,18 @@ public class ColorBuilder extends JPanel
 		sldR.setValue(r);
 		sldG.setValue(g);
 		sldB.setValue(b);
+		sldA.setValue(a);
 
 		lblR.setText(String.format("%03d", r));
 		lblG.setText(String.format("%03d", g));
 		lblB.setText(String.format("%03d", b));
+		lblA.setText(String.format("%03d", a));
 
 	}
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		btnResult.setStrokeColor(new Color(sldR.getValue(), sldG.getValue(), sldB.getValue()));
+		btnResult.setStrokeColor(new Color(sldR.getValue(), sldG.getValue(), sldB.getValue(),sldA.getValue()));
 	}
 
 	@Override

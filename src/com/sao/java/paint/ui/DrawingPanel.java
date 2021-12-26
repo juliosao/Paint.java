@@ -92,15 +92,14 @@ public class DrawingPanel
 		g2d.setStroke(new BasicStroke(3));
 		g2d.setColor(Color.lightGray);
 		g2d.fillRect(0,0,getWidth(),getHeight());
-		g2d.setColor(Color.black);
+		
 		if(image != null)
 		{
 			int w = image.getWidth();
 			int h = image.getHeight();
 			int realW = zoom*w/100-x-1;
 			int realH = zoom*h/100-y-1;
-
-			g2d.drawRect(-x-1,-y-1,zoom*w/100, zoom*h/100);
+			
 			g2d.setColor(Color.white);
 			for(int i=0; i<realW; i+=10)
 			{
@@ -116,6 +115,9 @@ public class DrawingPanel
 					even=!even;
 				}
 			}
+
+			g2d.setColor(Color.black);
+			g2d.drawRect(-x-1,-y-1,zoom*w/100, zoom*h/100);
 
 			g2d.drawImage(image, -x-1,-y-1, zoom*w/100, zoom*h/100 , this);
 

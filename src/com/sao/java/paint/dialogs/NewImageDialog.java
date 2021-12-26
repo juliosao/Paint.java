@@ -12,6 +12,7 @@ import javax.swing.SpinnerNumberModel;
 
 import com.sao.java.paint.divcompat.ColorPalette;
 import com.sao.java.paint.i18n.Translator;
+import com.sao.java.paint.ui.ColorButton;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -49,12 +50,11 @@ public class NewImageDialog
 		JSpinner txtHeight = new JSpinner(new SpinnerNumberModel(600, 1, 10240, 1));
 		jp.add(txtHeight);
 		jp.add(new JLabel(Translator.m("Color")));
-		JButton btnColor = new JButton("...");
-		btnColor.setBackground(Color.WHITE);
+		ColorButton btnColor = new ColorButton(Color.WHITE);
 		btnColor.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
-				cp.setStrokeColor(btnColor.getBackground());
-				btnColor.setBackground(cp.askForStrokeColor(Color.WHITE));
+				cp.setStrokeColor(btnColor.getStrokeColor());
+				btnColor.setStrokeColor((cp.askForStrokeColor(Color.WHITE)));
 			}
 		});
 		jp.add(btnColor);
@@ -69,7 +69,7 @@ public class NewImageDialog
 			public void actionPerformed(ActionEvent evt) {
                 img = new BufferedImage((int)txtWidth.getValue(), (int)txtHeight.getValue(), BufferedImage.TYPE_INT_ARGB);
 				Graphics2D g = (Graphics2D)img.createGraphics();
-				g.setPaint(btnColor.getBackground());
+				g.setPaint(btnColor.getStrokeColor());
 				g.fillRect ( 0, 0, img.getWidth(), img.getHeight() );
 				g.dispose();
 				result = OK;

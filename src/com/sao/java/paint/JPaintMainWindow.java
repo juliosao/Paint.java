@@ -9,9 +9,11 @@ import com.sao.java.paint.dialogs.NewImageDialog;
 import com.sao.java.paint.dialogs.ScaleDialog;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.BasicStroke;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -423,7 +425,7 @@ public class JPaintMainWindow extends JFrame
 				if(imgSel != null)
 				{
 					setDrawingTool(rectangleSelection);
-					rectangleSelection.paste(drawingPanel,imgSel.getPngImage());
+					rectangleSelection.paste(drawingPanel,imgSel.getPngImage(),false);
 				}
 			}
 		});
@@ -661,7 +663,27 @@ public class JPaintMainWindow extends JFrame
 			if (index > 0) {
 				mode = f.getName().substring(index + 1).toLowerCase();
 			}
-			ImageIO.write(drawingPanel.getImage(), mode ,f );
+
+			BufferedImage saved = drawingPanel.getImage();
+			if(mode == "png")
+				ImageIO.write(saved, mode ,f );
+			else
+			{
+				// Transparecny are not allowed
+				final int w = saved.getWidth();
+				final int h = saved.getHeight();
+				final Color c = drawingPanel.getFillColor();
+
+				BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+				Graphics2D g = img.createGraphics();
+				g.setBackground( new Color(c.getRed(),c.getGreen(),c.getBlue()) );
+				g.clearRect(0, 0, w, h);
+				g.drawImage(saved, 0, 0, null);
+				g.dispose();
+				
+				ImageIO.write(img, mode ,f );
+			}
+
 			currentFile = f;
 			this.setTitle(TITLE + " - " + currentFile.getName());
 		}

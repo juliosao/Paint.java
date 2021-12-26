@@ -5,6 +5,7 @@
  */
 package com.sao.java.paint.ui;
 
+import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.Dimension;
 import javax.swing.JButton;
@@ -18,6 +19,10 @@ public class ColorButton
         extends JButton
         implements Coloreable
 {
+    //private static final BasicStroke BORDERSTROKE = new BasicStroke(2, BasicStroke.CAP_BUTT,BasicStroke.JOIN_MITER);
+    Color filColor;
+
+
     /**
      * Class constructor
      * @param c Color for the button
@@ -25,7 +30,7 @@ public class ColorButton
     public ColorButton(final Color c)
     {
         super();
-        setBackground(c);
+        filColor = c;
         setText("");
         Dimension s = new Dimension(24,24);
         setMinimumSize(s);
@@ -35,13 +40,45 @@ public class ColorButton
 
     @Override
     public void setStrokeColor(Color c) {
-        setBackground(c);
+        filColor=c;
+        updateUI();
     }
+    
+    public void paintComponent(Graphics g){        
+        final int w = getWidth();
+        final int h = getHeight();
 
+        if(filColor.getAlpha() != 255)
+        {
+            g.setColor(Color.white);
+            for(int i=0; i<w; i+=10)
+            {
+                boolean even = (i/10)%2==1;
+                for(int j=0; j<h; j+=10)
+                {
+                    if(even)
+                    {
+                        final int rw = i+10>w ? w%10 : 10;
+                        final int rh = j+10>h ? h%10 : 10;
+                        g.fillRect(i,j,rw,rh);
+                    }
+                    even=!even;
+                }
+            }
+        }
+
+        g.setColor(filColor);
+        g.fillRect(0, 0, w, h);
+
+
+        g.setColor(Color.black);
+        g.drawRect(0,0, w, h);
+
+    }
 
     @Override
     public Color getStrokeColor() {
-        return getBackground();
+        return filColor;
     }
 
     @Override

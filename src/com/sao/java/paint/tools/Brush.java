@@ -10,7 +10,6 @@ public class Brush extends BrushDrawingTool
 	BufferedImage image;
 	int oldX, oldY;
 	int r,g,b,a;
-	private static final int alpha = 255 << 24;
 
 	@Override
 	public void onMousePressed(DrawingPanel dp,  DrawingMouseEvent me)

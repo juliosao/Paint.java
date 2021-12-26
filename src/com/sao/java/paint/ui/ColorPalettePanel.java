@@ -65,7 +65,7 @@ public class ColorPalettePanel
 
     @Override
     public Color getStrokeColor() {
-        return buttons[idx].getBackground();
+        return buttons[idx].getStrokeColor();
     }
 
     public ColorPalette getColorPalette() {

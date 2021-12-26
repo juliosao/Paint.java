@@ -286,10 +286,10 @@ public class StrokeTextDialog
 		int height = fm.getHeight();
 		int margin = drawBorder ? (int)(drawingPanel.getStroke().getLineWidth() + 3) : 3;
 
-		BufferedImage img = new BufferedImage(width, height*lines.length+margin, BufferedImage.TYPE_4BYTE_ABGR);
+		BufferedImage img = new BufferedImage(width, height*lines.length+margin, BufferedImage.TYPE_INT_ARGB );
 		Graphics2D g = img.createGraphics();
 		g.setBackground(new Color(255,255,255,0));
-		g.clearRect(0, 0, width, height*lines.length);
+		g.clearRect(0, 0, width, height*lines.length+margin);
 
 		final AffineTransform at = g.getTransform();
 
@@ -333,8 +333,8 @@ public class StrokeTextDialog
 			}
 		}
 		g.dispose();
-
-		selectionTool.paste(drawingPanel, img);
+		
+		selectionTool.paste(drawingPanel, img, true);
 	}
 
 	/**

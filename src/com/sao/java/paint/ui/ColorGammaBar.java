@@ -127,14 +127,14 @@ public class ColorGammaBar
 
 	@Override
 	public void setStrokeColor(Color c) {
-		strokeButton.setBackground(c);
+		strokeButton.setStrokeColor(c);
 		if(actionListener != null)
 			actionListener.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, ACTIONSTROKE));
 	}
 
 	@Override
 	public Color getStrokeColor() {
-		return strokeButton.getBackground();
+		return strokeButton.getStrokeColor();
 	}
 
 	public void addActionListener(ActionListener l)
@@ -144,12 +144,12 @@ public class ColorGammaBar
 
 	@Override
 	public Color getFillColor() {
-		return fillButton.getBackground();
+		return fillButton.getStrokeColor();
 	}
 
 	@Override
 	public void setFillColor(Color c) {
-		fillButton.setBackground(c);
+		fillButton.setStrokeColor(c);
 		if(actionListener != null)
 			actionListener.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, ACTIONFILL));
 	}

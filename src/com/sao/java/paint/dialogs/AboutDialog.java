@@ -22,7 +22,7 @@ public class AboutDialog extends JDialog{
 		l.setAlignmentX(CENTER_ALIGNMENT);
 		add(l);
 
-		l = new JLabel("Version 0.1");
+		l = new JLabel("Version 0.2");
 		l.setAlignmentX(CENTER_ALIGNMENT);
 		add(l);
 

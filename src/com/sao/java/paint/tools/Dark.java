@@ -3,6 +3,8 @@ package com.sao.java.paint.tools;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
+import javax.swing.Icon;
+
 import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
@@ -13,6 +15,13 @@ public class Dark extends BrushDrawingTool {
 	double convolution[][] = new double[][]{
 		{0,0,0},{0,0.9,0},{0,0,0}
 	};
+
+	private static final Icon icon;
+
+	static
+	{
+		icon = loadIcon("darken");
+	}
 
 
 	@Override
@@ -135,4 +144,8 @@ public class Dark extends BrushDrawingTool {
 		return Translator.m("Darken");
 	}
 
+	public Icon getIcon()
+	{
+		return icon;
+	}
 }

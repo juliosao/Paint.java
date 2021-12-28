@@ -3,6 +3,9 @@ package com.sao.java.paint.tools;
 import java.awt.Rectangle;
 import java.awt.BasicStroke;
 import java.awt.image.BufferedImage;
+
+import javax.swing.Icon;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -31,6 +34,13 @@ extends DrawingTool
 	BufferedImage originalImage;
 	BufferedImage pastedImage;
 	int status=SELECTING;
+	private static final Icon icon;
+
+	static
+	{
+		icon = loadIcon("selection");
+	}
+
 
 	@Override
 	public void onSelected(DrawingPanel dp)
@@ -91,13 +101,26 @@ extends DrawingTool
 				g.setColor(selectionBorderColor);
 				g.drawRect(old.x, old.y, 1, 1 );
 				break;
-		}
 
+		}
 	}
 
 	@Override
 	public void onMouseReleased(DrawingPanel dp,  DrawingMouseEvent me)
 	{
+		if(me.button == DrawingMouseEvent.RIGHTBUTTON)
+		{
+			if(pastedImage != null && originalImage != null)
+			{
+				pastedImage = null;
+				originalImage = null;
+				old = null;
+				current = null;
+
+			}
+			return;
+		}
+
 		switch(status)
 		{
 			case SELECTING:
@@ -195,7 +218,7 @@ extends DrawingTool
 	 */
 	public void paste(DrawingPanel dp, BufferedImage img, boolean forceTransparency)
 	{
-		int x,y,w,h;
+		int x,y,w,h,tmpW,tmpH;
 		dp.notifyChanged();
 		pastedImage = img;
 
@@ -207,14 +230,28 @@ extends DrawingTool
 
 		if(old==null)
 		{
-			old = new Point(0,0);
-			current = new Point(img.getWidth(),img.getHeight());
-			x = old.x < current.x ? old.x : current.x;
-			y = old.y < current.y ? old.y : current.y;
-			w = Math.abs(old.x - current.x);
-			h = Math.abs(old.y - current.y);
+			old = dp.getScrollPossition();
 
-			g.drawImage(img, 0, 0, null);
+			tmpW = pastedImage.getWidth();
+			tmpH = pastedImage.getHeight();
+
+			if(tmpW>tmpH)
+			{
+				w = 100*dp.getWidth()/(2*dp.getZoom());
+				h = w * tmpH / tmpW;
+			}
+			else
+			{
+				h = 100*dp.getHeight()/(2*dp.getZoom());
+				w = h * tmpW / tmpH;
+			}
+
+			x = old.x + w/4;
+			y = old.y + h/4;
+
+			current = new Point(x+w,y+h);
+
+			g.drawImage(img, x, y, w, h, null);
 		}
 		else
 		{
@@ -369,6 +406,11 @@ extends DrawingTool
 	public String getDescription()
 	{
 		return Translator.m("Selection");
+	}
+
+	public Icon getIcon()
+	{
+		return icon;
 	}
 
 }

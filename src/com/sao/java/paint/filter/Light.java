@@ -1,5 +1,7 @@
 package com.sao.java.paint.filter;
 
+import com.sao.java.paint.i18n.Translator;
+
 public class Light extends ConvolutionFilter {
 	public Light()
 	{
@@ -10,6 +12,6 @@ public class Light extends ConvolutionFilter {
 
 	@Override
 	public String getDescription() {
-		return "Illuminate";
+		return Translator.m("Illuminate");
 	}
 }

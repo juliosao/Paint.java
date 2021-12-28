@@ -27,8 +27,7 @@ public abstract class ShapingTool
 
     @Override
     public void onMousePressed(DrawingPanel dp,  DrawingMouseEvent me)
-    {
-        dp.notifyChanged();
+    {        
         tooling = dp.createToolingLayer();
         graphics = (Graphics2D)tooling.getGraphics();
         strokeColor = me.button == 1 ? dp.getStrokeColor() : dp.getFillColor();
@@ -38,19 +37,14 @@ public abstract class ShapingTool
         old=me.getPoint();
         current=old;
         draw();
-
     }
 
     @Override
     public void onMouseReleased(DrawingPanel dp,  DrawingMouseEvent me)
     {
         current =  me.getPoint();
-        draw();
-        graphics.dispose();
-        BufferedImage img = dp.getImage();
-        Graphics2D g = img.createGraphics();
-        g.drawImage(tooling, 0, 0, null);
-        g.dispose();
+        draw();     
+        put(dp);
     }
 
     @Override
@@ -64,6 +58,16 @@ public abstract class ShapingTool
     {
         graphics.setBackground(TRANSPARENT);
         graphics.clearRect(0,0,tooling.getWidth(),tooling.getHeight());
+    }
+
+    protected void put(DrawingPanel dp)
+    {
+        dp.notifyChanged();
+        graphics.dispose();
+        BufferedImage img = dp.getImage();
+        Graphics2D g = img.createGraphics();
+        g.drawImage(tooling, 0, 0, null);
+        g.dispose();
     }
 
     protected abstract void draw();

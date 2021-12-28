@@ -1,6 +1,9 @@
 package com.sao.java.paint.tools;
 
 import java.awt.image.BufferedImage;
+
+import javax.swing.Icon;
+
 import java.awt.Graphics2D;
 import java.awt.Point;
 
@@ -10,8 +13,14 @@ import com.sao.java.paint.ui.DrawingPanel;
 public class Pencil
 	extends DrawingTool
 {
+	private static final Icon icon;
 	Point old = null;
 	Graphics2D g;
+
+	static
+	{		
+		icon = loadIcon("pencil");
+	}
 
 	@Override
 	public void onMousePressed(DrawingPanel dp,  DrawingMouseEvent me)
@@ -45,6 +54,11 @@ public class Pencil
 	public String getDescription()
 	{
 		return Translator.m("Pencil");
+	}
+
+	public Icon getIcon()
+	{
+		return icon;
 	}
 
 }

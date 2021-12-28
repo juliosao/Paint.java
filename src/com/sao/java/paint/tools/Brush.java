@@ -2,14 +2,23 @@ package com.sao.java.paint.tools;
 
 import java.awt.image.BufferedImage;
 
+import javax.swing.Icon;
+
 import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
 public class Brush extends BrushDrawingTool
 {
 	BufferedImage image;
+	private final static Icon icon;
 	int oldX, oldY;
 	int r,g,b,a;
+
+
+	static
+	{		
+		icon = loadIcon("brush");
+	}
 
 	@Override
 	public void onMousePressed(DrawingPanel dp,  DrawingMouseEvent me)
@@ -116,9 +125,15 @@ public class Brush extends BrushDrawingTool
 	}
 
 
-
+	@Override
 	public String getDescription()
 	{
 		return Translator.m("Brush");
+	}
+
+	@Override
+	public Icon getIcon()
+	{
+		return icon;
 	}
 }

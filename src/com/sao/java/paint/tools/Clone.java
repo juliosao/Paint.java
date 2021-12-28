@@ -2,6 +2,8 @@ package com.sao.java.paint.tools;
 
 import java.awt.image.BufferedImage;
 
+import javax.swing.Icon;
+
 import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
@@ -13,6 +15,14 @@ public class Clone extends BrushDrawingTool {
 	BufferedImage image;
 	int oldX, oldY, originX, originY;
 	private int status = INIT;
+
+	private static final Icon icon;
+
+	static
+	{
+		icon = loadIcon("clone");
+	}
+
 
 	public void onSelected(DrawingPanel dp)
 	{
@@ -129,6 +139,11 @@ public class Clone extends BrushDrawingTool {
 	public String getDescription()
 	{
 		return Translator.m("Clone");
+	}
+
+	public Icon getIcon()
+	{
+		return icon;
 	}
 
 }

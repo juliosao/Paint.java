@@ -5,23 +5,29 @@ import java.awt.geom.QuadCurve2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
+import javax.swing.Icon;
+
 import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
 public class Curve
-	extends DrawingTool
+	extends ShapingTool
 {
 
 	public final int STARTPOINT = 0;
 	public final int ENDPOINT = 1;
 	public final int CONTROLPOINT = 2;
+	private static final Icon icon;
 
 	int status = STARTPOINT;
 	Point2D.Double start;
 	Point2D.Double end;
 	Point2D.Double control;
-	BufferedImage backupImage;
-	Graphics2D g;
+
+	static
+	{
+		icon = loadIcon("curve");
+	}
 
 	@Override
 	public void onSelected(DrawingPanel dp)
@@ -32,43 +38,31 @@ public class Curve
 	@Override
 	public void onMousePressed(DrawingPanel dp,  DrawingMouseEvent me)
 	{
-		dp.notifyChanged();
+		super.onMousePressed(dp, me);
 
 		switch(status)
 		{
 			case STARTPOINT:
-				BufferedImage image = dp.getImage();
-				g = image.createGraphics();
-				g.setStroke(dp.getStroke());
-				g.setColor(me.button == 1 ? dp.getStrokeColor() : dp.getFillColor());
-
-				backupImage = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
-				Graphics2D tmpG = (Graphics2D)backupImage.getGraphics();
-				tmpG.drawImage(image, 0, 0, null);
-				tmpG.dispose();
 
 				start = new Point2D.Double(me.x,me.y);
 				end = start;
 				control = start;
-				draw(dp);
+				draw();
 				status = ENDPOINT;
 				break;
 			case ENDPOINT:
 				end = new Point2D.Double(me.x,me.y);
-				g.setStroke(dp.getStroke());
-				g.setColor(me.button == 1 ? dp.getStrokeColor() : dp.getFillColor());
-				draw(dp);
+				draw();
 				status = CONTROLPOINT;
 				break;
 			case CONTROLPOINT:
 				control = new Point2D.Double(me.x,me.y);
-				g.setStroke(dp.getStroke());
-				g.setColor(me.button == 1 ? dp.getStrokeColor() : dp.getFillColor());
-				draw(dp);
+				draw();
+				put(dp);
 				status = STARTPOINT;
 				break;
 		};
-       	}
+    }
 
 	@Override
 	public void onMouseFlight(DrawingPanel dp, DrawingMouseEvent me)
@@ -77,38 +71,51 @@ public class Curve
 		{
 			case ENDPOINT:
 				end = new Point2D.Double(me.x,me.y);
-				draw(dp);
+				draw();
 				break;
 			case CONTROLPOINT:
 				control = new Point2D.Double(me.x,me.y);
-				draw(dp);
+				draw();
 				break;
 		};
 
 	}
 
-	public void draw(DrawingPanel dp)
+	@Override
+	public void onMouseReleased(DrawingPanel dp,  DrawingMouseEvent me)
+    {
+        draw();
+    }
+
+	@Override
+	public void draw()
 	{
+		graphics.setStroke(stroke);
+		graphics.setColor(strokeColor);
+
+		clear();
+
 		switch(status)
 		{
 			case ENDPOINT:
-				g.drawImage(backupImage, 0, 0, null);
-				g.drawLine((int)start.x, (int)start.y, (int)end.x, (int)end.y);
+				graphics.drawLine((int)start.x, (int)start.y, (int)end.x, (int)end.y);
 				break;
 			case CONTROLPOINT:
-				g.drawImage(backupImage, 0, 0, null);
 				QuadCurve2D q = new QuadCurve2D.Double();
 				q.setCurve(start, control, end);
-				g.draw(q);
+				graphics.draw(q);
 				break;
 		};
-
-
 	}
 
 	public String getDescription()
 	{
 		return Translator.m("Curve");
+	}
+
+	public Icon getIcon()
+	{
+		return icon;
 	}
 
 }

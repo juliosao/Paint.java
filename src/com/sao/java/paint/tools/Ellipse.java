@@ -1,15 +1,26 @@
 package com.sao.java.paint.tools;
 
+import javax.swing.Icon;
+
 import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
 public class Ellipse
 	extends ShapingTool
 {
+
+	private static final Icon icon;
+
+	static
+	{
+		icon = loadIcon("ellipse");
+	}
+
+
 	@Override
 	public void onMousePressed(DrawingPanel dp,  DrawingMouseEvent me)
 	{
-		super.onMousePressed(dp,me);		
+		super.onMousePressed(dp,me);
 		draw();
 	}
 
@@ -39,6 +50,11 @@ public class Ellipse
 	public String getDescription()
 	{
 		return Translator.m("Ellipse");
+	}
+
+	public Icon getIcon()
+	{
+		return icon;
 	}
 
 }

@@ -3,6 +3,8 @@ package com.sao.java.paint.tools;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
+import javax.swing.Icon;
+
 import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
@@ -14,6 +16,13 @@ public class Sharpen extends BrushDrawingTool {
 	double convolution[][] = new double[][]{
 		{0,-adjust,0},{-adjust,8*adjust,-adjust},{-adjust,0,-adjust}
 	};
+
+	private static final Icon icon;
+
+	static
+	{
+		icon = loadIcon("sharpen");
+	}
 
 
 	@Override
@@ -129,7 +138,10 @@ public class Sharpen extends BrushDrawingTool {
 		}
 	}
 
-
+	public Icon getIcon()
+	{
+		return icon;
+	}
 
 	public String getDescription()
 	{

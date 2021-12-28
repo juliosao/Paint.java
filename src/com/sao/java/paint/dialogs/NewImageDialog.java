@@ -20,6 +20,9 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import java.awt.Window;
 
+/**
+ * Dialog to generate new images
+ */
 public class NewImageDialog
 	extends javax.swing.JDialog
 {
@@ -28,7 +31,14 @@ public class NewImageDialog
 
 	int result = CANCEL;
 	BufferedImage img;
+	JSpinner txtWidth;
+	JSpinner txtHeight;
+	ColorButton btnColor;
 
+	/**
+	 * Class constructor
+	 * @param parent Parent window where the dialog is in
+	 */
 	public NewImageDialog(Window parent)
 	{
 		super(parent);
@@ -44,13 +54,13 @@ public class NewImageDialog
 		add(jp,BorderLayout.CENTER);
 		jp.setLayout(new GridLayout(3,2));
 		jp.add(new JLabel(Translator.m("NewWidth")));
-		JSpinner txtWidth = new JSpinner(new SpinnerNumberModel(800, 1, 10240, 1));
+		txtWidth = new JSpinner(new SpinnerNumberModel(800, 1, 10240, 1));
 		jp.add(txtWidth);
 		jp.add(new JLabel(Translator.m("NewHeight")));
-		JSpinner txtHeight = new JSpinner(new SpinnerNumberModel(600, 1, 10240, 1));
+		txtHeight = new JSpinner(new SpinnerNumberModel(600, 1, 10240, 1));
 		jp.add(txtHeight);
 		jp.add(new JLabel(Translator.m("Color")));
-		ColorButton btnColor = new ColorButton(Color.WHITE);
+		btnColor = new ColorButton(Color.WHITE);
 		btnColor.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
 				cp.setStrokeColor(btnColor.getStrokeColor());
@@ -92,11 +102,39 @@ public class NewImageDialog
 
 	}
 
+	/**
+	 * Sets generated image dimensions
+	 * @param width width of the new image
+	 * @param height height of the new image
+	 */
+	public void setDimensions(int width, int height)
+	{
+		txtWidth.setValue(width);
+		txtHeight.setValue(height);
+	}
+
+	/**
+	 * Sets the background color of the new image
+	 * @param c The background color of the new image
+	 */
+	public void setColor(Color c)
+	{
+		btnColor.setStrokeColor(c);
+	}
+
+	/**
+	 * Gets the new image generated
+	 * @return Gets the new image generated
+	 */
 	public BufferedImage getImage()
 	{
 		return img;
 	}
 
+	/**
+	 * Gets the result action of the dialog
+	 * @return OK if user pressed "Ok" button, else CANCEL
+	 */
 	public int getResult()
 	{
 		return result;

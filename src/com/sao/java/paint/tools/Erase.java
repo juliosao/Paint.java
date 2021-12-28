@@ -2,6 +2,8 @@ package com.sao.java.paint.tools;
 
 import java.awt.image.BufferedImage;
 
+import javax.swing.Icon;
+
 import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
@@ -12,6 +14,12 @@ public class Erase extends BrushDrawingTool
 	int color;
 	int replace;
 	boolean doReplace = false;
+	public static final Icon icon;
+
+	static
+	{
+		icon = loadIcon("eraser");
+	}
 
 	@Override
 	public void onMousePressed(DrawingPanel dp,  DrawingMouseEvent me)
@@ -107,5 +115,10 @@ public class Erase extends BrushDrawingTool
 	public String getDescription()
 	{
 		return Translator.m("Eraser");
+	}
+
+	public Icon getIcon()
+	{
+		return icon;
 	}
 }

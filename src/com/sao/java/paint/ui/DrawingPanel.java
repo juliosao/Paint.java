@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 
+import javax.naming.OperationNotSupportedException;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import com.sao.java.paint.tools.DrawingTool;
@@ -32,6 +33,7 @@ public class DrawingPanel
 {
 	public static final int BORDER = 1;
 	public static final int FILL = 2;
+	public static final Color TRANSPARENT = new Color(255,255,255,0);
 
 	private BufferedImage image;
 	private BufferedImage toolingLayer;
@@ -47,6 +49,9 @@ public class DrawingPanel
 	private LinkedList<BufferedImage> history = new LinkedList<>();
 	private LinkedList<BufferedImage> fordwardHistory = new LinkedList<>();
 
+	/**
+	 * Class constructor
+	 */
 	public DrawingPanel()
 	{
 		super();
@@ -84,6 +89,10 @@ public class DrawingPanel
 		stroke = new BasicStroke();
 	}
 
+	/**
+	 * Occurs when is needed to redraw panel
+	 * @param g Graphics context where to draw the updates
+	 */
 	@Override
 	public void paintComponent(Graphics g)
 	{
@@ -128,25 +137,19 @@ public class DrawingPanel
 		}
 	}
 
-	public void setDrawingTool(DrawingTool t)
-	{
-		if(dtool != null)
-			dtool.onFinished(this);
-
-		dtool = t;
-		toolingLayer = null;
-		dtool.onSelected(this);
-		setCursor(dtool.getCursor());
-		updateUI();
-	}
 
 	public void notifyChanged()
 	{
 		if(history.size()>16)
 			history.removeFirst();
 
-		BufferedImage tmp = new BufferedImage(image.getWidth(),image.getHeight(),BufferedImage.TYPE_INT_ARGB);
+		final int w = image.getWidth();
+		final int h = image.getHeight();
+
+		BufferedImage tmp = new BufferedImage(w,h,BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = tmp.createGraphics();
+		g.setBackground(TRANSPARENT);		
+		g.clearRect(0, 0, w, h);
 		g.drawImage(image,0,0,null);
 		g.dispose();
 		fordwardHistory.clear();
@@ -161,18 +164,27 @@ public class DrawingPanel
 		if(history.size()==0)
 			return;
 
-		BufferedImage forward = new BufferedImage(image.getWidth(),image.getHeight(),BufferedImage.TYPE_INT_ARGB);
+		final int w = image.getWidth();
+		final int h = image.getHeight();
+
+
+		BufferedImage forward = new BufferedImage(w,h,BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = forward.createGraphics();
+		g.setBackground(TRANSPARENT);		
+		g.clearRect(0, 0, w, h);
 		g.drawImage(image,0,0,null);
 		g.dispose();
 		fordwardHistory.push(forward);
 
 		BufferedImage tmp = history.pop();
 		g = image.createGraphics();
+		g.setBackground(TRANSPARENT);		
+		g.clearRect(0, 0, w, h);
 		g.drawImage(tmp,0,0,null);
 		g.dispose();
+		setDrawingTool(dtool);
 		updateUI();
-		dtool.onSelected(this);
+		
 	}
 
 	/**
@@ -183,32 +195,77 @@ public class DrawingPanel
 		if(fordwardHistory.size()==0)
 			return;
 
-		BufferedImage tmp = new BufferedImage(image.getWidth(),image.getHeight(),BufferedImage.TYPE_INT_ARGB);
+		final int w = image.getWidth();
+		final int h = image.getHeight();
+
+		BufferedImage tmp = new BufferedImage(w,h,BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = tmp.createGraphics();
+		g.setBackground(TRANSPARENT);		
+		g.clearRect(0, 0, w, h);
 		g.drawImage(image,0,0,null);
 		g.dispose();
 		history.push(tmp);
 
 		tmp = fordwardHistory.pop();
 		g = image.createGraphics();
+		g.setBackground(TRANSPARENT);		
+		g.clearRect(0, 0, w, h);
 		g.drawImage(tmp,0,0,null);
 		g.dispose();
+		setDrawingTool(dtool);
 		updateUI();
-		dtool.onSelected(this);
+		
 	}
 
+	/**
+	 * Sets the current drawing tool
+	 * @param t The current drawing tool
+	 */
+	public void setDrawingTool(DrawingTool t)
+	{
+		if(dtool != null)
+			dtool.onFinished(this);
+
+		dtool = t;
+		toolingLayer = null;
+		dtool.onSelected(this);
+		setCursor(dtool.getCursor());
+		updateUI();
+	}
+
+	/**
+	 * Gets the current drawing tool
+	 * @return
+	 */
 	public DrawingTool getDrawingTool()
 	{
 		return dtool;
 	}
 
+	/**
+	 * Sets the image to edit
+	 * @param img The image to edit
+	 */
 	public void setImage(BufferedImage img)
 	{
-		image = img;
+		if(img.getType() == BufferedImage.TYPE_INT_ARGB )
+			image = img;
+		else
+		{
+			image = new BufferedImage(img.getWidth(),img.getHeight(),BufferedImage.TYPE_INT_ARGB);
+			Graphics2D g = image.createGraphics();
+			g.drawImage(img, 0, 0, null);
+			g.dispose();
+		}
+
 		updateUI();
 		notifyChanged();
 	}
 
+	/**
+	 * Gets the image to edit
+	 * @return The image to edit
+	 */
 	public BufferedImage getImage()
 	{
 		return image;
@@ -273,6 +330,11 @@ public class DrawingPanel
 		// Does nothing
 	}
 
+	/**
+	 * Moves scroll to given coordinates
+	 * @param newX x-coordinate to move
+	 * @param newY y-coordinate to move
+	 */
 	public void scrollTo(int newX, int newY) {
 		x = newX;
 		y = newY;
@@ -280,12 +342,32 @@ public class DrawingPanel
 	}
 
 	/**
-	 * Sets current zoom
-	 * @param newZoom
+	 * Return the current scroll coordinates
+	 * @return A point with the current scroll coordinates
 	 */
-	public void setZoom(int newZoom){
+	public Point getScrollPossition()
+	{
+		return new Point(x,y);
+	}
+
+	/**
+	 * Sets current zoom
+	 * @param newZoom Zoom to be used. 100=100%
+	 */
+	public void setZoom(int newZoom) throws OperationNotSupportedException
+	{
+		if(newZoom<1)
+			throw new OperationNotSupportedException("Cannot set zoom to 0%");
 		zoom = newZoom;
 		updateUI();
+	}
+
+	/**
+	 * Returns current zoom
+	 */
+	public int getZoom()
+	{
+		return zoom;
 	}
 
 	/**

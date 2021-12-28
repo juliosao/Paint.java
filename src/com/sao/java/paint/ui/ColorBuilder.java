@@ -102,11 +102,14 @@ public class ColorBuilder extends JPanel
 		lblG.setText(String.format("%03d", g));
 		lblB.setText(String.format("%03d", b));
 		lblA.setText(String.format("%03d", a));
-
 	}
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
+		lblR.setText(String.format("%03d", sldR.getValue()));
+		lblG.setText(String.format("%03d", sldG.getValue()));
+		lblB.setText(String.format("%03d", sldB.getValue()));
+		lblA.setText(String.format("%03d", sldA.getValue()));
 		btnResult.setStrokeColor(new Color(sldR.getValue(), sldG.getValue(), sldB.getValue(),sldA.getValue()));
 	}
 

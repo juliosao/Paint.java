@@ -43,25 +43,29 @@ public class ColorButton
         filColor=c;
         updateUI();
     }
-    
-    public void paintComponent(Graphics g){        
+
+    public void paintComponent(Graphics g){
         final int w = getWidth();
         final int h = getHeight();
 
         if(filColor.getAlpha() != 255)
         {
-            g.setColor(Color.white);
             for(int i=0; i<w; i+=10)
             {
                 boolean even = (i/10)%2==1;
                 for(int j=0; j<h; j+=10)
                 {
+                    final int rw = i+10>w ? w%10 : 10;
+                    final int rh = j+10>h ? h%10 : 10;
                     if(even)
                     {
-                        final int rw = i+10>w ? w%10 : 10;
-                        final int rh = j+10>h ? h%10 : 10;
-                        g.fillRect(i,j,rw,rh);
+                        g.setColor(Color.white);
                     }
+                    else
+                    {
+                        g.setColor(Color.LIGHT_GRAY);
+                    }
+                    g.fillRect(i,j,rw,rh);
                     even=!even;
                 }
             }

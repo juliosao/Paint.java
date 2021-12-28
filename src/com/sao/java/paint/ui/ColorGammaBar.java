@@ -12,6 +12,7 @@ import com.sao.java.paint.divcompat.ColorGamma;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Dimension;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.Box.Filler;
@@ -34,6 +35,7 @@ public class ColorGammaBar
 	ColorButton[] colorButtons;
 	ColorPalette palette;
 	ActionListener actionListener;
+	Window mainWindow = null;
 
 	public ColorGammaBar(ColorPalette p)
 	{
@@ -47,7 +49,7 @@ public class ColorGammaBar
 		strokeButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ColorPickerDialog cpd = new ColorPickerDialog(null, palette);
+				ColorPickerDialog cpd = new ColorPickerDialog(mainWindow, palette);
 				final Color c = cpd.askForStrokeColor(strokeButton.getStrokeColor());
 				ColorPalette newPalette = cpd.getColorPalette();
 				if(newPalette != palette)
@@ -69,7 +71,7 @@ public class ColorGammaBar
 		fillButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ColorPickerDialog cpd = new ColorPickerDialog(null, palette);
+				ColorPickerDialog cpd = new ColorPickerDialog(mainWindow, palette);
 				final Color c = cpd.askForStrokeColor(fillButton.getStrokeColor());
 				ColorPalette newPalette = cpd.getColorPalette();
 				if(newPalette != palette)
@@ -152,5 +154,10 @@ public class ColorGammaBar
 		fillButton.setStrokeColor(c);
 		if(actionListener != null)
 			actionListener.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, ACTIONFILL));
+	}
+
+	public void setParentWindow(Window w)
+	{
+		mainWindow = w;
 	}
 }

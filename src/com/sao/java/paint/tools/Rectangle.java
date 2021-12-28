@@ -1,21 +1,26 @@
 package com.sao.java.paint.tools;
 
-import java.awt.image.BufferedImage;
+import javax.swing.Icon;
 
 import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
-
-import java.awt.Graphics2D;
-import java.awt.Point;
 
 
 public class Rectangle
 	extends ShapingTool
 {
+	private static final Icon icon;
+
+	static
+	{
+		icon = loadIcon("rectangle");
+	}
+
+
 	@Override
 	public void onMousePressed(DrawingPanel dp,  DrawingMouseEvent me)
 	{
-		super.onMousePressed(dp,me);		
+		super.onMousePressed(dp,me);
 		draw();
 	}
 
@@ -42,11 +47,14 @@ public class Rectangle
 		}
 	}
 
-	
-
 	public String getDescription()
 	{
 		return Translator.m("Rectangle");
+	}
+
+	public Icon getIcon()
+	{
+		return icon;
 	}
 
 }

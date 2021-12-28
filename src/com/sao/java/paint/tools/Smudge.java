@@ -2,12 +2,21 @@ package com.sao.java.paint.tools;
 
 import java.awt.image.BufferedImage;
 
+import javax.swing.Icon;
+
 import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
 public class Smudge extends BrushDrawingTool {
 	BufferedImage image;
 	int oldX, oldY;
+
+	private static final Icon icon;
+
+	static
+	{
+		icon = loadIcon("smudge");
+	}
 
 
 	@Override
@@ -109,4 +118,8 @@ public class Smudge extends BrushDrawingTool {
 		return Translator.m("Smudge");
 	}
 
+	public Icon getIcon()
+	{
+		return icon;
+	}
 }

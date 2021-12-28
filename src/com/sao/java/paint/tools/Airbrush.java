@@ -2,6 +2,8 @@ package com.sao.java.paint.tools;
 
 import java.awt.image.BufferedImage;
 
+import javax.swing.Icon;
+
 import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
@@ -10,6 +12,12 @@ public class Airbrush extends BrushDrawingTool
 	BufferedImage image;
 	int oldX, oldY;
 	int r,g,b,a;
+	private static final Icon icon;
+
+	static
+	{
+		icon = loadIcon("airbrush");
+	}
 
 	@Override
 	public void onMousePressed(DrawingPanel dp,  DrawingMouseEvent me)
@@ -111,10 +119,17 @@ public class Airbrush extends BrushDrawingTool
 		}
 	}
 
-
-
+	@Override
 	public String getDescription()
 	{
 		return Translator.m("Airbrush");
 	}
+
+	@Override
+	public Icon getIcon()
+	{
+		return icon;
+	}
+
+
 }

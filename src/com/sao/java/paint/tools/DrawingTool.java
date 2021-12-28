@@ -1,8 +1,13 @@
 package com.sao.java.paint.tools;
 
+import com.sao.java.paint.ui.AdaptableIcon;
 import com.sao.java.paint.ui.DrawingPanel;
 
 import java.awt.Cursor;
+import java.net.URL;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 /**
  * Represents a drawing tool
@@ -62,6 +67,22 @@ public abstract class DrawingTool {
 		return "DrawingTool";
 	}
 
+	public Icon getIcon()
+	{
+		return null;
+	}
+
+	/**
+	 * Loads icon from path
+	 * @param what name of the icon to load
+	 * @return The found icon or null
+	 */
+	protected static Icon loadIcon(String what)
+	{
+		URL url = DrawingTool.class.getResource("img/"+what+".png");
+		return new AdaptableIcon(url);
+	}
+
 	/**
 	 * Mouse cursor representing this tool
 	 */
@@ -72,11 +93,12 @@ public abstract class DrawingTool {
 	}
 
 	/**
-	 * Gets RGB from components, with 100%alpha
-	 * @param r
-	 * @param g
-	 * @param b
-	 * @return
+	 * Gets RGB from components
+	 * @param a alpha component
+	 * @param r red component
+	 * @param g green component
+	 * @param b blue component
+	 * @return The rgb value for the color
 	 */
 	public static final int rgb(int a,int r, int g, int b)
 	{

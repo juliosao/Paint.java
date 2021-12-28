@@ -36,7 +36,7 @@ public class GrayScale
 		}
 
 		dp.notifyChanged();
-		for(int x=x0; x<y0; x++)
+		for(int x=x0; x<x1; x++)
 		{
 			for(int y=x0; y<y1; y++)
 			{

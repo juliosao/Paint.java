@@ -26,6 +26,8 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.ItemEvent;
 
 import javax.imageio.ImageIO;
+import javax.naming.OperationNotSupportedException;
+import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -44,6 +46,7 @@ import com.sao.java.paint.tools.*;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.net.URL;
 
 import javax.swing.JSpinner;
 import javax.swing.JToggleButton;
@@ -65,14 +68,15 @@ public class JPaintMainWindow extends JFrame
 	 * Allowed file types
 	*/
 	static final FileNameExtensionFilter filters[] = new FileNameExtensionFilter[]{
-		new FileNameExtensionFilter(Translator.m("JPEG_Image"), "JPEG","JPG"),
-		new FileNameExtensionFilter(Translator.m("PNG_Image"), "PNG"),
-		new FileNameExtensionFilter(Translator.m("BMP_Image"), "BMP"),
-		new FileNameExtensionFilter(Translator.m("MAP_Image"), "MAP"),
-		new FileNameExtensionFilter(Translator.m("All_Images"), "JPEG","JPG","PNG","BMP","MAP"),
+		new FileNameExtensionFilter(Translator.m("JPEG_Image"), "jpeg","jpg"),
+		new FileNameExtensionFilter(Translator.m("PNG_Image"), "png"),
+		new FileNameExtensionFilter(Translator.m("BMP_Image"), "bmp"),
+		new FileNameExtensionFilter(Translator.m("MAP_Image"), "map"),
+		new FileNameExtensionFilter(Translator.m("All_Images"), "png","jpeg","jpg","bmp","map"),
 	};
 	static int windowCount = 0;
 	final static Dimension preferredDimension = new Dimension(1024,768);
+	File currentDir = new File(System.getProperty("user.home"));
 
 	DrawingPanel drawingPanel;
 	JToolBar toolbox;
@@ -176,7 +180,11 @@ public class JPaintMainWindow extends JFrame
 		int i = 0;
 		for(DrawingTool t: tools)
 		{
-			buttons[i] = new JToggleButton(tools[i].getDescription());
+			buttons[i] = new JToggleButton();
+			buttons[i].setIcon(t.getIcon());
+			buttons[i].setToolTipText(tools[i].getDescription());
+			buttons[i].setMinimumSize(new Dimension(32,32));
+			buttons[i].setPreferredSize(new Dimension(48,48));
 			buttons[i].addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e)
 				{
@@ -214,6 +222,7 @@ public class JPaintMainWindow extends JFrame
 		pnl.add(new JLabel(Translator.m("Color:")));
 
 		colorToolbar = new ColorGammaBar(new ColorPalette());
+		colorToolbar.setParentWindow(this);
 		colorToolbar.setStrokeColor(drawingPanel.getStrokeColor());
 		colorToolbar.setFillColor(drawingPanel.getFillColor());
 		pnl.add(colorToolbar);//,BorderLayout.CENTER);
@@ -238,8 +247,15 @@ public class JPaintMainWindow extends JFrame
 		zoomer.addChangeListener(new javax.swing.event.ChangeListener() {
 			@Override
 			public void stateChanged(javax.swing.event.ChangeEvent evt) {
-				drawingPanel.setZoom((int)zoomer.getValue());
-				lblZoom.setText(" "+zoomer.getValue()+"%");
+				try
+				{
+					drawingPanel.setZoom((int)zoomer.getValue());
+					lblZoom.setText(" "+zoomer.getValue()+"%");
+				}
+				catch(OperationNotSupportedException onse)
+				{
+					JOptionPane.showMessageDialog(JPaintMainWindow.this, Translator.m("Cannot_set_zoom_to_less_than_1%") , Translator.m("Error"), JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 		pnl.add(zoomer);//,BorderLayout.EAST);
@@ -309,7 +325,7 @@ public class JPaintMainWindow extends JFrame
 	 */
 	private void createFileMenu()
 	{
-		menuFile = new JMenu("File");
+		menuFile = new JMenu(Translator.m("File"));
 
 		JMenuItem mnu = new JMenuItem(Translator.m("New"));
 		mnu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,ActionEvent.CTRL_MASK));
@@ -317,6 +333,9 @@ public class JPaintMainWindow extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				NewImageDialog nid = new NewImageDialog(JPaintMainWindow.this);
+				final BufferedImage img = drawingPanel.getImage();
+				nid.setDimensions(img.getWidth(), img.getHeight());
+				nid.setColor(drawingPanel.getFillColor());
 				nid.setVisible(true);
 				if(nid.getResult() == NewImageDialog.OK)
 				{
@@ -532,6 +551,8 @@ public class JPaintMainWindow extends JFrame
 			new com.sao.java.paint.filter.Invert(),
 			new com.sao.java.paint.filter.DropColor(),
 			new com.sao.java.paint.filter.GrayScale(),
+			new com.sao.java.paint.filter.SwapChannels(),
+			new com.sao.java.paint.filter.ColorToAlpha()
 		};
 
 		for(ImageFilter f: filters)
@@ -629,7 +650,7 @@ public class JPaintMainWindow extends JFrame
 		try
 		{
 			JFileChooser fileChooser = new JFileChooser();
-			fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+			fileChooser.setCurrentDirectory(currentDir);
 			for(FileNameExtensionFilter filter: filters)
 			{
 				fileChooser.setFileFilter(filter);
@@ -641,6 +662,7 @@ public class JPaintMainWindow extends JFrame
 				BufferedImage bi = ImageIO.read(selectedFile);
 				drawingPanel.setImage(bi);
 				currentFile = selectedFile;
+				currentDir = fileChooser.getCurrentDirectory();
 				this.setTitle(TITLE + " - " + currentFile.getName());
 			}
 		}
@@ -665,7 +687,7 @@ public class JPaintMainWindow extends JFrame
 			}
 
 			BufferedImage saved = drawingPanel.getImage();
-			if(mode == "png")
+			if(mode.equals("png"))
 				ImageIO.write(saved, mode ,f );
 			else
 			{
@@ -680,7 +702,7 @@ public class JPaintMainWindow extends JFrame
 				g.clearRect(0, 0, w, h);
 				g.drawImage(saved, 0, 0, null);
 				g.dispose();
-				
+
 				ImageIO.write(img, mode ,f );
 			}
 
@@ -724,7 +746,7 @@ public class JPaintMainWindow extends JFrame
 				fileChooser.setFileFilter(filter);
 			}
 
-			fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+			fileChooser.setCurrentDirectory(currentDir);
 			int result = fileChooser.showSaveDialog(JPaintMainWindow.this);
 			if (result == JFileChooser.APPROVE_OPTION) {
 				File f = fileChooser.getSelectedFile();
@@ -735,6 +757,7 @@ public class JPaintMainWindow extends JFrame
 					f = new File(f.getAbsolutePath()+"."+ff.getExtensions()[0] );
 				}
 
+				currentDir = fileChooser.getCurrentDirectory();
 				savePicture(f);
 			}
 		}

@@ -3,6 +3,8 @@ package com.sao.java.paint.tools;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
+import javax.swing.Icon;
+
 import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
@@ -14,6 +16,14 @@ public class Blur extends BrushDrawingTool {
 	double convolution[][] = new double[][]{
 		{adjust,adjust,adjust},{adjust,adjust,adjust},{adjust,adjust,adjust}
 	};
+
+	private static final Icon icon;
+
+	static
+	{
+		icon = loadIcon("blur");
+	}
+
 
 	@Override
 	public void onMousePressed(DrawingPanel dp,  DrawingMouseEvent me)
@@ -132,6 +142,11 @@ public class Blur extends BrushDrawingTool {
 	public String getDescription()
 	{
 		return Translator.m("Blur");
+	}
+
+	public Icon getIcon()
+	{
+		return icon;
 	}
 
 }

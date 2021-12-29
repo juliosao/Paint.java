@@ -7,37 +7,27 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Window;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowFocusListener;
 import java.awt.font.GlyphVector;
 import java.awt.image.BufferedImage;
-import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.Graphics2D;
 
 import java.awt.geom.AffineTransform;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
 import javax.swing.JTextArea;
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import com.sao.java.paint.tools.RectangleSelection;
-import com.sao.java.paint.ui.AlignSelector;
+import com.sao.java.paint.ui.TextStyleToolbar;
 import com.sao.java.paint.ui.DrawingPanel;
 
 /**
@@ -45,20 +35,14 @@ import com.sao.java.paint.ui.DrawingPanel;
  */
 public class StrokeTextDialog
 	extends JDialog
-	implements WindowFocusListener
+	implements WindowFocusListener, ActionListener
 {
 
-	AlignSelector alignSelector;
+	TextStyleToolbar styleToolbar;
 	RectangleSelection selectionTool;
 	DrawingPanel drawingPanel;
 	JTextArea textArea;
-	int fontSize = 34;
-	boolean italic = false;
-	boolean bold = false;
-	boolean drawBorder = true;
-	boolean drawFill = true;
-	String fontName;
-	Color strokeColor = Color.BLACK;
+
 
 	/**
 	 * Class constructor
@@ -73,7 +57,9 @@ public class StrokeTextDialog
 		setLayout(new BorderLayout());
 		setLocationRelativeTo(parent);
 		addWindowFocusListener(this);
-		addToolbar();
+		styleToolbar = new TextStyleToolbar();
+		styleToolbar.addActionListener(this);
+		add(styleToolbar,BorderLayout.NORTH);
 		addBottomBar();
 		textArea = new JTextArea("New\ntext");
 		textArea.setPreferredSize(new Dimension(320,200));
@@ -113,107 +99,6 @@ public class StrokeTextDialog
 		}
 	}
 
-	/**
-	 * Puts toolbar for customizing text
-	 */
-	private void addToolbar()
-	{
-		JToolBar jt = new JToolBar();
-		jt.setFloatable(false);
-		add(jt,BorderLayout.NORTH);
-
-		String fonts[] = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-
-		jt.add(new JLabel("Font:"));
-		JComboBox<String> jcb = new JComboBox<>(fonts);
-		jcb.addItemListener(new ItemListener(){
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				fontName = (String)jcb.getSelectedItem();
-				updateImage();
-			}
-		});
-		fontName = (String)jcb.getSelectedItem();
-		jt.add(jcb);
-
-		jt.add(new JToolBar.Separator());
-		jt.add(new JLabel(" Size:"));
-
-		JSpinner spn = new JSpinner(new SpinnerNumberModel(32, 5, 100, 1));
-		spn.addChangeListener(new javax.swing.event.ChangeListener() {
-			@Override
-			public void stateChanged(javax.swing.event.ChangeEvent evt) {
-				fontSize = (int)spn.getValue();
-				updateImage();
-			}
-		});
-		jt.add(spn);
-
-		jt.add(new JToolBar.Separator());
-		JToggleButton btnB = new JToggleButton();
-		btnB.setIcon(new ImageIcon(getClass().getResource("../ui/img/italic.png")));
-		btnB.addItemListener(new ItemListener(){
-			@Override
-			public void itemStateChanged(ItemEvent e)
-			{
-				bold = btnB.isSelected();
-				updateImage();
-			}
-		});
-		jt.add(btnB);
-
-		JToggleButton btnI = new JToggleButton();
-		btnI.setIcon(new ImageIcon(getClass().getResource("../ui/img/bold.png")));
-		btnI.addItemListener(new ItemListener(){
-			@Override
-			public void itemStateChanged(ItemEvent e)
-			{
-				italic = btnI.isSelected();
-				updateImage();
-			}
-		});
-		jt.add(btnI);
-
-		jt.add(new JToolBar.Separator());
-
-		alignSelector = new AlignSelector();
-		alignSelector.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				updateImage();
-			}
-
-		});
-		jt.add(alignSelector);
-
-		jt.add(new JToolBar.Separator());
-		JToggleButton btnBorder = new JToggleButton("Border");
-		btnBorder.setFont(new Font("Serif", Font.PLAIN, 14));
-		btnBorder.setSelected(true);
-		btnBorder.addItemListener(new ItemListener(){
-			@Override
-			public void itemStateChanged(ItemEvent e)
-			{
-				drawBorder = btnBorder.isSelected();
-				updateImage();
-			}
-		});
-		jt.add(btnBorder);
-
-		JToggleButton btnFill = new JToggleButton("Fill");
-		btnFill.setFont(new Font("Serif", Font.PLAIN, 14));
-		btnFill.setSelected(true);
-		btnFill.addItemListener(new ItemListener(){
-			@Override
-			public void itemStateChanged(ItemEvent e)
-			{
-				drawFill = btnFill.isSelected();
-				updateImage();
-			}
-		});
-		jt.add(btnFill);
-
-	}
 
 	/**
 	 * Puts controls to apply results or cancel text insertion
@@ -252,6 +137,8 @@ public class StrokeTextDialog
 	 */
 	void updateImage()
 	{
+		boolean drawBorder = (drawingPanel.getShapeMode() & DrawingPanel.BORDER) != 0;
+		boolean drawFill = (drawingPanel.getShapeMode() & DrawingPanel.FILL) != 0;
 
 		if(drawingPanel.getDrawingTool() != selectionTool)
 		{
@@ -266,9 +153,7 @@ public class StrokeTextDialog
 		}
 
 		//Composes font
-		int style = bold ? Font.BOLD : Font.PLAIN;
-		if(italic) style |= Font.ITALIC;
-		Font f = new Font(fontName, style, fontSize);
+		Font f = new Font(styleToolbar.getFontName(), styleToolbar.getStyle(), styleToolbar.getFontSize());
 
 		//Calculates text dimensions
 		String[] lines = s.split("\n");
@@ -284,7 +169,7 @@ public class StrokeTextDialog
 
 		// Draws lines in selection
 		int height = fm.getHeight();
-		int margin = drawBorder ? (int)(drawingPanel.getStroke().getLineWidth() + 3) : 3;
+		int margin = ( drawingPanel.getShapeMode() & DrawingPanel.BORDER) != 0 ? (int)(drawingPanel.getStroke().getLineWidth() + 3) : 3;
 
 		BufferedImage img = new BufferedImage(width, height*lines.length+margin, BufferedImage.TYPE_INT_ARGB );
 		Graphics2D g = img.createGraphics();
@@ -302,20 +187,20 @@ public class StrokeTextDialog
 			g.setTransform(at);
 
 			int x;
-			switch(alignSelector.getAlign())
+			switch(styleToolbar.getAlign())
 			{
-				case AlignSelector.ALIGN_CENTER:
+				case TextStyleToolbar.ALIGN_CENTER:
 					x = (width - bounds.width) / 2 - bounds.x;
 					break;
-				case AlignSelector.ALIGN_RIGHT:
+				case TextStyleToolbar.ALIGN_RIGHT:
 					x=width-bounds.width;
 					break;
-				case AlignSelector.ALIGN_LEFT:
+				case TextStyleToolbar.ALIGN_LEFT:
 				default:
 					x = -bounds.x;
 					break;
 			}
-			final int y = (height+margin/2)+height*i;
+			final int y = (height/2+margin)+height*i;
 			g.translate(x,y);
 			//System.out.println(String.format("Render: '%s' x=%d, y=%d h=%d w=%d",lines[i],x,y,height,bounds.width));
 
@@ -333,7 +218,7 @@ public class StrokeTextDialog
 			}
 		}
 		g.dispose();
-		
+
 		selectionTool.paste(drawingPanel, img, true);
 	}
 
@@ -350,6 +235,11 @@ public class StrokeTextDialog
 	public void windowLostFocus(WindowEvent e) {
 		// Does nothing
 
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		updateImage();
 	}
 
 }

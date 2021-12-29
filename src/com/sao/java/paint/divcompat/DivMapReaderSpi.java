@@ -41,13 +41,10 @@ public class DivMapReaderSpi extends ImageReaderSpi {
                 supportsStandardImageMetadataFormat,nativeImageMetadataFormatName,
                 nativeStreamMetadataFormatClassName,extraImageMetadataFormatNames,
                 extraStreamMetadataFormatClassNames);
-        System.out.println("Contactando!");
-
     }
 
     @Override
     public boolean canDecodeInput(Object source) throws IOException {
-        System.out.println("Me piden una imagen!:"+source);
         ImageInputStream stream;
 
         if (source instanceof ImageInputStream) {
@@ -58,7 +55,6 @@ public class DivMapReaderSpi extends ImageReaderSpi {
         }
         else
         {
-            System.out.println("Origen no soportado");
             return false;
         }
 
@@ -68,7 +64,6 @@ public class DivMapReaderSpi extends ImageReaderSpi {
                 stream.readFully(b);
                 stream.reset();
         } catch (IOException e) {
-            System.out.println("No se pudo cargar la informacion");
             e.printStackTrace();
             return false;
         }
@@ -77,7 +72,6 @@ public class DivMapReaderSpi extends ImageReaderSpi {
         {
             if(MAPHDR[i] != b[i])
             {
-                System.out.println("El formato de imagen no esta admitido");
                 return false;
             }
         }

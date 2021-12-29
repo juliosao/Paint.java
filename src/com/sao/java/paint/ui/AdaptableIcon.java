@@ -17,6 +17,8 @@ import java.awt.image.BufferedImage;
 public class AdaptableIcon implements Icon{
 	protected static final BufferedImage FAILED;
 	BufferedImage image;
+	int minWidth;
+	int minHeight;
 
 	/**
 	 * Icon to use when resource load is failed
@@ -43,6 +45,26 @@ public class AdaptableIcon implements Icon{
 	{
 		try
 		{
+			minWidth=0;
+			minHeight=0;
+			image = ImageIO.read(url);
+		}
+		catch(Exception ex)
+		{
+			image = FAILED;
+		}
+	}
+
+	/**
+	 * Class constructor
+	 * @param url Url from wich the icon is loaded
+	 */
+	public AdaptableIcon(URL url, int minWidth, int minHeight)
+	{
+		try
+		{
+			this.minWidth=minWidth;
+			this.minHeight=minHeight;
 			image = ImageIO.read(url);
 		}
 		catch(Exception ex)
@@ -60,8 +82,9 @@ public class AdaptableIcon implements Icon{
 	 */
 	public void paintIcon(Component component, Graphics graphics, int x, int y)
 	{
-		int w = Math.min(component.getWidth(),image.getWidth());
-		int h = Math.min(component.getHeight(),image.getHeight());
+
+		int w = minWidth <=0 ? Math.min(component.getWidth(),image.getWidth()) : minWidth;
+		int h = minHeight <= 0 ? Math.min(component.getHeight(),image.getHeight()) : minHeight;
 
 		if(h<w)
 		{
@@ -72,7 +95,10 @@ public class AdaptableIcon implements Icon{
 			h = w * image.getHeight() / image.getWidth();
 		}
 
-		graphics.drawImage(image, x-w/2, y-h/2, w, h, null);
+		x = minWidth <=0 ? x-w/2 : x;
+		y = minHeight <= 0 ? y-h/2 : y;
+
+		graphics.drawImage(image, x, y, w, h, null);
 	}
 
 	/**
@@ -81,7 +107,7 @@ public class AdaptableIcon implements Icon{
 	 */
 	public int getIconWidth()
 	{
-		return 0;
+		return minWidth;
 	}
 
 	/**
@@ -90,6 +116,6 @@ public class AdaptableIcon implements Icon{
 	 */
 	public int getIconHeight()
 	{
-		return 0;
+		return minHeight;
 	}
 }

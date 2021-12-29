@@ -16,8 +16,9 @@ import com.sao.java.paint.ui.DrawingPanel;
 public class RectangleSelection
 extends DrawingTool
 {
-	static final int SELECTING=0;
-	static final int SELECTED=1;
+	static final int NONE = 0;
+	static final int SELECTING=1;
+	static final int SELECTED=2;
 
 	static final BasicStroke selectionStroke = new BasicStroke(1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER );
 	static final Color selectionColor = new Color(0,0,255,50);
@@ -33,7 +34,7 @@ extends DrawingTool
 	int height;
 	BufferedImage originalImage;
 	BufferedImage pastedImage;
-	int status=SELECTING;
+	int status=NONE;
 	private static final Icon icon;
 
 	static
@@ -54,7 +55,7 @@ extends DrawingTool
 		g.clearRect(0, 0, width,height);
 		g.setStroke(selectionStroke);
 		pastedImage = null;
-		status = SELECTING;
+		status = NONE;
 	}
 
 	@Override
@@ -83,25 +84,25 @@ extends DrawingTool
 	@Override
 	public void onMousePressed(DrawingPanel dp, DrawingMouseEvent me)
 	{
+		if(me.button == DrawingMouseEvent.RIGHTBUTTON)
+		{
+			selectNone(dp);
+			return;
+		}
+
+
 		switch(status)
 		{
-			case SELECTING:
-				old=me.getPoint();
-				current=old;
-
-				g.setBackground(selectionBColor);
-				g.clearRect(0, 0, width,height);
-
-				if(pastedImage != null)
-				{
-					g.drawImage(pastedImage, old.x, old.y, 1, 1, null);
-				}
-				g.setColor(selectionColor);
-				g.drawRect(old.x, old.y, 1, 1 );
-				g.setColor(selectionBorderColor);
-				g.drawRect(old.x, old.y, 1, 1 );
+			case NONE:
+				updateCoords(me.getPoint());
+				draw();
+				dp.updateUI();
+				status = SELECTING;
 				break;
-
+			default:
+				updateCoords(me.getPoint());
+				draw();
+				dp.updateUI();
 		}
 	}
 
@@ -116,58 +117,88 @@ extends DrawingTool
 				originalImage = null;
 				old = null;
 				current = null;
-
 			}
 			return;
 		}
 
-		switch(status)
-		{
-			case SELECTING:
-				current =  me.getPoint();
-				int x = old.x < current.x ? old.x : current.x;
-				int y = old.y < current.y ? old.y : current.y;
-				int w = Math.abs(old.x - current.x);
-				int h = Math.abs(old.y - current.y);
+		updateCoords(me.getPoint());
+		draw();
+		dp.updateUI();
+		status = SELECTED;
 
-				g.setBackground(selectionBColor);
-				g.clearRect(0, 0, width,height);
-				if(pastedImage != null)
-				{
-					g.drawImage(pastedImage, x, y, w, h, null);
-				}
-				g.setColor(selectionColor);;
-				g.fillRect(x, y, w, h);
-				g.setColor(selectionBorderColor);
-				g.drawRect(x,y,w,h);
-		}
 	}
 
 	@Override
 	public void onMouseDragged(DrawingPanel dp,  DrawingMouseEvent me)
 	{
+		updateCoords(me.getPoint());
+		draw();
+		dp.updateUI();
+	}
+
+	void updateCoords(Point tmp)
+	{
+		Point a,b,c,d,selected;
+		double dist,selDist;
+
 		switch(status)
 		{
-			case SELECTING:
-				current =  me.getPoint();
-				int x = old.x < current.x ? old.x : current.x;
-				int y = old.y < current.y ? old.y : current.y;
-				int w = Math.abs(old.x - current.x);
-				int h = Math.abs(old.y - current.y);
-				g.setColor(selectionBColor);
-				g.clearRect(0, 0, width,height);
-				if(pastedImage != null)
-				{
-					g.drawImage(pastedImage, x, y, w, h, null);
-				}
-				g.setColor(selectionColor);;
-				g.fillRect(x, y, w, h);
-				g.setColor(selectionBorderColor);
-				g.drawRect(x,y,w,h);
+			case NONE:
+				old=current = tmp;
 				break;
+
+			case SELECTING:
+				current = tmp;
+				break;
+
+			case SELECTED:
+				a = new Point(old);
+				b = new Point(old.x,current.y);
+				c = new Point(current);
+				d = new Point(current.x, old.y);
+
+				selected = a;
+				selDist = Math.sqrt( Math.pow(a.x-tmp.x,2) + Math.pow(a.y-tmp.y,2) );
+
+				dist = Math.sqrt( Math.pow(b.x-tmp.x,2) + Math.pow(b.y-tmp.y,2) );
+				if(dist<selDist)
+				{
+					selDist=dist;
+					selected=b;
+				}
+
+				dist = Math.sqrt( Math.pow(c.x-tmp.x,2) + Math.pow(c.y-tmp.y,2) );
+				if(dist<selDist)
+				{
+					selDist=dist;
+					selected=c;
+				}
+
+				dist = Math.sqrt( Math.pow(d.x-tmp.x,2) + Math.pow(d.y-tmp.y,2) );
+				if(dist<selDist)
+				{
+					selected=d;
+				}
+
+				if(selected == a)
+				{
+					old = tmp;
+				}
+				else if(selected == b)
+				{
+					old.x = tmp.x;
+					current.y = tmp.y;
+				}
+				else if(selected == c)
+				{
+					current = tmp;
+				}
+				else
+				{
+					current.x = tmp.x;
+					old.y = tmp.y;
+				}
 		}
-
-
 	}
 
 	/**
@@ -225,9 +256,6 @@ extends DrawingTool
 		if(!forceTransparency)
 			updateTransparency(dp);
 
-		g.setColor(selectionBColor);
-		g.clearRect(0, 0, width,height);
-
 		if(old==null)
 		{
 			old = dp.getScrollPossition();
@@ -250,22 +278,9 @@ extends DrawingTool
 			y = old.y + h/4;
 
 			current = new Point(x+w,y+h);
-
-			g.drawImage(img, x, y, w, h, null);
-		}
-		else
-		{
-			x = old.x < current.x ? old.x : current.x;
-			y = old.y < current.y ? old.y : current.y;
-			w = Math.abs(old.x - current.x);
-			h = Math.abs(old.y - current.y);
-			g.drawImage(pastedImage, x, y, w, h, null);
 		}
 
-		g.setColor(selectionColor);;
-		g.fillRect(x, y, w, h);
-		g.setColor(selectionBorderColor);
-		g.drawRect(x,y,w,h);
+		draw();
 		dp.updateUI();
 	}
 
@@ -277,21 +292,12 @@ extends DrawingTool
 	{
 		old = new Point(0,0);
 		current =  new Point(width,height);
-
-		int x = old.x < current.x ? old.x : current.x;
-		int y = old.y < current.y ? old.y : current.y;
-		int w = Math.abs(old.x - current.x);
-		int h = Math.abs(old.y - current.y);
-		g.setColor(selectionBColor);
-		g.clearRect(0, 0, width,height);
 		if(pastedImage != null)
 		{
 			pastedImage = null;
 		}
-		g.setColor(selectionColor);;
-		g.fillRect(x, y, w, h);
-		g.setColor(selectionBorderColor);
-		g.drawRect(x, y, w, h);
+
+		draw();
 		dp.updateUI();
 	}
 
@@ -303,6 +309,7 @@ extends DrawingTool
 	{
 		old = null;
 		current = null;
+		status = NONE;
 
 		g.setColor(selectionBColor);
 		g.clearRect(0, 0, width,height);
@@ -313,7 +320,8 @@ extends DrawingTool
 		dp.updateUI();
 	}
 
-	public Rectangle getBounds(){
+	public Rectangle getBounds()
+	{
 		if(old == null)
 			return null;
 
@@ -342,6 +350,28 @@ extends DrawingTool
 	public boolean getTransparentSelection()
 	{
 		return transparenSelection;
+	}
+
+	protected void draw()
+	{
+		if(old==null)
+			return;
+
+		final int x = old.x < current.x ? old.x : current.x;
+		final int y = old.y < current.y ? old.y : current.y;
+		final int w = Math.abs(old.x - current.x);
+		final int h = Math.abs(old.y - current.y);
+
+		g.setColor(selectionBColor);
+		g.clearRect(0, 0, width,height);
+		if(pastedImage != null)
+		{
+			g.drawImage(pastedImage, x, y, w, h, null);
+		}
+		g.setColor(selectionColor);;
+		g.fillRect(x, y, w, h);
+		g.setColor(selectionBorderColor);
+		g.drawRect(x, y, w, h);
 	}
 
 	/**

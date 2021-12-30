@@ -102,6 +102,7 @@ public class JPaintMainWindow extends JFrame
 	Smudge smudge = new Smudge();
 	Brush brush = new Brush();
 	RectangleSelection rectangleSelection = new RectangleSelection();
+	ColorSelectionTool colorSelection = new ColorSelectionTool();
 	Text text = new Text(this,rectangleSelection);
 	Clone clone = new Clone();
 	Blur blur = new Blur();
@@ -173,7 +174,7 @@ public class JPaintMainWindow extends JFrame
 		tools = new DrawingTool[]{
 			pencil, brush, airbrush, erase, line, curve, rectangle, ellipse, text, fill,
 			smudge, blur, sharpen, light, dark, clone,
-			colorPicker, rectangleSelection
+			colorPicker, rectangleSelection, colorSelection
 		};
 		buttons = new JToggleButton[tools.length];
 
@@ -272,7 +273,7 @@ public class JPaintMainWindow extends JFrame
 			@Override
 			public void stateChanged(javax.swing.event.ChangeEvent evt) {
 				lblWidth.setText(""+jslWidth.getValue()+" px");
-				drawingPanel.setStroke(new BasicStroke((int)jslWidth.getValue(),BasicStroke.CAP_BUTT,BasicStroke.JOIN_MITER));
+				drawingPanel.setStroke(new BasicStroke((int)jslWidth.getValue(),BasicStroke.CAP_SQUARE,BasicStroke.JOIN_MITER));
 			}
 		});
 		jslWidth.setValue(5);
@@ -418,9 +419,13 @@ public class JPaintMainWindow extends JFrame
 		mnu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,ActionEvent.CTRL_MASK));
 		mnu.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
-				BufferedImage img = rectangleSelection.cut(drawingPanel);
-				ImageSelection imgSel = new ImageSelection(img);
-				Toolkit.getDefaultToolkit().getSystemClipboard().setContents(imgSel, null);
+				DrawingTool dt = drawingPanel.getDrawingTool();
+				if(dt instanceof SelectionTool)
+				{
+					BufferedImage img = ((SelectionTool)dt).cut(drawingPanel);
+					ImageSelection imgSel = new ImageSelection(img);
+					imgSel.copyToClipboard();
+				}
 			}
 		});
 		menuEdit.add(mnu);
@@ -429,9 +434,13 @@ public class JPaintMainWindow extends JFrame
 		mnu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,ActionEvent.CTRL_MASK));
 		mnu.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt) {
-				BufferedImage img = rectangleSelection.copy(drawingPanel);
-				ImageSelection imgSel = new ImageSelection(img);
-				imgSel.copyToClipboard();
+				DrawingTool dt = drawingPanel.getDrawingTool();
+				if(dt instanceof SelectionTool)
+				{
+					BufferedImage img = ((SelectionTool)dt).copy(drawingPanel);
+					ImageSelection imgSel = new ImageSelection(img);
+					imgSel.copyToClipboard();
+				}
 			}
 		});
 		menuEdit.add(mnu);

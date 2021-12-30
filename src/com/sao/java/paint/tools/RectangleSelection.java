@@ -14,7 +14,8 @@ import com.sao.java.paint.i18n.Translator;
 import com.sao.java.paint.ui.DrawingPanel;
 
 public class RectangleSelection
-extends DrawingTool
+	extends DrawingTool
+	implements SelectionTool
 {
 	static final int NONE = 0;
 	static final int SELECTING=1;

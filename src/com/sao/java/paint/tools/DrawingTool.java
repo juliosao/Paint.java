@@ -7,7 +7,6 @@ import java.awt.Cursor;
 import java.net.URL;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 
 /**
  * Represents a drawing tool

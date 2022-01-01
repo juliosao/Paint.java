@@ -2,7 +2,7 @@
 	<description>
 		Simple paint program written in java
 	</description>
-	<property name="version" value="0.2"/>
+	<property name="version" value="0.3"/>
 	<property name="src" location="src"/>
 	<property name="extras" location="extras"/>
 	<property name="build" location="build"/>
@@ -93,5 +93,11 @@
 			<arg line="--build --root-owner-group ${work} ${dist}.deb"/>
 		</exec>
 
+	</target>
+
+	<target name="msi" depends="dist">
+		<exec dir="." executable="jpackage.exe">
+			<arg line="-n paint.java --app-version ${version} -i ${dist} --main-jar paintjava.jar -t msi -d dist --icon extras/icon.ico --win-menu --win-dir-chooser"/>
+		</exec>
 	</target>
 </project>

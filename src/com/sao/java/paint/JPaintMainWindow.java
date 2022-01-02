@@ -89,7 +89,7 @@ public class JPaintMainWindow extends JFrame
 	JSpinner zoomer;
 	Container container;
 	File currentFile = null;
-	static final String TITLE = "Paint.java v0.2";
+	static final String TITLE = "Paint.java v0.3";
 
 	Pencil pencil = new Pencil();
 	Line line = new Line();

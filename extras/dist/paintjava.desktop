@@ -6,9 +6,8 @@ Name=Paint.java
 Comment=A Simple drawing program written in java
 Exec=/opt/sao/paintjava/paintjava.sh
 Path=/opt/sao/paintjava
-Icon=/usr/share/icons/gnome/scalable/categories/applications-graphics-symbolic.svg
+Icon=/opt/sao/paintjava/icon.png
 Terminal=false
 Type=Application
 Categories=Graphics
 MimeType=application/x-protocol
-

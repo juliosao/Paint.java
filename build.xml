@@ -37,6 +37,7 @@
 		</jar>
 		<copy todir="${dist}">
 			<fileset dir=".">
+				<include name="changelog"/>
 				<include name="README.md"/>
 				<include name="LICENSE"/>
 			</fileset>
@@ -86,6 +87,11 @@
 		<copy todir="${work}">
 			<fileset dir="extras">
 				<include name="DEBIAN/**" />
+			</fileset>
+		</copy>
+		<copy todir="${work}/DEBIAN">
+			<fileset dir=".">
+				<include name="changelog" />
 			</fileset>
 		</copy>
 		<exec dir="." executable="dpkg-deb" >

@@ -25,7 +25,7 @@ public class Invert
 				int g = ((oldColor) >> 8) & 255;
 				int b = oldColor & 255;
 
-				if((mode & ImageFilter.MODE_R) != 0)
+				if((mode & ImageFilter.MODE_A) != 0)
 				{
 					a = 255-a;
 				}
